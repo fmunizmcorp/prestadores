@@ -1,0 +1,54 @@
+# Sistema de Gestão de Prestadores - Clinfec
+# .gitignore
+
+# Logs
+logs/*.log
+logs/*.txt
+*.log
+
+# Cache e temporários
+cache/
+tmp/
+temp/
+*.tmp
+*.cache
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# Configurações sensíveis
+config/local.php
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Composer
+vendor/
+composer.lock
+
+# NPM
+node_modules/
+package-lock.json
+
+# PHP
+*.php~
+
+# Backups
+*.bak
+*.backup
+*.sql.gz
+*.sql.zip
+
+# Session files
+sessions/
