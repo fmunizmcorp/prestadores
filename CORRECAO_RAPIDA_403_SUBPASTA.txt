@@ -1,0 +1,233 @@
+═══════════════════════════════════════════════════════════════
+   🚨 CORREÇÃO RÁPIDA ERRO 403 - SUBPASTA PRESTADORES 🚨
+═══════════════════════════════════════════════════════════════
+
+SITUAÇÃO: Arquivos em public_html/prestadores/ → Erro 403
+
+═══════════════════════════════════════════════════════════════
+   ⚡ FAÇA ISSO AGORA (3 PASSOS - 5 MINUTOS)
+═══════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│ PASSO 1: VERIFICAR/CORRIGIR ESTRUTURA                        │
+└─────────────────────────────────────────────────────────────┘
+
+❌ ERRADO (se você tem isso):
+public_html/
+└── prestadores/
+    └── public/          ← PROBLEMA!
+        ├── index.php
+        ├── css/
+        └── js/
+
+✅ CORRETO (deve ficar assim):
+public_html/
+└── prestadores/         ← Sua subpasta
+    ├── index.php       ← INDEX.PHP AQUI!
+    ├── .htaccess       ← .HTACCESS AQUI!
+    ├── css/
+    ├── js/
+    ├── config/
+    ├── database/
+    ├── src/
+    └── uploads/
+
+🔧 AÇÃO:
+Via File Manager Hostinger:
+1. Entre em public_html/prestadores/
+2. Se tem pasta "public/" dentro:
+   → Selecione TODO conteúdo de public/
+   → Clique em "Move"
+   → Volte para prestadores/
+   → Clique em "Move Here"
+   → Delete a pasta public/ vazia
+3. Confirme: index.php está em prestadores/index.php
+
+
+┌─────────────────────────────────────────────────────────────┐
+│ PASSO 2: EDITAR .htaccess                                    │
+└─────────────────────────────────────────────────────────────┘
+
+📁 Arquivo: public_html/prestadores/.htaccess
+
+🔧 AÇÃO:
+1. Abra o arquivo .htaccess no File Manager
+2. Clique em "Edit"
+3. APAGUE TUDO
+4. COLE o conteúdo abaixo:
+
+─────────────────────────────────────────────────────────────
+RewriteEngine On
+RewriteBase /prestadores/
+
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RewriteRule ^(config|database|src|docs)/ - [F,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+Options -Indexes
+─────────────────────────────────────────────────────────────
+
+🔴 LINHA MAIS IMPORTANTE:
+RewriteBase /prestadores/     ← ESSENCIAL PARA SUBPASTA!
+
+5. Clique em "Save"
+
+
+┌─────────────────────────────────────────────────────────────┐
+│ PASSO 3: EDITAR config/config.php                            │
+└─────────────────────────────────────────────────────────────┘
+
+📁 Arquivo: public_html/prestadores/config/config.php
+
+🔧 AÇÃO:
+1. Abra config/config.php no File Manager
+2. Encontre estas linhas e ALTERE:
+
+─────────────────────────────────────────────────────────────
+ANTES (errado):
+'base_url' => 'https://seudominio.com.br',
+'upload_url' => '/uploads/',
+
+DEPOIS (correto):
+'base_url' => 'https://seudominio.com.br/prestadores',
+'upload_url' => '/prestadores/uploads/',
+─────────────────────────────────────────────────────────────
+
+🔴 ADICIONE /prestadores em AMBAS as linhas!
+
+3. Clique em "Save"
+
+
+═══════════════════════════════════════════════════════════════
+   🧪 TESTE AGORA
+═══════════════════════════════════════════════════════════════
+
+1. Crie arquivo: public_html/prestadores/test.php
+
+   Conteúdo:
+   ─────────────────────────────────────────────────────────
+   <?php
+   echo "✅ PHP funcionando!<br>";
+   echo "Versão: " . PHP_VERSION;
+   ?>
+   ─────────────────────────────────────────────────────────
+
+2. Acesse: https://seudominio.com.br/prestadores/test.php
+
+   ✅ FUNCIONOU? → Ótimo! Delete test.php e acesse o sistema
+   ❌ AINDA 403? → Veja PASSO 4 abaixo
+
+
+═══════════════════════════════════════════════════════════════
+   🔧 PASSO 4: PERMISSÕES (SE AINDA DER ERRO)
+═══════════════════════════════════════════════════════════════
+
+Via File Manager:
+
+1. Clique direito em "prestadores/"
+2. Permissions → 755 (rwxr-xr-x)
+3. Marque "Apply to subdirectories"
+4. Save
+
+5. Depois faça o mesmo para:
+   - prestadores/index.php → 644
+   - prestadores/.htaccess → 644
+   - prestadores/uploads/ → 755 (ou 777 se necessário)
+
+
+═══════════════════════════════════════════════════════════════
+   ✅ CHECKLIST FINAL
+═══════════════════════════════════════════════════════════════
+
+Antes de acessar, confirme:
+
+☐ index.php está em: prestadores/index.php (NÃO em prestadores/public/)
+☐ .htaccess tem linha: RewriteBase /prestadores/
+☐ config.php tem: 'base_url' => '.../prestadores'
+☐ config.php tem: 'upload_url' => '/prestadores/uploads/'
+☐ Permissões: prestadores/ = 755
+☐ Permissões: index.php = 644
+☐ test.php funciona
+
+
+═══════════════════════════════════════════════════════════════
+   🌐 URLs DE ACESSO
+═══════════════════════════════════════════════════════════════
+
+Após corrigir:
+
+Teste:
+https://seudominio.com.br/prestadores/test.php
+
+Login:
+https://seudominio.com.br/prestadores/
+
+Sistema:
+https://seudominio.com.br/prestadores/?page=dashboard
+
+
+═══════════════════════════════════════════════════════════════
+   ❓ SE AINDA NÃO FUNCIONAR
+═══════════════════════════════════════════════════════════════
+
+Me informe:
+
+1. Estrutura:
+   - Tem pasta prestadores/public/? SIM ou NÃO
+   - index.php está em qual caminho EXATO?
+
+2. .htaccess:
+   - Tem linha "RewriteBase /prestadores/"? SIM ou NÃO
+   - Cole as primeiras 5 linhas do arquivo
+
+3. config.php:
+   - Qual valor de 'base_url'?
+   - Qual valor de 'upload_url'?
+
+4. Error log:
+   - Painel Hostinger → Arquivos → Logs → error_log
+   - Cole as últimas 3 linhas
+
+5. Teste:
+   - O que aparece ao acessar test.php?
+
+
+═══════════════════════════════════════════════════════════════
+   📚 DOCUMENTAÇÃO COMPLETA
+═══════════════════════════════════════════════════════════════
+
+Criada no GitHub (acabei de fazer push):
+
+- CORRECAO_SUBPASTA_HOSTINGER.md (guia completo)
+- .htaccess.subpasta (arquivo pronto)
+- config.subpasta.php (exemplo completo)
+
+Baixe em: https://github.com/fmunizmcorp/prestadores
+
+
+═══════════════════════════════════════════════════════════════
+   💡 RESUMO
+═══════════════════════════════════════════════════════════════
+
+Erro 403 em subpasta é causado por:
+
+1. ❌ Arquivos dentro de prestadores/public/ 
+   ✅ MOVER para prestadores/
+
+2. ❌ .htaccess sem RewriteBase /prestadores/
+   ✅ ADICIONAR essa linha
+
+3. ❌ config.php sem /prestadores nas URLs
+   ✅ ADICIONAR /prestadores
+
+Faça os 3 passos e funcionará! 🚀
+
+
+═══════════════════════════════════════════════════════════════
+FIM - Boa sorte! Me avise o resultado!
+═══════════════════════════════════════════════════════════════
