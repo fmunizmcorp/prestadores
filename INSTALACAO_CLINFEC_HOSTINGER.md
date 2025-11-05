@@ -41,6 +41,7 @@ cd prestadores
 2. **Navegue até:** `public_html/prestadores/`
 3. **DELETE TUDO** que está lá (faça backup se necessário)
 4. **Selecione todos os arquivos** do projeto (extraídos do ZIP)
+   - ⚠️ **IMPORTANTE:** Inclua a pasta `uploads/` vazia!
 5. **Arraste ou clique em Upload**
 6. **Aguarde** o upload completar
 
@@ -51,21 +52,22 @@ Após upload, a estrutura deve ficar:
 ```
 public_html/
 └── prestadores/              ← Sua subpasta
-    ├── index.php            ← ARQUIVO PRINCIPAL (novo)
-    ├── .htaccess            ← CONFIGURAÇÃO APACHE (novo)
+    ├── index.php            ← ARQUIVO PRINCIPAL (corrigido)
+    ├── .htaccess            ← CONFIGURAÇÃO APACHE
     ├── config/              
-    │   ├── config.php       ← JÁ CONFIGURADO (novo)
+    │   ├── config.php       ← JÁ CONFIGURADO
     │   └── database.php     ← JÁ TEM SUAS CREDENCIAIS
     ├── database/
     │   └── migrations/
     ├── src/
+    │   ├── Database.php     ← Classe de conexão
+    │   ├── DatabaseMigration.php  ← Classe de migrations
     │   ├── controllers/
     │   ├── models/
-    │   ├── views/
-    │   └── helpers/
+    │   └── views/
     ├── css/
     ├── js/
-    ├── uploads/
+    ├── uploads/             ← DEVE EXISTIR (vazia com README.md)
     ├── docs/
     └── *.md (documentação)
 ```
@@ -83,10 +85,16 @@ Via File Manager do Hostinger:
 - Clique **"Save"**
 
 ### 2. Pasta uploads (IMPORTANTE!):
+- ⚠️ **ATENÇÃO:** Se a pasta `uploads/` não veio no ZIP, crie manualmente!
 - Entre em `prestadores/uploads/`
 - Clique direito → **Permissions**
 - Configure: **777** (rwxrwxrwx) - necessário para uploads
 - Clique **"Save"**
+
+**Como criar se não existir:**
+- Dentro de `prestadores/`, clique em **"New Folder"**
+- Nome: `uploads`
+- Depois configure permissão 777
 
 ### 3. Verificar arquivos principais:
 ```

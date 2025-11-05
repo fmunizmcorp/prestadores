@@ -20,8 +20,9 @@ URL DO SISTEMA: https://clinfec.com.br/prestadores
 1. Acesse File Manager do Hostinger
 2. Navegue até: public_html/prestadores/
 3. DELETE TUDO que está lá
-4. UPLOAD de todos os arquivos deste ZIP
+4. UPLOAD de todos os arquivos deste ZIP (incluindo pasta uploads/)
 5. Aguarde completar
+6. Se pasta uploads/ não vier, CRIE manualmente
 
 ═══════════════════════════════════════════════════════════════
   🔧 APÓS UPLOAD
@@ -31,6 +32,11 @@ URL DO SISTEMA: https://clinfec.com.br/prestadores
    
    prestadores/           → 755
    prestadores/uploads/   → 777 (IMPORTANTE!)
+   
+   ⚠️ Se pasta uploads/ não existir, CRIE primeiro:
+   - Dentro de prestadores/, clique "New Folder"
+   - Nome: uploads
+   - Depois configure permissão 777
    
    Como fazer:
    - Clique direito na pasta
