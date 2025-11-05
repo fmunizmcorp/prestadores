@@ -1,0 +1,158 @@
+═══════════════════════════════════════════════════════════════
+  🚨 NOVA CORREÇÃO - MÉTODO MIGRATIONS
+═══════════════════════════════════════════════════════════════
+
+ERRO: Call to private method runMigrations() from global scope
+
+STATUS: ✅ CORRIGIDO NO GITHUB (commit fb4809e)
+
+═══════════════════════════════════════════════════════════════
+  ⚡ SOLUÇÃO IMEDIATA (2 MINUTOS)
+═══════════════════════════════════════════════════════════════
+
+OPÇÃO 1: SUBSTITUIR APENAS index.php (RÁPIDO)
+─────────────────────────────────────────────────────────────
+
+1. Baixe index.php atualizado:
+   https://github.com/fmunizmcorp/prestadores
+   → Clique em "index.php"
+   → Clique em "Raw"
+   → Ctrl+S para salvar
+
+2. Via File Manager Hostinger:
+   → Entre em prestadores/
+   → Delete o index.php antigo
+   → Upload do index.php novo
+
+3. Teste:
+   https://clinfec.com.br/prestadores/
+
+
+OPÇÃO 2: RE-BAIXAR ZIP COMPLETO
+─────────────────────────────────────────────────────────────
+
+1. Baixe ZIP atualizado:
+   https://github.com/fmunizmcorp/prestadores
+
+2. Delete tudo em prestadores/
+
+3. Upload dos arquivos novos
+
+4. Teste
+
+
+═══════════════════════════════════════════════════════════════
+  🔧 O QUE FOI CORRIGIDO
+═══════════════════════════════════════════════════════════════
+
+Arquivo: index.php (linha 77)
+
+ANTES (errado):
+$result = $migration->runMigrations();
+
+DEPOIS (correto):
+$result = $migration->checkAndMigrate();
+
+POR QUÊ:
+- runMigrations() é PRIVADO (não pode ser chamado fora da classe)
+- checkAndMigrate() é PÚBLICO (método correto para usar)
+
+
+═══════════════════════════════════════════════════════════════
+  ✅ RESULTADO ESPERADO
+═══════════════════════════════════════════════════════════════
+
+Após corrigir:
+
+1. Acesse: https://clinfec.com.br/prestadores/
+
+2. Sistema irá:
+   ✅ Executar migrations automaticamente
+   ✅ Criar tabelas no banco de dados
+   ✅ Redirecionar para login
+
+3. Login:
+   Usuário: admin
+   Senha: admin123
+
+
+═══════════════════════════════════════════════════════════════
+  📋 CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+Antes de testar:
+
+☐ Baixou index.php atualizado do GitHub
+☐ Substituiu em prestadores/index.php
+☐ Pasta uploads/ existe com permissão 777
+☐ Testou: https://clinfec.com.br/prestadores/
+
+
+═══════════════════════════════════════════════════════════════
+  🐛 SE AINDA DER ERRO
+═══════════════════════════════════════════════════════════════
+
+1. Verifique se substituiu o arquivo:
+   File Manager → prestadores/index.php
+   → Clique direito → Edit
+   → Procure por "checkAndMigrate" na linha 77
+   → Se não encontrar, arquivo não foi substituído
+
+2. Veja error_log:
+   Painel Hostinger → Files → Logs → error_log
+
+3. Ative debug:
+   Edite index.php, linha 15:
+   ini_set('display_errors', 1);
+
+4. Me envie:
+   - Erro exato
+   - Última linha do error_log
+   - Confirmação: index.php tem "checkAndMigrate"? SIM/NÃO
+
+
+═══════════════════════════════════════════════════════════════
+  📦 STATUS GITHUB
+═══════════════════════════════════════════════════════════════
+
+Último commit: fb4809e
+Branch: main
+Arquivo corrigido: index.php (linha 77)
+Status: ✅ Pronto para download
+
+URL: https://github.com/fmunizmcorp/prestadores
+
+
+═══════════════════════════════════════════════════════════════
+  🎯 RESUMO
+═══════════════════════════════════════════════════════════════
+
+Erro: Método privado runMigrations()
+Causa: Tentativa de chamar método privado
+Solução: Usar método público checkAndMigrate()
+
+Correção: ✅ Aplicada (commit fb4809e)
+
+Ação necessária:
+1. Baixar index.php atualizado
+2. Substituir em prestadores/
+3. Testar login
+
+Tempo: 2 minutos
+
+
+═══════════════════════════════════════════════════════════════
+  🚀 PRÓXIMO PASSO
+═══════════════════════════════════════════════════════════════
+
+Depois de corrigir e sistema funcionar:
+
+1. Delete test.php (se ainda existir)
+2. Faça login: admin / admin123
+3. TROQUE A SENHA imediatamente
+4. Comece a usar o sistema!
+
+
+═══════════════════════════════════════════════════════════════
+FIM - Baixe o index.php novo e teste! 🚀
+═══════════════════════════════════════════════════════════════
