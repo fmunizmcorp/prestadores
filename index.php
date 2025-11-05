@@ -6,57 +6,64 @@
  * URL: https://clinfec.com.br/prestadores
  */
 
+// ==================== CONFIGURAÇÕES INICIAIS ====================
+
 // Iniciar sessão
 session_start();
 
 // Configurar timezone
 date_default_timezone_set('America/Sao_Paulo');
 
-// Configurar error reporting (EM PRODUÇÃO: display_errors = 0)
+// Configurar error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);  // Mude para 0 em produção
 ini_set('log_errors', 1);
 
-// Definir constantes de caminho
-define('ROOT_PATH', __DIR__);  // Raiz é public_html/prestadores/
+// ==================== DEFINIR CAMINHOS ====================
+
+define('ROOT_PATH', __DIR__);
 define('CONFIG_PATH', ROOT_PATH . '/config');
 define('SRC_PATH', ROOT_PATH . '/src');
-define('BASE_URL', '/prestadores');  // Importante para subpasta
+define('BASE_URL', '/prestadores');
 
-// Gerar CSRF Token se não existir
+// ==================== GERAR CSRF TOKEN ====================
+
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Autoloader PSR-4
+// ==================== AUTOLOADER PSR-4 ====================
+
 spl_autoload_register(function ($class) {
-    // Namespace base
-    $prefix = 'App\\';
+    // Converter namespace para caminho de arquivo
+    // Exemplo: App\Controllers\AuthController → src/controllers/AuthController.php
     
-    // Diretório base
-    $base_dir = SRC_PATH . '/';
-    
-    // Verificar se a classe usa o namespace
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        return;
+    // Remover prefixo App\
+    if (strpos($class, 'App\\') === 0) {
+        $class = substr($class, 4);
     }
     
-    // Nome relativo da classe
-    $relative_class = substr($class, $len);
+    // Converter namespace para caminho
+    $file = SRC_PATH . '/' . str_replace('\\', '/', $class) . '.php';
     
-    // Substituir namespace por diretório
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    // Converter para lowercase nas pastas (controllers, models, etc)
+    $file = preg_replace_callback('/\/([A-Z][a-z]+)\//', function($matches) {
+        return '/' . strtolower($matches[1]) . '/';
+    }, $file);
     
     // Carregar arquivo se existir
     if (file_exists($file)) {
-        require $file;
+        require_once $file;
+        return true;
     }
+    
+    return false;
 });
 
-// Carregar configurações (verifica se existem)
+// ==================== CARREGAR CONFIGURAÇÕES ====================
+
 if (!file_exists(CONFIG_PATH . '/config.php')) {
-    die('ERRO: Arquivo config/config.php não encontrado! Verifique a instalação.');
+    die('ERRO: Arquivo config/config.php não encontrado!');
 }
 
 if (!file_exists(CONFIG_PATH . '/database.php')) {
@@ -66,14 +73,15 @@ if (!file_exists(CONFIG_PATH . '/database.php')) {
 $config = require CONFIG_PATH . '/config.php';
 $dbConfig = require CONFIG_PATH . '/database.php';
 
-// Importar classes necessárias
-use App\Database;
-use App\DatabaseMigration;
+// ==================== EXECUTAR MIGRATIONS ====================
 
-// Executar migrations automaticamente (apenas uma vez por sessão)
 try {
+    // Importar classes necessárias
+    require_once SRC_PATH . '/Database.php';
+    require_once SRC_PATH . '/DatabaseMigration.php';
+    
     if (!isset($_SESSION['migrations_executed'])) {
-        $migration = new DatabaseMigration();
+        $migration = new App\DatabaseMigration();
         $result = $migration->checkAndMigrate();
         
         if (!$result['success']) {
@@ -86,44 +94,37 @@ try {
         $_SESSION['migrations_executed'] = true;
     }
 } catch (Exception $e) {
-    // Log error
     error_log("Erro ao executar migrations: " . $e->getMessage());
-    
-    // Mostrar erro apenas se debug estiver ativo
     if (!empty($config['debug'])) {
         die("Erro ao executar migrations: " . $e->getMessage());
     }
 }
 
-// Verificar se usuário está logado (exceto páginas públicas)
-$publicPages = ['login', 'logout'];
+// ==================== VERIFICAR LOGIN ====================
 
-// Pegar a página da URL
+$publicPages = ['login', 'logout'];
 $page = $_GET['page'] ?? 'dashboard';
 
-// Se não está logado e não é página pública, redirecionar para login
 if (!isset($_SESSION['user_id']) && !in_array($page, $publicPages)) {
     header('Location: ' . BASE_URL . '/?page=login');
     exit;
 }
 
-// Roteamento simples baseado em query string
+// ==================== OBTER PARÂMETROS ====================
+
 $action = $_GET['action'] ?? 'index';
 $id = $_GET['id'] ?? null;
 
-// Importar controllers
-use App\Controllers\AuthController;
-use App\Controllers\EmpresaTomadoraController;
-use App\Controllers\EmpresaPrestadoraController;
-use App\Controllers\ServicoController;
-use App\Controllers\ContratoController;
+// ==================== ROTEAMENTO ====================
 
-// Roteamento
 try {
     switch ($page) {
+        
         // ==================== AUTENTICAÇÃO ====================
         case 'login':
-            $controller = new AuthController();
+            require_once SRC_PATH . '/controllers/AuthController.php';
+            $controller = new App\Controllers\AuthController();
+            
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $controller->login();
             } else {
@@ -132,7 +133,8 @@ try {
             break;
             
         case 'logout':
-            $controller = new AuthController();
+            require_once SRC_PATH . '/controllers/AuthController.php';
+            $controller = new App\Controllers\AuthController();
             $controller->logout();
             break;
             
@@ -143,7 +145,8 @@ try {
             
         // ==================== EMPRESAS TOMADORAS ====================
         case 'empresas-tomadoras':
-            $controller = new EmpresaTomadoraController();
+            require_once SRC_PATH . '/controllers/EmpresaTomadoraController.php';
+            $controller = new App\Controllers\EmpresaTomadoraController();
             
             switch ($action) {
                 case 'index':
@@ -174,7 +177,8 @@ try {
             
         // ==================== EMPRESAS PRESTADORAS ====================
         case 'empresas-prestadoras':
-            $controller = new EmpresaPrestadoraController();
+            require_once SRC_PATH . '/controllers/EmpresaPrestadoraController.php';
+            $controller = new App\Controllers\EmpresaPrestadoraController();
             
             switch ($action) {
                 case 'index':
@@ -205,7 +209,8 @@ try {
             
         // ==================== SERVIÇOS ====================
         case 'servicos':
-            $controller = new ServicoController();
+            require_once SRC_PATH . '/controllers/ServicoController.php';
+            $controller = new App\Controllers\ServicoController();
             
             switch ($action) {
                 case 'index':
@@ -236,7 +241,8 @@ try {
             
         // ==================== CONTRATOS ====================
         case 'contratos':
-            $controller = new ContratoController();
+            require_once SRC_PATH . '/controllers/ContratoController.php';
+            $controller = new App\Controllers\ContratoController();
             
             switch ($action) {
                 case 'index':
@@ -323,7 +329,8 @@ try {
                         <p><strong>Arquivo:</strong> <?= htmlspecialchars($e->getFile()) ?></p>
                         <p><strong>Linha:</strong> <?= $e->getLine() ?></p>
                         <hr>
-                        <pre><?= htmlspecialchars($e->getTraceAsString()) ?></pre>
+                        <h5>Stack Trace:</h5>
+                        <pre style="text-align: left; max-height: 400px; overflow-y: auto;"><?= htmlspecialchars($e->getTraceAsString()) ?></pre>
                     </div>
                 <?php else: ?>
                     <p>Por favor, tente novamente mais tarde ou entre em contato com o suporte.</p>

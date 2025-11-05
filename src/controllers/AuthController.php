@@ -12,11 +12,18 @@ class AuthController {
     }
     
     /**
+     * Mostrar formulário de login
+     */
+    public function showLoginForm() {
+        require __DIR__ . '/../views/auth/login.php';
+    }
+    
+    /**
      * Login
      */
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            require __DIR__ . '/../views/auth/login.php';
+            $this->showLoginForm();
             return;
         }
         
@@ -25,7 +32,7 @@ class AuthController {
         
         if (empty($email) || empty($senha)) {
             $_SESSION['erro'] = 'E-mail e senha são obrigatórios.';
-            header('Location: /login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
             exit;
         }
         
@@ -34,23 +41,24 @@ class AuthController {
             
             if (!$usuario) {
                 $_SESSION['erro'] = 'E-mail ou senha inválidos.';
-                header('Location: /login');
+                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
                 exit;
             }
             
             if (!password_verify($senha, $usuario['senha'])) {
                 $_SESSION['erro'] = 'E-mail ou senha inválidos.';
-                header('Location: /login');
+                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
                 exit;
             }
             
             if (!$usuario['ativo']) {
                 $_SESSION['erro'] = 'Usuário inativo. Entre em contato com o administrador.';
-                header('Location: /login');
+                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
                 exit;
             }
             
             // Criar sessão
+            $_SESSION['user_id'] = $usuario['id'];  // Corrigido para user_id
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['usuario_nome'] = $usuario['nome'];
             $_SESSION['usuario_email'] = $usuario['email'];
@@ -61,13 +69,13 @@ class AuthController {
             $this->model->updateLastLogin($usuario['id']);
             
             $_SESSION['sucesso'] = 'Bem-vindo(a), ' . $usuario['nome'] . '!';
-            header('Location: /');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=dashboard');
             exit;
             
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao fazer login. Tente novamente.';
             error_log($e->getMessage());
-            header('Location: /login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
             exit;
         }
     }
@@ -77,7 +85,7 @@ class AuthController {
      */
     public function logout() {
         session_destroy();
-        header('Location: /login');
+        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
         exit;
     }
     
