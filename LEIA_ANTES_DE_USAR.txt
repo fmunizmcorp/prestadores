@@ -1,0 +1,162 @@
+═══════════════════════════════════════════════════════════════
+  🚀 CLINFEC PRESTADORES - PRONTO PARA UPLOAD NO HOSTINGER
+═══════════════════════════════════════════════════════════════
+
+URL DO SISTEMA: https://clinfec.com.br/prestadores
+
+═══════════════════════════════════════════════════════════════
+  ✅ O QUE FOI CORRIGIDO
+═══════════════════════════════════════════════════════════════
+
+✅ index.php       - Configurado para /prestadores
+✅ .htaccess       - RewriteBase /prestadores/
+✅ config.php      - URLs corretas com /prestadores
+✅ database.php    - Credenciais do Hostinger já configuradas
+
+═══════════════════════════════════════════════════════════════
+  📤 COMO FAZER UPLOAD
+═══════════════════════════════════════════════════════════════
+
+1. Acesse File Manager do Hostinger
+2. Navegue até: public_html/prestadores/
+3. DELETE TUDO que está lá
+4. UPLOAD de todos os arquivos deste ZIP
+5. Aguarde completar
+
+═══════════════════════════════════════════════════════════════
+  🔧 APÓS UPLOAD
+═══════════════════════════════════════════════════════════════
+
+1. Configurar Permissões:
+   
+   prestadores/           → 755
+   prestadores/uploads/   → 777 (IMPORTANTE!)
+   
+   Como fazer:
+   - Clique direito na pasta
+   - Permissions
+   - Configure o número
+   - Apply to subdirectories
+   - Save
+
+2. Testar PHP:
+   
+   Criar: prestadores/test.php
+   
+   <?php phpinfo(); ?>
+   
+   Acessar: https://clinfec.com.br/prestadores/test.php
+   
+   Se funcionar → PHP OK, pode deletar test.php
+
+3. Acessar Sistema:
+   
+   URL: https://clinfec.com.br/prestadores/
+   
+   Login: admin
+   Senha: admin123
+   
+   IMPORTANTE: Troque a senha depois!
+
+═══════════════════════════════════════════════════════════════
+  🐛 SE DER ERRO 500
+═══════════════════════════════════════════════════════════════
+
+1. Ativar Debug Temporário:
+   
+   Editar: prestadores/index.php (linha 15)
+   
+   Mudar de:
+   ini_set('display_errors', 0);
+   
+   Para:
+   ini_set('display_errors', 1);
+   
+   Acessar o site novamente → verá o erro na tela
+
+2. Ver Log de Erro:
+   
+   Painel Hostinger → Files → Logs → error_log
+   
+   As últimas linhas mostrarão o erro
+
+3. Verificar:
+   
+   ☐ Pasta src/ foi enviada?
+   ☐ Pasta database/ foi enviada?
+   ☐ Permissões corretas (755/777)?
+   ☐ database.php tem credenciais corretas?
+
+═══════════════════════════════════════════════════════════════
+  📁 ESTRUTURA CORRETA (APÓS UPLOAD)
+═══════════════════════════════════════════════════════════════
+
+public_html/prestadores/
+├── index.php                 ← Novo (11KB)
+├── .htaccess                 ← Novo (2KB)
+├── config/
+│   ├── config.php           ← Novo (3KB)
+│   └── database.php         ← Já estava correto
+├── database/
+│   └── migrations/
+├── src/
+│   ├── controllers/
+│   ├── models/
+│   ├── views/
+│   └── helpers/
+├── css/
+├── js/
+├── uploads/                  ← Permissão 777!
+└── docs/
+
+═══════════════════════════════════════════════════════════════
+  ✅ CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+Antes de considerar pronto:
+
+☐ Todos arquivos enviados
+☐ Permissões: prestadores/ = 755
+☐ Permissões: uploads/ = 777
+☐ test.php funciona (https://clinfec.com.br/prestadores/test.php)
+☐ Sistema abre login (https://clinfec.com.br/prestadores/)
+☐ Login admin/admin123 funciona
+☐ Dashboard carrega
+☐ test.php foi DELETADO
+☐ Senha do admin foi TROCADA
+
+═══════════════════════════════════════════════════════════════
+  📞 SE PRECISAR DE AJUDA
+═══════════════════════════════════════════════════════════════
+
+Me envie:
+
+1. URL exata que está acessando
+2. Mensagem de erro (se aparecer)
+3. Últimas linhas do error_log
+4. Print da estrutura de pastas
+5. Resultado do test.php
+
+═══════════════════════════════════════════════════════════════
+  📚 DOCUMENTAÇÃO
+═══════════════════════════════════════════════════════════════
+
+Documentação completa no repositório:
+https://github.com/fmunizmcorp/prestadores
+
+Arquivos úteis:
+- INSTALACAO_CLINFEC_HOSTINGER.md (guia completo)
+- MANUAL_INSTALACAO_COMPLETO.md (manual de uso)
+- GUIA_RAPIDO_REFERENCIA.md (referência rápida)
+
+═══════════════════════════════════════════════════════════════
+  🎯 RESUMO EM 3 PASSOS
+═══════════════════════════════════════════════════════════════
+
+1. UPLOAD: Todos arquivos → public_html/prestadores/
+2. PERMISSÕES: uploads/ → 777
+3. TESTAR: https://clinfec.com.br/prestadores/
+
+BOA SORTE! 🚀
+
+═══════════════════════════════════════════════════════════════
