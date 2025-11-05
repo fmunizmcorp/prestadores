@@ -6,6 +6,33 @@
 - **CRUDs**: 3 principais (Projetos, Orçamentos, Alocações)
 - **Complexidade**: Alta
 - **Prioridade**: Core do sistema
+- **Status**: ⏳ PLANEJADA (Aguardando Sprint 4)
+
+---
+
+## 🔧 CONTEXTO DAS CORREÇÕES
+
+**IMPORTANTE:** Esta sprint será desenvolvida **APÓS** as correções aplicadas nas Sprints 1-3.
+
+### Correções que Impactam Esta Sprint:
+
+1. **Namespaces Corretos:**
+   - Controllers: `namespace App\Controllers;`
+   - Models: `namespace App\Models;`
+   
+2. **BASE_URL em Redirects:**
+   - Todos os redirects: `header('Location: ' . BASE_URL . '/?page=projetos');`
+   
+3. **Session Variables:**
+   - Usar `$_SESSION['user_id']` e `$_SESSION['usuario_id']`
+   
+4. **Autoloader PSR-4:**
+   - Classes carregam automaticamente
+   - Estrutura: `src/controllers/`, `src/models/`
+
+Para detalhes completos das correções, ver:
+- `docs/SPRINT_1_2_3_ATUALIZADO.md`
+- `docs/RESUMO_CORRECOES_APLICADAS.md`
 
 ---
 
@@ -20,8 +47,9 @@ Esta sprint implementa a **gestão completa de projetos**, incluindo:
 - Relatórios financeiros em tempo real
 
 **Dependências**:
-- Sprint 4 completa (Empresas e Contratos)
-- Tabelas de empresas, contratos e serviços criadas
+- ✅ Sprint 1, 2, 3 completas e corrigidas
+- ⏳ Sprint 4 completa (Empresas e Contratos)
+- ⏳ Tabelas de empresas, contratos e serviços criadas
 
 ---
 
@@ -30,6 +58,8 @@ Esta sprint implementa a **gestão completa de projetos**, incluindo:
 Ver arquivo principal `PLANEJAMENTO_ULTRA_DETALHADO.md`:
 - ✅ Dias 1-2: Estrutura de banco (7 tabelas)
 - ✅ Dias 3-4: Model Projeto.php (40+ métodos)
+
+**NOTA:** Códigos deste documento devem ser adaptados com as correções de namespace e BASE_URL.
 
 ---
 
