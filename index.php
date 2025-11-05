@@ -67,8 +67,8 @@ $config = require CONFIG_PATH . '/config.php';
 $dbConfig = require CONFIG_PATH . '/database.php';
 
 // Importar classes necessárias
-use App\Helpers\Database;
-use App\Helpers\DatabaseMigration;
+use App\Database;
+use App\DatabaseMigration;
 
 // Executar migrations automaticamente (apenas uma vez)
 try {
