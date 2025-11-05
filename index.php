@@ -70,11 +70,19 @@ $dbConfig = require CONFIG_PATH . '/database.php';
 use App\Database;
 use App\DatabaseMigration;
 
-// Executar migrations automaticamente (apenas uma vez)
+// Executar migrations automaticamente (apenas uma vez por sessão)
 try {
     if (!isset($_SESSION['migrations_executed'])) {
         $migration = new DatabaseMigration();
-        $result = $migration->runMigrations();
+        $result = $migration->checkAndMigrate();
+        
+        if (!$result['success']) {
+            error_log("Erro nas migrations: " . ($result['error'] ?? 'Erro desconhecido'));
+            if (!empty($config['debug'])) {
+                die("Erro ao executar migrations: " . ($result['error'] ?? 'Erro desconhecido'));
+            }
+        }
+        
         $_SESSION['migrations_executed'] = true;
     }
 } catch (Exception $e) {
