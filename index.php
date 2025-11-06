@@ -309,6 +309,155 @@ try {
             }
             break;
             
+        // ==================== PROJETOS ====================
+        case 'projetos':
+            require_once SRC_PATH . '/controllers/ProjetoController.php';
+            $controller = new App\Controllers\ProjetoController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show($id);
+                    break;
+                case 'dashboard':
+                    $controller->dashboard($id);
+                    break;
+                case 'edit':
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'alterarStatus':
+                    $controller->alterarStatus($id);
+                    break;
+                case 'destroy':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== PROJETO ETAPAS (CRONOGRAMA) ====================
+        case 'projeto-etapas':
+            require_once SRC_PATH . '/controllers/ProjetoEtapaController.php';
+            $controller = new App\Controllers\ProjetoEtapaController();
+            $projetoId = $_GET['projeto_id'] ?? $id;
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index($projetoId);
+                    break;
+                case 'gantt':
+                    $controller->gantt($projetoId);
+                    break;
+                case 'store':
+                    $controller->store($projetoId);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'aprovar':
+                    $controller->aprovar($id);
+                    break;
+                case 'destroy':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index($projetoId);
+            }
+            break;
+            
+        // ==================== PROJETO EQUIPE ====================
+        case 'projeto-equipe':
+            require_once SRC_PATH . '/controllers/ProjetoEquipeController.php';
+            $controller = new App\Controllers\ProjetoEquipeController();
+            $projetoId = $_GET['projeto_id'] ?? $id;
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index($projetoId);
+                    break;
+                case 'store':
+                    $controller->store($projetoId);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'avaliar':
+                    $controller->avaliar($id);
+                    break;
+                case 'destroy':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index($projetoId);
+            }
+            break;
+            
+        // ==================== PROJETO ORÇAMENTO ====================
+        case 'projeto-orcamento':
+            require_once SRC_PATH . '/controllers/ProjetoOrcamentoController.php';
+            $controller = new App\Controllers\ProjetoOrcamentoController();
+            $projetoId = $_GET['projeto_id'] ?? $id;
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index($projetoId);
+                    break;
+                case 'store':
+                    $controller->store($projetoId);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'aprovar':
+                    $controller->aprovar($id);
+                    break;
+                case 'destroy':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index($projetoId);
+            }
+            break;
+            
+        // ==================== PROJETO EXECUÇÃO (APONTAMENTO) ====================
+        case 'projeto-execucao':
+            require_once SRC_PATH . '/controllers/ProjetoExecucaoController.php';
+            $controller = new App\Controllers\ProjetoExecucaoController();
+            $projetoId = $_GET['projeto_id'] ?? $id;
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index($projetoId);
+                    break;
+                case 'store':
+                    $controller->store($projetoId);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'aprovar':
+                    $controller->aprovar($id);
+                    break;
+                case 'destroy':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index($projetoId);
+            }
+            break;
+            
         // ==================== 404 ====================
         default:
             http_response_code(404);
