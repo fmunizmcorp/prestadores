@@ -4,611 +4,865 @@ namespace App\Models;
 
 use App\Database;
 use PDO;
+use PDOException;
 
+/**
+ * Model Contrato
+ * Gerencia contratos entre empresas tomadoras e prestadoras
+ */
 class Contrato {
+    
     private $db;
-    private $conn;
+    private $table = 'contratos';
     
     public function __construct() {
         $this->db = Database::getInstance();
-        $this->conn = $this->db->getConnection();
     }
     
-    // CRUD BÁSICO
-    public function create($data) {
-        $sql = "INSERT INTO contratos (
-            numero_contrato, empresa_tomadora_id, empresa_prestadora_id,
-            tipo_contrato, objeto_contrato, descricao, data_assinatura,
-            data_inicio_vigencia, data_fim_vigencia, prazo_meses,
-            renovavel, prazo_renovacao_meses, valor_total, moeda,
-            forma_pagamento, condicoes_pagamento, prazo_pagamento_dias,
-            dia_vencimento, periodicidade_faturamento, reajuste_previsto,
-            indice_reajuste, periodicidade_reajuste_meses, percentual_multa_rescisao,
-            percentual_retencao_impostos, exige_garantia, tipo_garantia,
-            valor_garantia, percentual_garantia, vigencia_garantia,
-            clausulas_especiais, penalidades, sla_atendimento_horas,
-            permite_subcontratacao, exige_seguro, valor_seguro_minimo,
-            status, observacoes, arquivo_contrato, criado_por
-        ) VALUES (
-            :numero_contrato, :empresa_tomadora_id, :empresa_prestadora_id,
-            :tipo_contrato, :objeto_contrato, :descricao, :data_assinatura,
-            :data_inicio_vigencia, :data_fim_vigencia, :prazo_meses,
-            :renovavel, :prazo_renovacao_meses, :valor_total, :moeda,
-            :forma_pagamento, :condicoes_pagamento, :prazo_pagamento_dias,
-            :dia_vencimento, :periodicidade_faturamento, :reajuste_previsto,
-            :indice_reajuste, :periodicidade_reajuste_meses, :percentual_multa_rescisao,
-            :percentual_retencao_impostos, :exige_garantia, :tipo_garantia,
-            :valor_garantia, :percentual_garantia, :vigencia_garantia,
-            :clausulas_especiais, :penalidades, :sla_atendimento_horas,
-            :permite_subcontratacao, :exige_seguro, :valor_seguro_minimo,
-            :status, :observacoes, :arquivo_contrato, :criado_por
-        )";
+    /**
+     * Buscar todos os contratos
+     * 
+     * @param array $filtros
+     * @param int $page
+     * @param int $limit
+     * @return array
+     */
+    public function all($filtros = [], $page = 1, $limit = 25) {
+        $sql = "SELECT 
+                    c.*,
+                    et.nome_fantasia as tomadora_nome,
+                    et.cidade as tomadora_cidade,
+                    et.estado as tomadora_estado,
+                    ep.nome_fantasia as prestadora_nome,
+                    ep.cidade as prestadora_cidade,
+                    DATEDIFF(c.data_fim, NOW()) as dias_vencimento,
+                    (SELECT COUNT(*) FROM servico_valores sv WHERE sv.contrato_id = c.id AND sv.ativo = 1) as total_servicos
+                FROM {$this->table} c
+                INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
+                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
+                WHERE 1=1";
         
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($data);
+        $params = [];
         
-        return $this->conn->lastInsertId();
-    }
-    
-    public function findById($id) {
-        $sql = "SELECT c.*, 
-                et.nome_fantasia as tomadora_nome, et.cnpj as tomadora_cnpj,
-                ep.nome_fantasia as prestadora_nome, ep.cnpj as prestadora_cnpj
-                FROM contratos c
-                LEFT JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                LEFT JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
-                WHERE c.id = :id AND c.deleted_at IS NULL";
+        // Filtro: Status
+        if (!empty($filtros['status'])) {
+            $sql .= " AND c.status = :status";
+            $params[':status'] = $filtros['status'];
+        }
         
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch();
-    }
-    
-    public function findByNumero($numeroContrato) {
-        $sql = "SELECT c.*, 
-                et.nome_fantasia as tomadora_nome,
-                ep.nome_fantasia as prestadora_nome
-                FROM contratos c
-                LEFT JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                LEFT JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
-                WHERE c.numero_contrato = :numero_contrato AND c.deleted_at IS NULL";
+        // Filtro: Empresa Tomadora
+        if (!empty($filtros['empresa_tomadora_id'])) {
+            $sql .= " AND c.empresa_tomadora_id = :empresa_tomadora_id";
+            $params[':empresa_tomadora_id'] = $filtros['empresa_tomadora_id'];
+        }
         
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['numero_contrato' => $numeroContrato]);
-        return $stmt->fetch();
-    }
-    
-    public function all($filtros = [], $page = 1, $limit = 20) {
+        // Filtro: Empresa Prestadora
+        if (!empty($filtros['empresa_prestadora_id'])) {
+            $sql .= " AND c.empresa_prestadora_id = :empresa_prestadora_id";
+            $params[':empresa_prestadora_id'] = $filtros['empresa_prestadora_id'];
+        }
+        
+        // Filtro: Busca
+        if (!empty($filtros['search'])) {
+            $sql .= " AND (c.numero_contrato LIKE :search 
+                         OR c.descricao LIKE :search 
+                         OR et.nome_fantasia LIKE :search
+                         OR ep.nome_fantasia LIKE :search)";
+            $params[':search'] = '%' . $filtros['search'] . '%';
+        }
+        
+        // Filtro: Vigência (contratos ativos em determinado período)
+        if (!empty($filtros['data_inicio']) && !empty($filtros['data_fim'])) {
+            $sql .= " AND ((c.data_inicio BETWEEN :data_inicio AND :data_fim)
+                         OR (c.data_fim BETWEEN :data_inicio AND :data_fim)
+                         OR (c.data_inicio <= :data_inicio AND c.data_fim >= :data_fim))";
+            $params[':data_inicio'] = $filtros['data_inicio'];
+            $params[':data_fim'] = $filtros['data_fim'];
+        }
+        
+        // Ordenação
+        $orderBy = $filtros['order_by'] ?? 'c.created_at';
+        $orderDir = $filtros['order_dir'] ?? 'DESC';
+        $sql .= " ORDER BY {$orderBy} {$orderDir}";
+        
+        // Paginação
         $offset = ($page - 1) * $limit;
-        $where = ["c.deleted_at IS NULL"];
-        $params = [];
+        $sql .= " LIMIT :limit OFFSET :offset";
         
-        if (!empty($filtros['status'])) {
-            $where[] = "c.status = :status";
-            $params['status'] = $filtros['status'];
+        $stmt = $this->db->prepare($sql);
+        
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
         }
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
         
-        if (!empty($filtros['empresa_tomadora_id'])) {
-            $where[] = "c.empresa_tomadora_id = :empresa_tomadora_id";
-            $params['empresa_tomadora_id'] = $filtros['empresa_tomadora_id'];
-        }
-        
-        if (!empty($filtros['empresa_prestadora_id'])) {
-            $where[] = "c.empresa_prestadora_id = :empresa_prestadora_id";
-            $params['empresa_prestadora_id'] = $filtros['empresa_prestadora_id'];
-        }
-        
-        if (!empty($filtros['tipo_contrato'])) {
-            $where[] = "c.tipo_contrato = :tipo_contrato";
-            $params['tipo_contrato'] = $filtros['tipo_contrato'];
-        }
-        
-        if (!empty($filtros['vencimento_ate'])) {
-            $where[] = "c.data_fim_vigencia <= :vencimento_ate";
-            $params['vencimento_ate'] = $filtros['vencimento_ate'];
-        }
-        
-        if (!empty($filtros['search'])) {
-            $where[] = "(c.numero_contrato LIKE :search OR c.objeto_contrato LIKE :search OR et.nome_fantasia LIKE :search OR ep.nome_fantasia LIKE :search)";
-            $params['search'] = "%{$filtros['search']}%";
-        }
-        
-        $whereClause = implode(' AND ', $where);
-        
-        $sql = "SELECT c.*, 
-                et.nome_fantasia as tomadora_nome,
-                ep.nome_fantasia as prestadora_nome
-                FROM contratos c
-                LEFT JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                LEFT JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
-                WHERE $whereClause 
-                ORDER BY c.data_assinatura DESC 
-                LIMIT $limit OFFSET $offset";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
-        
+        $stmt->execute();
         return $stmt->fetchAll();
     }
     
+    /**
+     * Contar total de contratos
+     * 
+     * @param array $filtros
+     * @return int
+     */
     public function count($filtros = []) {
-        $where = ["c.deleted_at IS NULL"];
+        $sql = "SELECT COUNT(*) as total 
+                FROM {$this->table} c
+                INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
+                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
+                WHERE 1=1";
+        
         $params = [];
         
         if (!empty($filtros['status'])) {
-            $where[] = "c.status = :status";
-            $params['status'] = $filtros['status'];
+            $sql .= " AND c.status = :status";
+            $params[':status'] = $filtros['status'];
         }
         
         if (!empty($filtros['empresa_tomadora_id'])) {
-            $where[] = "c.empresa_tomadora_id = :empresa_tomadora_id";
-            $params['empresa_tomadora_id'] = $filtros['empresa_tomadora_id'];
+            $sql .= " AND c.empresa_tomadora_id = :empresa_tomadora_id";
+            $params[':empresa_tomadora_id'] = $filtros['empresa_tomadora_id'];
         }
         
         if (!empty($filtros['empresa_prestadora_id'])) {
-            $where[] = "c.empresa_prestadora_id = :empresa_prestadora_id";
-            $params['empresa_prestadora_id'] = $filtros['empresa_prestadora_id'];
-        }
-        
-        if (!empty($filtros['tipo_contrato'])) {
-            $where[] = "c.tipo_contrato = :tipo_contrato";
-            $params['tipo_contrato'] = $filtros['tipo_contrato'];
-        }
-        
-        if (!empty($filtros['vencimento_ate'])) {
-            $where[] = "c.data_fim_vigencia <= :vencimento_ate";
-            $params['vencimento_ate'] = $filtros['vencimento_ate'];
+            $sql .= " AND c.empresa_prestadora_id = :empresa_prestadora_id";
+            $params[':empresa_prestadora_id'] = $filtros['empresa_prestadora_id'];
         }
         
         if (!empty($filtros['search'])) {
-            $where[] = "(c.numero_contrato LIKE :search OR c.objeto_contrato LIKE :search)";
-            $params['search'] = "%{$filtros['search']}%";
+            $sql .= " AND (c.numero_contrato LIKE :search 
+                         OR c.descricao LIKE :search)";
+            $params[':search'] = '%' . $filtros['search'] . '%';
         }
         
-        $whereClause = implode(' AND ', $where);
-        
-        $sql = "SELECT COUNT(*) as total 
-                FROM contratos c
-                LEFT JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                LEFT JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
-                WHERE $whereClause";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
-        
-        return $stmt->fetch()['total'];
-    }
-    
-    public function update($id, $data) {
-        $fields = [];
-        $params = ['id' => $id];
-        
-        $allowedFields = [
-            'numero_contrato', 'empresa_tomadora_id', 'empresa_prestadora_id',
-            'tipo_contrato', 'objeto_contrato', 'descricao', 'data_assinatura',
-            'data_inicio_vigencia', 'data_fim_vigencia', 'prazo_meses',
-            'renovavel', 'prazo_renovacao_meses', 'valor_total', 'moeda',
-            'forma_pagamento', 'condicoes_pagamento', 'prazo_pagamento_dias',
-            'dia_vencimento', 'periodicidade_faturamento', 'reajuste_previsto',
-            'indice_reajuste', 'periodicidade_reajuste_meses', 'percentual_multa_rescisao',
-            'percentual_retencao_impostos', 'exige_garantia', 'tipo_garantia',
-            'valor_garantia', 'percentual_garantia', 'vigencia_garantia',
-            'clausulas_especiais', 'penalidades', 'sla_atendimento_horas',
-            'permite_subcontratacao', 'exige_seguro', 'valor_seguro_minimo',
-            'status', 'observacoes', 'arquivo_contrato', 'atualizado_por'
-        ];
-        
-        foreach ($allowedFields as $field) {
-            if (isset($data[$field])) {
-                $fields[] = "$field = :$field";
-                $params[$field] = $data[$field];
-            }
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
         }
-        
-        if (empty($fields)) {
-            return false;
-        }
-        
-        $fieldsStr = implode(', ', $fields);
-        $sql = "UPDATE contratos SET $fieldsStr WHERE id = :id";
-        
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute($params);
-    }
-    
-    public function delete($id) {
-        $sql = "UPDATE contratos SET deleted_at = NOW() WHERE id = :id";
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute(['id' => $id]);
-    }
-    
-    // VALIDAÇÕES
-    public function validateUniqueNumero($numeroContrato, $id = null) {
-        $sql = "SELECT id FROM contratos WHERE numero_contrato = :numero_contrato AND deleted_at IS NULL";
-        
-        if ($id) {
-            $sql .= " AND id != :id";
-        }
-        
-        $stmt = $this->conn->prepare($sql);
-        $params = ['numero_contrato' => $numeroContrato];
-        
-        if ($id) {
-            $params['id'] = $id;
-        }
-        
-        $stmt->execute($params);
-        return $stmt->fetch() === false;
-    }
-    
-    // SERVIÇOS DO CONTRATO
-    public function addServico($contratoId, $data) {
-        $sql = "INSERT INTO contrato_servicos (
-            contrato_id, servico_id, descricao_customizada, quantidade,
-            unidade, valor_unitario, valor_total, periodicidade,
-            data_inicio, data_fim, observacoes, criado_por
-        ) VALUES (
-            :contrato_id, :servico_id, :descricao_customizada, :quantidade,
-            :unidade, :valor_unitario, :valor_total, :periodicidade,
-            :data_inicio, :data_fim, :observacoes, :criado_por
-        )";
-        
-        $data['contrato_id'] = $contratoId;
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($data);
-        
-        return $this->conn->lastInsertId();
-    }
-    
-    public function getServicos($contratoId) {
-        $sql = "SELECT cs.*, s.codigo as servico_codigo, s.nome as servico_nome
-                FROM contrato_servicos cs
-                LEFT JOIN servicos s ON cs.servico_id = s.id
-                WHERE cs.contrato_id = :contrato_id 
-                AND cs.deleted_at IS NULL
-                ORDER BY cs.created_at ASC";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['contrato_id' => $contratoId]);
-        
-        return $stmt->fetchAll();
-    }
-    
-    public function updateServico($id, $data) {
-        $fields = [];
-        $params = ['id' => $id];
-        
-        $allowedFields = [
-            'descricao_customizada', 'quantidade', 'unidade', 'valor_unitario',
-            'valor_total', 'periodicidade', 'data_inicio', 'data_fim',
-            'observacoes', 'atualizado_por'
-        ];
-        
-        foreach ($allowedFields as $field) {
-            if (isset($data[$field])) {
-                $fields[] = "$field = :$field";
-                $params[$field] = $data[$field];
-            }
-        }
-        
-        if (empty($fields)) {
-            return false;
-        }
-        
-        $fieldsStr = implode(', ', $fields);
-        $sql = "UPDATE contrato_servicos SET $fieldsStr WHERE id = :id";
-        
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute($params);
-    }
-    
-    public function deleteServico($id) {
-        $sql = "UPDATE contrato_servicos SET deleted_at = NOW() WHERE id = :id";
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute(['id' => $id]);
-    }
-    
-    // ADITIVOS
-    public function addAditivo($contratoId, $data) {
-        $sql = "INSERT INTO contrato_aditivos (
-            contrato_id, numero_aditivo, tipo_aditivo, data_aditivo,
-            descricao, justificativa, valor_anterior, valor_novo,
-            data_vigencia_anterior, data_vigencia_nova, percentual_alteracao,
-            aprovado_por, data_aprovacao, arquivo, observacoes, criado_por
-        ) VALUES (
-            :contrato_id, :numero_aditivo, :tipo_aditivo, :data_aditivo,
-            :descricao, :justificativa, :valor_anterior, :valor_novo,
-            :data_vigencia_anterior, :data_vigencia_nova, :percentual_alteracao,
-            :aprovado_por, :data_aprovacao, :arquivo, :observacoes, :criado_por
-        )";
-        
-        $data['contrato_id'] = $contratoId;
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($data);
-        
-        return $this->conn->lastInsertId();
-    }
-    
-    public function getAditivos($contratoId) {
-        $sql = "SELECT ca.*, u.nome as aprovador_nome
-                FROM contrato_aditivos ca
-                LEFT JOIN usuarios u ON ca.aprovado_por = u.id
-                WHERE ca.contrato_id = :contrato_id 
-                AND ca.deleted_at IS NULL
-                ORDER BY ca.data_aditivo DESC";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['contrato_id' => $contratoId]);
-        
-        return $stmt->fetchAll();
-    }
-    
-    public function updateAditivo($id, $data) {
-        $fields = [];
-        $params = ['id' => $id];
-        
-        $allowedFields = [
-            'numero_aditivo', 'tipo_aditivo', 'data_aditivo', 'descricao',
-            'justificativa', 'valor_anterior', 'valor_novo', 'data_vigencia_anterior',
-            'data_vigencia_nova', 'percentual_alteracao', 'aprovado_por',
-            'data_aprovacao', 'arquivo', 'observacoes', 'atualizado_por'
-        ];
-        
-        foreach ($allowedFields as $field) {
-            if (isset($data[$field])) {
-                $fields[] = "$field = :$field";
-                $params[$field] = $data[$field];
-            }
-        }
-        
-        if (empty($fields)) {
-            return false;
-        }
-        
-        $fieldsStr = implode(', ', $fields);
-        $sql = "UPDATE contrato_aditivos SET $fieldsStr WHERE id = :id";
-        
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute($params);
-    }
-    
-    public function deleteAditivo($id) {
-        $sql = "UPDATE contrato_aditivos SET deleted_at = NOW() WHERE id = :id";
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute(['id' => $id]);
-    }
-    
-    // HISTÓRICO
-    public function addHistorico($contratoId, $data) {
-        $sql = "INSERT INTO contrato_historico (
-            contrato_id, tipo_evento, descricao, usuario_id,
-            data_evento, detalhes_json
-        ) VALUES (
-            :contrato_id, :tipo_evento, :descricao, :usuario_id,
-            :data_evento, :detalhes_json
-        )";
-        
-        $data['contrato_id'] = $contratoId;
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($data);
-        
-        return $this->conn->lastInsertId();
-    }
-    
-    public function getHistorico($contratoId, $limit = 50) {
-        $sql = "SELECT ch.*, u.nome as usuario_nome
-                FROM contrato_historico ch
-                LEFT JOIN usuarios u ON ch.usuario_id = u.id
-                WHERE ch.contrato_id = :contrato_id
-                ORDER BY ch.data_evento DESC
-                LIMIT :limit";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindValue(':contrato_id', $contratoId, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
         
-        return $stmt->fetchAll();
-    }
-    
-    // VALORES POR PERÍODO
-    public function addValorPeriodo($contratoId, $data) {
-        $sql = "INSERT INTO contrato_valores_periodo (
-            contrato_id, mes_ano, valor_previsto, valor_realizado,
-            valor_pago, data_pagamento, numero_nf, status_periodo,
-            observacoes, criado_por
-        ) VALUES (
-            :contrato_id, :mes_ano, :valor_previsto, :valor_realizado,
-            :valor_pago, :data_pagamento, :numero_nf, :status_periodo,
-            :observacoes, :criado_por
-        )";
-        
-        $data['contrato_id'] = $contratoId;
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($data);
-        
-        return $this->conn->lastInsertId();
-    }
-    
-    public function getValoresPeriodo($contratoId, $anoInicio = null, $anoFim = null) {
-        $sql = "SELECT * FROM contrato_valores_periodo
-                WHERE contrato_id = :contrato_id 
-                AND deleted_at IS NULL";
-        
-        $params = ['contrato_id' => $contratoId];
-        
-        if ($anoInicio) {
-            $sql .= " AND YEAR(mes_ano) >= :ano_inicio";
-            $params['ano_inicio'] = $anoInicio;
-        }
-        
-        if ($anoFim) {
-            $sql .= " AND YEAR(mes_ano) <= :ano_fim";
-            $params['ano_fim'] = $anoFim;
-        }
-        
-        $sql .= " ORDER BY mes_ano ASC";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
-        
-        return $stmt->fetchAll();
-    }
-    
-    public function updateValorPeriodo($id, $data) {
-        $fields = [];
-        $params = ['id' => $id];
-        
-        $allowedFields = [
-            'valor_previsto', 'valor_realizado', 'valor_pago',
-            'data_pagamento', 'numero_nf', 'status_periodo',
-            'observacoes', 'atualizado_por'
-        ];
-        
-        foreach ($allowedFields as $field) {
-            if (isset($data[$field])) {
-                $fields[] = "$field = :$field";
-                $params[$field] = $data[$field];
-            }
-        }
-        
-        if (empty($fields)) {
-            return false;
-        }
-        
-        $fieldsStr = implode(', ', $fields);
-        $sql = "UPDATE contrato_valores_periodo SET $fieldsStr WHERE id = :id";
-        
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute($params);
-    }
-    
-    // ESTATÍSTICAS
-    public function countTotal() {
-        $sql = "SELECT COUNT(*) as total FROM contratos WHERE deleted_at IS NULL";
-        $stmt = $this->conn->query($sql);
-        return $stmt->fetch()['total'];
-    }
-    
-    public function countPorStatus($status) {
-        $sql = "SELECT COUNT(*) as total FROM contratos 
-                WHERE status = :status AND deleted_at IS NULL";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['status' => $status]);
-        return $stmt->fetch()['total'];
-    }
-    
-    public function getAtivos() {
-        $sql = "SELECT c.*, 
-                et.nome_fantasia as tomadora_nome,
-                ep.nome_fantasia as prestadora_nome
-                FROM contratos c
-                LEFT JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                LEFT JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
-                WHERE c.status = 'Vigente' 
-                AND c.deleted_at IS NULL
-                ORDER BY c.data_fim_vigencia ASC";
-        
-        $stmt = $this->conn->query($sql);
-        return $stmt->fetchAll();
-    }
-    
-    public function getVencendo($dias = 90) {
-        $sql = "SELECT c.*, 
-                et.nome_fantasia as tomadora_nome,
-                ep.nome_fantasia as prestadora_nome,
-                DATEDIFF(c.data_fim_vigencia, CURDATE()) as dias_restantes
-                FROM contratos c
-                LEFT JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                LEFT JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
-                WHERE c.status = 'Vigente' 
-                AND c.deleted_at IS NULL
-                AND DATEDIFF(c.data_fim_vigencia, CURDATE()) <= :dias
-                AND DATEDIFF(c.data_fim_vigencia, CURDATE()) >= 0
-                ORDER BY c.data_fim_vigencia ASC";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['dias' => $dias]);
-        return $stmt->fetchAll();
-    }
-    
-    public function getValorTotalAtivos() {
-        $sql = "SELECT SUM(valor_total) as total 
-                FROM contratos 
-                WHERE status = 'Vigente' 
-                AND deleted_at IS NULL";
-        
-        $stmt = $this->conn->query($sql);
         $result = $stmt->fetch();
         return $result['total'] ?? 0;
     }
     
-    public function getPorTipo() {
-        $sql = "SELECT tipo_contrato, COUNT(*) as total 
-                FROM contratos 
-                WHERE deleted_at IS NULL 
-                GROUP BY tipo_contrato
-                ORDER BY total DESC";
+    /**
+     * Buscar contrato por ID
+     * 
+     * @param int $id
+     * @return array|null
+     */
+    public function findById($id) {
+        $sql = "SELECT 
+                    c.*,
+                    et.nome_fantasia as tomadora_nome,
+                    et.razao_social as tomadora_razao_social,
+                    et.cnpj as tomadora_cnpj,
+                    et.cidade as tomadora_cidade,
+                    et.estado as tomadora_estado,
+                    ep.nome_fantasia as prestadora_nome,
+                    ep.razao_social as prestadora_razao_social,
+                    ep.cnpj as prestadora_cnpj,
+                    ep.cidade as prestadora_cidade,
+                    ep.estado as prestadora_estado,
+                    u1.nome as criado_por_nome,
+                    u2.nome as atualizado_por_nome,
+                    DATEDIFF(c.data_fim, NOW()) as dias_vencimento
+                FROM {$this->table} c
+                INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
+                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
+                LEFT JOIN usuarios u1 ON c.created_by = u1.id
+                LEFT JOIN usuarios u2 ON c.updated_by = u2.id
+                WHERE c.id = :id";
         
-        $stmt = $this->conn->query($sql);
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetch() ?: null;
+    }
+    
+    /**
+     * Buscar por número de contrato
+     * 
+     * @param string $numero
+     * @param int|null $exceptId
+     * @return array|null
+     */
+    public function findByNumero($numero, $exceptId = null) {
+        $sql = "SELECT * FROM {$this->table} WHERE numero_contrato = :numero";
+        
+        if ($exceptId) {
+            $sql .= " AND id != :except_id";
+        }
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':numero', $numero);
+        
+        if ($exceptId) {
+            $stmt->bindValue(':except_id', $exceptId, PDO::PARAM_INT);
+        }
+        
+        $stmt->execute();
+        return $stmt->fetch() ?: null;
+    }
+    
+    /**
+     * Criar novo contrato
+     * 
+     * @param array $data
+     * @return int
+     */
+    public function create($data) {
+        $sql = "INSERT INTO {$this->table} (
+                    empresa_tomadora_id, empresa_prestadora_id,
+                    numero_contrato, descricao, objeto,
+                    data_inicio, data_fim,
+                    valor_total, valor_executado,
+                    status, arquivo_contrato, observacoes,
+                    created_by, created_at
+                ) VALUES (
+                    :empresa_tomadora_id, :empresa_prestadora_id,
+                    :numero_contrato, :descricao, :objeto,
+                    :data_inicio, :data_fim,
+                    :valor_total, :valor_executado,
+                    :status, :arquivo_contrato, :observacoes,
+                    :created_by, NOW()
+                )";
+        
+        $stmt = $this->db->prepare($sql);
+        
+        $stmt->bindValue(':empresa_tomadora_id', $data['empresa_tomadora_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':empresa_prestadora_id', $data['empresa_prestadora_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':numero_contrato', $data['numero_contrato']);
+        $stmt->bindValue(':descricao', $data['descricao'] ?? null);
+        $stmt->bindValue(':objeto', $data['objeto'] ?? null);
+        $stmt->bindValue(':data_inicio', $data['data_inicio']);
+        $stmt->bindValue(':data_fim', $data['data_fim'] ?? null);
+        $stmt->bindValue(':valor_total', $data['valor_total'] ?? null);
+        $stmt->bindValue(':valor_executado', $data['valor_executado'] ?? 0);
+        $stmt->bindValue(':status', $data['status'] ?? 'rascunho');
+        $stmt->bindValue(':arquivo_contrato', $data['arquivo_contrato'] ?? null);
+        $stmt->bindValue(':observacoes', $data['observacoes'] ?? null);
+        $stmt->bindValue(':created_by', $data['created_by'] ?? $_SESSION['user_id'], PDO::PARAM_INT);
+        
+        $stmt->execute();
+        $contratoId = $this->db->lastInsertId();
+        
+        // Registrar no histórico
+        $this->registrarHistorico($contratoId, 'criacao', null, null, null, 'Contrato criado');
+        
+        return $contratoId;
+    }
+    
+    /**
+     * Atualizar contrato
+     * 
+     * @param int $id
+     * @param array $data
+     * @return bool
+     */
+    public function update($id, $data) {
+        $sql = "UPDATE {$this->table} SET
+                    empresa_tomadora_id = :empresa_tomadora_id,
+                    empresa_prestadora_id = :empresa_prestadora_id,
+                    numero_contrato = :numero_contrato,
+                    descricao = :descricao,
+                    objeto = :objeto,
+                    data_inicio = :data_inicio,
+                    data_fim = :data_fim,
+                    valor_total = :valor_total,
+                    status = :status,
+                    arquivo_contrato = :arquivo_contrato,
+                    observacoes = :observacoes,
+                    updated_by = :updated_by,
+                    updated_at = NOW()
+                WHERE id = :id";
+        
+        $stmt = $this->db->prepare($sql);
+        
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':empresa_tomadora_id', $data['empresa_tomadora_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':empresa_prestadora_id', $data['empresa_prestadora_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':numero_contrato', $data['numero_contrato']);
+        $stmt->bindValue(':descricao', $data['descricao'] ?? null);
+        $stmt->bindValue(':objeto', $data['objeto'] ?? null);
+        $stmt->bindValue(':data_inicio', $data['data_inicio']);
+        $stmt->bindValue(':data_fim', $data['data_fim'] ?? null);
+        $stmt->bindValue(':valor_total', $data['valor_total'] ?? null);
+        $stmt->bindValue(':status', $data['status']);
+        $stmt->bindValue(':arquivo_contrato', $data['arquivo_contrato'] ?? null);
+        $stmt->bindValue(':observacoes', $data['observacoes'] ?? null);
+        $stmt->bindValue(':updated_by', $data['updated_by'] ?? $_SESSION['user_id'], PDO::PARAM_INT);
+        
+        return $stmt->execute();
+    }
+    
+    /**
+     * Alterar status do contrato
+     * 
+     * @param int $id
+     * @param string $novoStatus
+     * @param string|null $motivo
+     * @return bool
+     */
+    public function alterarStatus($id, $novoStatus, $motivo = null) {
+        $contratoAtual = $this->findById($id);
+        
+        if (!$contratoAtual) {
+            throw new \Exception('Contrato não encontrado');
+        }
+        
+        $sql = "UPDATE {$this->table} 
+                SET status = :status, 
+                    updated_by = :updated_by,
+                    updated_at = NOW()";
+        
+        if ($novoStatus == 'encerrado' || $novoStatus == 'cancelado') {
+            $sql .= ", motivo_encerramento = :motivo";
+        }
+        
+        $sql .= " WHERE id = :id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':status', $novoStatus);
+        $stmt->bindValue(':updated_by', $_SESSION['user_id'] ?? null, PDO::PARAM_INT);
+        
+        if ($novoStatus == 'encerrado' || $novoStatus == 'cancelado') {
+            $stmt->bindValue(':motivo', $motivo);
+        }
+        
+        $result = $stmt->execute();
+        
+        if ($result) {
+            $this->registrarHistorico(
+                $id, 
+                $novoStatus == 'ativo' ? 'ativacao' : 
+                ($novoStatus == 'suspenso' ? 'suspensao' : 
+                ($novoStatus == 'encerrado' ? 'encerramento' : 'cancelamento')),
+                'status',
+                $contratoAtual['status'],
+                $novoStatus,
+                $motivo ?? "Status alterado para: {$novoStatus}"
+            );
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Encerrar contrato
+     * 
+     * @param int $id
+     * @param string $motivo
+     * @return bool
+     */
+    public function encerrar($id, $motivo) {
+        return $this->alterarStatus($id, 'encerrado', $motivo);
+    }
+    
+    /**
+     * Cancelar contrato
+     * 
+     * @param int $id
+     * @param string $motivo
+     * @return bool
+     */
+    public function cancelar($id, $motivo) {
+        return $this->alterarStatus($id, 'cancelado', $motivo);
+    }
+    
+    /**
+     * Ativar contrato
+     * 
+     * @param int $id
+     * @return bool
+     */
+    public function ativar($id) {
+        return $this->alterarStatus($id, 'ativo');
+    }
+    
+    /**
+     * Suspender contrato
+     * 
+     * @param int $id
+     * @param string $motivo
+     * @return bool
+     */
+    public function suspender($id, $motivo) {
+        return $this->alterarStatus($id, 'suspenso', $motivo);
+    }
+    
+    /**
+     * Buscar contratos vigentes
+     * 
+     * @return array
+     */
+    public function getVigentes() {
+        $sql = "SELECT c.*, 
+                       et.nome_fantasia as tomadora_nome,
+                       ep.nome_fantasia as prestadora_nome
+                FROM {$this->table} c
+                INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
+                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
+                WHERE c.status = 'ativo'
+                  AND c.data_inicio <= CURDATE()
+                  AND (c.data_fim IS NULL OR c.data_fim >= CURDATE())
+                ORDER BY c.numero_contrato ASC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
     
-    public function getPorEmpresaTomadora($empresaId = null) {
-        $sql = "SELECT et.nome_fantasia, COUNT(c.id) as total, SUM(c.valor_total) as valor_total
-                FROM contratos c
-                LEFT JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                WHERE c.deleted_at IS NULL";
+    /**
+     * Buscar contratos próximos ao vencimento
+     * 
+     * @param int $dias Dias antes do vencimento
+     * @return array
+     */
+    public function getProximosVencimento($dias = 30) {
+        $sql = "SELECT c.*, 
+                       et.nome_fantasia as tomadora_nome,
+                       ep.nome_fantasia as prestadora_nome,
+                       DATEDIFF(c.data_fim, NOW()) as dias_restantes
+                FROM {$this->table} c
+                INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
+                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
+                WHERE c.status = 'ativo'
+                  AND c.data_fim IS NOT NULL
+                  AND DATEDIFF(c.data_fim, NOW()) <= :dias
+                  AND DATEDIFF(c.data_fim, NOW()) >= 0
+                ORDER BY c.data_fim ASC";
         
-        $params = [];
-        if ($empresaId) {
-            $sql .= " AND c.empresa_tomadora_id = :empresa_id";
-            $params['empresa_id'] = $empresaId;
-        }
-        
-        $sql .= " GROUP BY c.empresa_tomadora_id ORDER BY total DESC";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
-        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':dias', $dias, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
     
-    public function getPorEmpresaPrestadora($empresaId = null) {
-        $sql = "SELECT ep.nome_fantasia, COUNT(c.id) as total, SUM(c.valor_total) as valor_total
-                FROM contratos c
-                LEFT JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
-                WHERE c.deleted_at IS NULL";
+    /**
+     * Buscar contratos vencidos
+     * 
+     * @return array
+     */
+    public function getVencidos() {
+        $sql = "SELECT c.*, 
+                       et.nome_fantasia as tomadora_nome,
+                       ep.nome_fantasia as prestadora_nome,
+                       DATEDIFF(NOW(), c.data_fim) as dias_vencido
+                FROM {$this->table} c
+                INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
+                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
+                WHERE c.status = 'ativo'
+                  AND c.data_fim IS NOT NULL
+                  AND c.data_fim < CURDATE()
+                ORDER BY c.data_fim ASC";
         
-        $params = [];
-        if ($empresaId) {
-            $sql .= " AND c.empresa_prestadora_id = :empresa_id";
-            $params['empresa_id'] = $empresaId;
-        }
-        
-        $sql .= " GROUP BY c.empresa_prestadora_id ORDER BY total DESC";
-        
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
-        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
     
-    public function getMediaValor($empresaTomadoraId = null) {
-        $sql = "SELECT AVG(valor_total) as media 
-                FROM contratos 
-                WHERE deleted_at IS NULL";
+    /**
+     * Buscar valores de serviços do contrato
+     * 
+     * @param int $id
+     * @return array
+     */
+    public function getValoresServicos($id) {
+        $sql = "SELECT sv.*, s.nome as servico_nome
+                FROM servico_valores sv
+                INNER JOIN servicos s ON sv.servico_id = s.id
+                WHERE sv.contrato_id = :id AND sv.ativo = 1
+                ORDER BY s.nome ASC, sv.data_inicio DESC";
         
-        $params = [];
-        if ($empresaTomadoraId) {
-            $sql .= " AND empresa_tomadora_id = :empresa_id";
-            $params['empresa_id'] = $empresaTomadoraId;
-        }
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+    /**
+     * Buscar aditivos do contrato
+     * 
+     * @param int $id
+     * @return array
+     */
+    public function getAditivos($id) {
+        $sql = "SELECT a.*, u.nome as criado_por_nome
+                FROM contrato_aditivos a
+                LEFT JOIN usuarios u ON a.created_by = u.id
+                WHERE a.contrato_id = :id
+                ORDER BY a.data_aditivo DESC";
         
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+    /**
+     * Buscar histórico do contrato
+     * 
+     * @param int $id
+     * @return array
+     */
+    public function getHistorico($id) {
+        $sql = "SELECT h.*, u.nome as usuario_nome
+                FROM contrato_historico h
+                LEFT JOIN usuarios u ON h.created_by = u.id
+                WHERE h.contrato_id = :id
+                ORDER BY h.created_at DESC";
         
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+    /**
+     * Registrar no histórico
+     * 
+     * @param int $contratoId
+     * @param string $tipo
+     * @param string|null $campo
+     * @param string|null $valorAnterior
+     * @param string|null $valorNovo
+     * @param string $descricao
+     * @return int
+     */
+    public function registrarHistorico($contratoId, $tipo, $campo, $valorAnterior, $valorNovo, $descricao) {
+        $sql = "INSERT INTO contrato_historico (
+                    contrato_id, tipo_alteracao, campo_alterado,
+                    valor_anterior, valor_novo, descricao,
+                    created_by, created_at
+                ) VALUES (
+                    :contrato_id, :tipo, :campo,
+                    :valor_anterior, :valor_novo, :descricao,
+                    :created_by, NOW()
+                )";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':contrato_id', $contratoId, PDO::PARAM_INT);
+        $stmt->bindValue(':tipo', $tipo);
+        $stmt->bindValue(':campo', $campo);
+        $stmt->bindValue(':valor_anterior', $valorAnterior);
+        $stmt->bindValue(':valor_novo', $valorNovo);
+        $stmt->bindValue(':descricao', $descricao);
+        $stmt->bindValue(':created_by', $_SESSION['user_id'] ?? null, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        return $this->db->lastInsertId();
+    }
+    
+    /**
+     * Buscar estatísticas gerais
+     * 
+     * @return array
+     */
+    public function getEstatisticasGerais() {
+        $sql = "SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'ativo' THEN 1 ELSE 0 END) as ativos,
+                    SUM(CASE WHEN status = 'suspenso' THEN 1 ELSE 0 END) as suspensos,
+                    SUM(CASE WHEN status = 'encerrado' THEN 1 ELSE 0 END) as encerrados,
+                    SUM(CASE WHEN status = 'cancelado' THEN 1 ELSE 0 END) as cancelados,
+                    SUM(CASE WHEN status = 'ativo' AND data_fim < CURDATE() THEN 1 ELSE 0 END) as vencidos,
+                    SUM(CASE WHEN status = 'ativo' AND data_fim IS NOT NULL AND DATEDIFF(data_fim, NOW()) <= 30 THEN 1 ELSE 0 END) as vencendo_30dias,
+                    SUM(valor_total) as valor_total,
+                    SUM(valor_executado) as valor_executado
+                FROM {$this->table}";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+    
+    /**
+     * Contar total de contratos
+     * 
+     * @return int
+     */
+    public function countTotal() {
+        $sql = "SELECT COUNT(*) as total FROM {$this->table}";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
         $result = $stmt->fetch();
-        return $result['media'] ?? 0;
+        return $result['total'] ?? 0;
+    }
+    
+    /**
+     * Contar por status
+     * 
+     * @param string $status
+     * @return int
+     */
+    public function countPorStatus($status) {
+        $sql = "SELECT COUNT(*) as total FROM {$this->table} WHERE status = :status";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':status', $status);
+        $stmt->execute();
+        $result = $stmt->fetch();
+        return $result['total'] ?? 0;
+    }
+    
+    /**
+     * Buscar contratos vencendo
+     * 
+     * @param int $dias
+     * @return array
+     */
+    public function getVencendo($dias = 90) {
+        $sql = "SELECT c.*, 
+                       et.nome_fantasia as tomadora_nome,
+                       ep.nome_fantasia as prestadora_nome,
+                       DATEDIFF(c.data_fim, CURDATE()) as dias_restantes
+                FROM {$this->table} c
+                INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
+                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
+                WHERE c.status = 'ativo' 
+                  AND c.data_fim IS NOT NULL
+                  AND DATEDIFF(c.data_fim, CURDATE()) <= :dias
+                  AND DATEDIFF(c.data_fim, CURDATE()) >= 0
+                ORDER BY c.data_fim ASC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':dias', $dias, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+    /**
+     * Calcular valor total dos contratos ativos
+     * 
+     * @return float
+     */
+    public function getValorTotalAtivos() {
+        $sql = "SELECT SUM(valor_total) as total FROM {$this->table} WHERE status = 'ativo'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch();
+        return floatval($result['total'] ?? 0);
+    }
+    
+    /**
+     * Validar unicidade do número do contrato
+     * 
+     * @param string $numero
+     * @param int|null $exceptId
+     * @return bool
+     */
+    public function validateUniqueNumero($numero, $exceptId = null) {
+        $existing = $this->findByNumero($numero, $exceptId);
+        return $existing === null;
+    }
+    
+    /**
+     * Buscar serviços do contrato
+     * 
+     * @param int $contratoId
+     * @return array
+     */
+    public function getServicos($id) {
+        // Este método retorna os serviços vinculados ao contrato
+        // da tabela servico_valores
+        $sql = "SELECT sv.*, s.nome as servico_nome
+                FROM servico_valores sv
+                INNER JOIN servicos s ON sv.servico_id = s.id
+                WHERE sv.contrato_id = :contrato_id AND sv.ativo = 1
+                ORDER BY sv.data_inicio DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':contrato_id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    
+    /**
+     * Adicionar serviço ao contrato
+     * 
+     * @param int $contratoId
+     * @param array $data
+     * @return int
+     */
+    public function addServico($contratoId, $data) {
+        $sql = "INSERT INTO servico_valores (
+                    contrato_id, servico_id, descricao_customizada,
+                    quantidade, unidade, valor_unitario, valor_total,
+                    periodicidade, data_inicio, data_fim,
+                    observacoes, ativo, created_by, created_at
+                ) VALUES (
+                    :contrato_id, :servico_id, :descricao_customizada,
+                    :quantidade, :unidade, :valor_unitario, :valor_total,
+                    :periodicidade, :data_inicio, :data_fim,
+                    :observacoes, 1, :created_by, NOW()
+                )";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':contrato_id', $contratoId, PDO::PARAM_INT);
+        $stmt->bindValue(':servico_id', $data['servico_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':descricao_customizada', $data['descricao_customizada'] ?? null);
+        $stmt->bindValue(':quantidade', $data['quantidade']);
+        $stmt->bindValue(':unidade', $data['unidade'] ?? 'unidade');
+        $stmt->bindValue(':valor_unitario', $data['valor_unitario']);
+        $stmt->bindValue(':valor_total', $data['valor_total']);
+        $stmt->bindValue(':periodicidade', $data['periodicidade'] ?? null);
+        $stmt->bindValue(':data_inicio', $data['data_inicio'] ?? null);
+        $stmt->bindValue(':data_fim', $data['data_fim'] ?? null);
+        $stmt->bindValue(':observacoes', $data['observacoes'] ?? null);
+        $stmt->bindValue(':created_by', $data['criado_por'] ?? $_SESSION['user_id'], PDO::PARAM_INT);
+        
+        $stmt->execute();
+        return $this->db->lastInsertId();
+    }
+    
+    /**
+     * Excluir serviço do contrato (soft delete)
+     * 
+     * @param int $servicoId
+     * @return bool
+     */
+    public function deleteServico($servicoId) {
+        $sql = "UPDATE servico_valores SET ativo = 0, updated_at = NOW() WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $servicoId, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
+    /**
+     * Adicionar aditivo ao contrato
+     * 
+     * @param int $contratoId
+     * @param array $data
+     * @return int
+     */
+    public function addAditivo($contratoId, $data) {
+        $sql = "INSERT INTO contrato_aditivos (
+                    contrato_id, numero_aditivo, tipo_aditivo, data_aditivo,
+                    descricao, justificativa, valor_anterior, valor_novo,
+                    data_vigencia_anterior, data_vigencia_nova, percentual_alteracao,
+                    aprovado_por, data_aprovacao, caminho_arquivo,
+                    observacoes, ativo, created_by, created_at
+                ) VALUES (
+                    :contrato_id, :numero_aditivo, :tipo_aditivo, :data_aditivo,
+                    :descricao, :justificativa, :valor_anterior, :valor_novo,
+                    :data_vigencia_anterior, :data_vigencia_nova, :percentual_alteracao,
+                    :aprovado_por, :data_aprovacao, :caminho_arquivo,
+                    :observacoes, 1, :created_by, NOW()
+                )";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':contrato_id', $contratoId, PDO::PARAM_INT);
+        $stmt->bindValue(':numero_aditivo', $data['numero_aditivo']);
+        $stmt->bindValue(':tipo_aditivo', $data['tipo_aditivo']);
+        $stmt->bindValue(':data_aditivo', $data['data_aditivo']);
+        $stmt->bindValue(':descricao', $data['descricao']);
+        $stmt->bindValue(':justificativa', $data['justificativa'] ?? null);
+        $stmt->bindValue(':valor_anterior', $data['valor_anterior'] ?? null);
+        $stmt->bindValue(':valor_novo', $data['valor_novo'] ?? null);
+        $stmt->bindValue(':data_vigencia_anterior', $data['data_vigencia_anterior'] ?? null);
+        $stmt->bindValue(':data_vigencia_nova', $data['data_vigencia_nova'] ?? null);
+        $stmt->bindValue(':percentual_alteracao', $data['percentual_alteracao'] ?? null);
+        $stmt->bindValue(':aprovado_por', $data['aprovado_por'] ?? null);
+        $stmt->bindValue(':data_aprovacao', $data['data_aprovacao'] ?? null);
+        $stmt->bindValue(':caminho_arquivo', $data['arquivo'] ?? null);
+        $stmt->bindValue(':observacoes', $data['observacoes'] ?? null);
+        $stmt->bindValue(':created_by', $data['criado_por'] ?? $_SESSION['user_id'], PDO::PARAM_INT);
+        
+        $stmt->execute();
+        return $this->db->lastInsertId();
+    }
+    
+    /**
+     * Excluir aditivo (soft delete)
+     * 
+     * @param int $aditivoId
+     * @return bool
+     */
+    public function deleteAditivo($aditivoId) {
+        $sql = "UPDATE contrato_aditivos SET ativo = 0, updated_at = NOW() WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $aditivoId, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
+    /**
+     * Adicionar histórico ao contrato
+     * 
+     * @param int $contratoId
+     * @param array $data
+     * @return int
+     */
+    public function addHistorico($contratoId, $data) {
+        $sql = "INSERT INTO contrato_historico (
+                    contrato_id, tipo_alteracao, campo_alterado,
+                    valor_anterior, valor_novo, descricao,
+                    created_by, created_at
+                ) VALUES (
+                    :contrato_id, :tipo_alteracao, :campo_alterado,
+                    :valor_anterior, :valor_novo, :descricao,
+                    :created_by, NOW()
+                )";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':contrato_id', $contratoId, PDO::PARAM_INT);
+        $stmt->bindValue(':tipo_alteracao', $data['tipo_evento'] ?? 'Outro');
+        $stmt->bindValue(':campo_alterado', null); // Opcional
+        $stmt->bindValue(':valor_anterior', null);
+        $stmt->bindValue(':valor_novo', $data['detalhes_json'] ?? null);
+        $stmt->bindValue(':descricao', $data['descricao']);
+        $stmt->bindValue(':created_by', $data['usuario_id'] ?? $_SESSION['user_id'], PDO::PARAM_INT);
+        
+        $stmt->execute();
+        return $this->db->lastInsertId();
+    }
+    
+    /**
+     * Buscar valores por período do contrato
+     * 
+     * @param int $contratoId
+     * @return array
+     */
+    public function getValoresPeriodo($contratoId) {
+        // Este método busca os valores mensais/periódicos do contrato
+        // Retorna array vazio por enquanto - será implementado na Sprint 7 (Financeiro)
+        return [];
+    }
+    
+    /**
+     * Adicionar valor de período
+     * 
+     * @param int $contratoId
+     * @param array $data
+     * @return int
+     */
+    public function addValorPeriodo($contratoId, $data) {
+        // Placeholder - será implementado na Sprint 7 (Gestão Financeira)
+        // Por enquanto retorna 0
+        return 0;
+    }
+    
+    /**
+     * Soft delete
+     * 
+     * @param int $id
+     * @return bool
+     */
+    public function delete($id) {
+        // Verificar se pode excluir (sem projetos ativos, etc)
+        $sql = "UPDATE {$this->table} 
+                SET status = 'cancelado', 
+                    updated_by = :updated_by,
+                    updated_at = NOW() 
+                WHERE id = :id";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':updated_by', $_SESSION['user_id'] ?? null, PDO::PARAM_INT);
+        
+        return $stmt->execute();
     }
 }

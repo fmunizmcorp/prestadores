@@ -271,6 +271,44 @@ try {
             }
             break;
             
+        // ==================== SERVICO VALORES ====================
+        case 'servico-valores':
+            require_once SRC_PATH . '/controllers/ServicoValorController.php';
+            $controller = new App\Controllers\ServicoValorController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show($id);
+                    break;
+                case 'edit':
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'destroy':
+                    $controller->destroy($id);
+                    break;
+                case 'getValorVigente':
+                    $controller->getValorVigente();
+                    break;
+                case 'verificarSobreposicao':
+                    $controller->verificarSobreposicao();
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+            
         // ==================== 404 ====================
         default:
             http_response_code(404);
