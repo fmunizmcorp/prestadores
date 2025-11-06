@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col">
-            <h1><i class="fas fa-plus-circle"></i> Novo Projeto</h1>
+            <h1><i class="fas fa-plus-circle"></i> Editar Projeto</h1>
         </div>
         <div class="col-auto">
             <a href="<?= BASE_URL ?>/?page=projetos" class="btn btn-secondary">
@@ -21,7 +21,7 @@
         <?php unset($_SESSION['erro']); ?>
     <?php endif; ?>
 
-    <form method="POST" action="<?= BASE_URL ?>/?page=projetos&action=store">
+    <form method="POST" action="<?= BASE_URL ?>/?page=projetos&action=update">
         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
         <!-- Informações Básicas -->
@@ -260,7 +260,7 @@
                 <div class="row">
                     <div class="col-md-12 text-end">
                         <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-save"></i> Criar Projeto
+                            <i class="fas fa-save"></i> Salvar Alterações
                         </button>
                         <a href="<?= BASE_URL ?>/?page=projetos" class="btn btn-secondary btn-lg">
                             <i class="fas fa-times"></i> Cancelar
