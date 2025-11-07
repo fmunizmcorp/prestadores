@@ -6,12 +6,14 @@ use App\Models\Contrato;
 use App\Models\EmpresaTomadora;
 use App\Models\EmpresaPrestadora;
 use App\Models\Servico;
+use App\Models\ContratoFinanceiro;
 
 class ContratoController {
     private $model;
     private $empresaTomadoraModel;
     private $empresaPrestadoraModel;
     private $servicoModel;
+    private $contratoFinanceiro;
     
     public function __construct() {
         if (!isset($_SESSION['usuario_id'])) {
@@ -23,6 +25,7 @@ class ContratoController {
         $this->empresaTomadoraModel = new EmpresaTomadora();
         $this->empresaPrestadoraModel = new EmpresaPrestadora();
         $this->servicoModel = new Servico();
+        $this->contratoFinanceiro = new ContratoFinanceiro();
     }
     
     // LISTAGEM
@@ -489,6 +492,78 @@ class ContratoController {
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'erro' => $e->getMessage()]);
         }
+        exit;
+    }
+    
+    // FATURAMENTO DO CONTRATO
+    public function faturamento($id) {
+        $contrato = $this->model->findById($id);
+        
+        if (!$contrato) {
+            $_SESSION['erro'] = 'Contrato não encontrado.';
+            header('Location: /contratos');
+            exit;
+        }
+        
+        try {
+            // Gerar relatório financeiro completo
+            $relatorio = $this->contratoFinanceiro->gerarRelatorioCompleto($id);
+            
+            $contrato = $relatorio['contrato'];
+            $faturamento = $relatorio['faturamento'];
+            $historico_mensal = $relatorio['historico_mensal'];
+            $inadimplencia = $relatorio['inadimplencia'];
+            $projecao_receita = $relatorio['projecao_receita'];
+            $faturas_pendentes = $relatorio['faturas_pendentes'];
+            
+            require __DIR__ . '/../views/contratos/faturamento.php';
+        } catch (\Exception $e) {
+            $_SESSION['erro'] = 'Erro ao gerar relatório de faturamento: ' . $e->getMessage();
+            header("Location: /contratos/$id");
+            exit;
+        }
+    }
+    
+    // GERAR FATURA RECORRENTE MANUALMENTE
+    public function gerarFatura($id) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /contratos/$id/faturamento");
+            exit;
+        }
+        
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            $_SESSION['erro'] = 'Token de segurança inválido.';
+            header("Location: /contratos/$id/faturamento");
+            exit;
+        }
+        
+        $mesReferencia = $_POST['mes_referencia'] ?? date('Y-m-01');
+        
+        try {
+            $contaId = $this->contratoFinanceiro->gerarFaturaRecorrente($id, $mesReferencia);
+            
+            if ($contaId) {
+                $_SESSION['sucesso'] = 'Fatura gerada com sucesso!';
+                
+                // Adicionar histórico ao contrato
+                $this->model->addHistorico($id, [
+                    'tipo_evento' => 'Faturamento',
+                    'descricao' => 'Fatura recorrente gerada manualmente',
+                    'usuario_id' => $_SESSION['usuario_id'],
+                    'data_evento' => date('Y-m-d H:i:s'),
+                    'detalhes_json' => json_encode([
+                        'mes_referencia' => $mesReferencia,
+                        'conta_receber_id' => $contaId
+                    ])
+                ]);
+            } else {
+                $_SESSION['erro'] = 'Não foi possível gerar a fatura. Verifique se o contrato permite faturamento automático e se já não existe fatura para o mês selecionado.';
+            }
+        } catch (\Exception $e) {
+            $_SESSION['erro'] = 'Erro ao gerar fatura: ' . $e->getMessage();
+        }
+        
+        header("Location: /contratos/$id/faturamento");
         exit;
     }
     

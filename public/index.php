@@ -212,6 +212,10 @@ try {
                     $controller->edit($id);
                 } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     $controller->destroy($id);
+                } elseif ($parts[2] === 'faturamento') {
+                    $controller->faturamento($id);
+                } elseif ($parts[2] === 'gerar-fatura' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $controller->gerarFatura($id);
                 } elseif ($parts[2] === 'servicos') {
                     if ($parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         $controller->addServico($id);
@@ -229,6 +233,284 @@ try {
                 }
             } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $controller->store();
+            }
+            break;
+            
+        // Projetos
+        case 'projetos':
+            $controller = new App\Controllers\ProjetoController();
+            
+            if (!isset($parts[1])) {
+                $controller->index();
+            } elseif ($parts[1] === 'create') {
+                $controller->create();
+            } elseif (is_numeric($parts[1])) {
+                $id = $parts[1];
+                
+                if (!isset($parts[2])) {
+                    $controller->show($id);
+                } elseif ($parts[2] === 'edit') {
+                    $controller->edit($id);
+                } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $controller->delete($id);
+                } elseif ($parts[2] === 'dashboard') {
+                    $controller->dashboard($id);
+                } elseif ($parts[2] === 'financeiro') {
+                    $controller->financeiro($id);
+                } elseif ($parts[2] === 'alterar-status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $controller->alterarStatus($id);
+                }
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->store();
+            }
+            break;
+            
+        // Atividades
+        case 'atividades':
+            $controller = new App\Controllers\AtividadeController();
+            
+            if (!isset($parts[1])) {
+                $controller->index();
+            } elseif ($parts[1] === 'create') {
+                $controller->create();
+            } elseif (is_numeric($parts[1])) {
+                $id = $parts[1];
+                
+                if (!isset($parts[2])) {
+                    $controller->show($id);
+                } elseif ($parts[2] === 'edit') {
+                    $controller->edit($id);
+                } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $controller->delete($id);
+                } elseif ($parts[2] === 'custos') {
+                    $controller->custos($id);
+                } elseif ($parts[2] === 'alterar-status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $controller->alterarStatus($id);
+                }
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->store();
+            }
+            break;
+            
+        // Financeiro
+        case 'financeiro':
+            $controller = new App\Controllers\FinanceiroController();
+            $action = $_GET['action'] ?? 'index';
+            
+            switch ($action) {
+                case 'index':
+                case '':
+                    $controller->index();
+                    break;
+                    
+                // Categorias Financeiras
+                case 'categorias':
+                    $controller->categorias();
+                    break;
+                case 'categoria-create':
+                    $controller->categoriaCreate();
+                    break;
+                case 'categoria-store':
+                    $controller->categoriaStore();
+                    break;
+                case 'categoria-edit':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->categoriaEdit($id);
+                    break;
+                case 'categoria-update':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->categoriaUpdate($id);
+                    break;
+                case 'categoria-toggle-ativo':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->categoriaToggleAtivo($id);
+                    break;
+                    
+                // Contas a Pagar
+                case 'contas-pagar':
+                    $controller->contasPagar();
+                    break;
+                case 'conta-pagar-create':
+                    $controller->contaPagarCreate();
+                    break;
+                case 'conta-pagar-store':
+                    $controller->contaPagarStore();
+                    break;
+                case 'conta-pagar-show':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->contaPagarShow($id);
+                    break;
+                case 'conta-pagar-pagar':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->contaPagarPagar($id);
+                    break;
+                case 'conta-pagar-cancelar':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->contaPagarCancelar($id);
+                    break;
+                    
+                // Contas a Receber
+                case 'contas-receber':
+                    $controller->contasReceber();
+                    break;
+                case 'conta-receber-create':
+                    $controller->contaReceberCreate();
+                    break;
+                case 'conta-receber-store':
+                    $controller->contaReceberStore();
+                    break;
+                case 'conta-receber-show':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->contaReceberShow($id);
+                    break;
+                case 'conta-receber-receber':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->contaReceberReceber($id);
+                    break;
+                case 'conta-receber-cancelar':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->contaReceberCancelar($id);
+                    break;
+                    
+                // Boletos
+                case 'boletos':
+                    $controller->boletos();
+                    break;
+                case 'boleto-show':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->boletoShow($id);
+                    break;
+                case 'boleto-pagar':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->boletoPagar($id);
+                    break;
+                case 'boleto-cancelar':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->boletoCancelar($id);
+                    break;
+                    
+                // Lançamentos Financeiros
+                case 'lancamentos':
+                    $controller->lancamentos();
+                    break;
+                case 'lancamento-create':
+                    $controller->lancamentoCreate();
+                    break;
+                case 'lancamento-store':
+                    $controller->lancamentoStore();
+                    break;
+                case 'lancamento-estornar':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->lancamentoEstornar($id);
+                    break;
+                    
+                // Conciliação Bancária
+                case 'conciliacoes':
+                    $controller->conciliacoes();
+                    break;
+                case 'conciliacao-importar':
+                    $controller->conciliacaoImportar();
+                    break;
+                case 'conciliacao-processar-ofx':
+                    $controller->conciliacaoProcessarOFX();
+                    break;
+                case 'conciliacao-show':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->conciliacaoShow($id);
+                    break;
+                case 'conciliacao-vincular':
+                    $controller->conciliacaoVincular();
+                    break;
+                    
+                // Fluxo de Caixa
+                case 'fluxo-caixa':
+                    $controller->fluxoCaixa();
+                    break;
+                    
+                // Relatórios
+                case 'dre':
+                    $controller->dre();
+                    break;
+                case 'balancete':
+                    $controller->balancete();
+                    break;
+                    
+                default:
+                    $controller->index();
+                    break;
+            }
+            break;
+            
+        // Notas Fiscais
+        case 'notas-fiscais':
+            $controller = new App\Controllers\NotaFiscalController();
+            $action = $_GET['action'] ?? 'index';
+            
+            switch ($action) {
+                case 'index':
+                case '':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->show($id);
+                    break;
+                case 'edit':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->update($id);
+                    break;
+                case 'emitir':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->emitir($id);
+                    break;
+                case 'consultar-status':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->consultarStatus($id);
+                    break;
+                case 'form-cancelar':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->formCancelar($id);
+                    break;
+                case 'cancelar':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->cancelar($id);
+                    break;
+                case 'form-carta-correcao':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->formCartaCorrecao($id);
+                    break;
+                case 'carta-correcao':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->cartaCorrecao($id);
+                    break;
+                case 'download-xml':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->downloadXML($id);
+                    break;
+                case 'download-danfe':
+                    $id = $_GET['id'] ?? 0;
+                    $controller->downloadDANFE($id);
+                    break;
+                case 'relatorio':
+                    $controller->relatorio();
+                    break;
+                case 'delete':
+                    $id = $_POST['id'] ?? 0;
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index();
+                    break;
             }
             break;
             

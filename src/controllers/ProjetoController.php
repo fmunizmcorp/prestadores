@@ -7,6 +7,7 @@ use App\Models\ProjetoCategoria;
 use App\Models\EmpresaTomadora;
 use App\Models\Contrato;
 use App\Models\Usuario;
+use App\Models\ProjetoFinanceiro;
 
 class ProjetoController extends BaseController
 {
@@ -15,6 +16,7 @@ class ProjetoController extends BaseController
     private $tomadora;
     private $contrato;
     private $usuario;
+    private $projetoFinanceiro;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class ProjetoController extends BaseController
         $this->tomadora = new EmpresaTomadora();
         $this->contrato = new Contrato();
         $this->usuario = new Usuario();
+        $this->projetoFinanceiro = new ProjetoFinanceiro();
     }
 
     /**
@@ -421,5 +424,44 @@ class ProjetoController extends BaseController
         }
 
         $this->redirect('projetos');
+    }
+
+    /**
+     * Exibe dashboard financeiro completo do projeto
+     */
+    public function financeiro($id)
+    {
+        $this->checkPermission(['master', 'admin', 'gestor', 'usuario']);
+
+        $projeto = $this->projeto->findById($id);
+
+        if (!$projeto) {
+            $_SESSION['erro'] = 'Projeto não encontrado.';
+            $this->redirect('projetos');
+            return;
+        }
+
+        try {
+            // Gerar relatório financeiro completo
+            $relatorio = $this->projetoFinanceiro->gerarRelatorioCompleto($id);
+
+            $data = [
+                'titulo' => 'Financeiro - ' . $projeto['nome'],
+                'projeto' => $relatorio['projeto'],
+                'custos' => $relatorio['custos'],
+                'receitas' => $relatorio['receitas'],
+                'margem' => $relatorio['margem'],
+                'performance' => $relatorio['performance'],
+                'consolidacao_mensal' => $relatorio['consolidacao_mensal'],
+                'top_fornecedores' => $relatorio['top_fornecedores'],
+                'contas_pagar_pendentes' => $relatorio['contas_pagar_pendentes'],
+                'contas_receber_pendentes' => $relatorio['contas_receber_pendentes']
+            ];
+
+            $this->render('projetos/financeiro', $data);
+        } catch (\Exception $e) {
+            $_SESSION['erro'] = 'Erro ao gerar relatório financeiro: ' . $e->getMessage();
+            $this->redirect('projetos/show/' . $id);
+        }
     }
 }
