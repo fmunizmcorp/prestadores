@@ -18,16 +18,16 @@ date_default_timezone_set('America/Sao_Paulo');
 // Definir diretório raiz
 define('ROOT_PATH', dirname(__DIR__));
 
-// Definir BASE_PATH para URLs
-// Como este arquivo está em public/index.php e é chamado via rewrite de /,
-// precisamos forçar BASE_PATH vazio para domínio raiz
-define('BASE_PATH', '');
+// Definir BASE_PATH para URLs (detecta automaticamente se está em subpasta)
+$scriptName = dirname($_SERVER['SCRIPT_NAME']);
+define('BASE_PATH', $scriptName !== '/' ? $scriptName : '');
 
 // Definir BASE_URL com domínio completo (ABSOLUTE URL)
 // Novo domínio: prestadores.clinfec.com.br (raiz, sem subpasta)
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'prestadores.clinfec.com.br';
-define('BASE_URL', $protocol . '://' . $host);
+$basePath = BASE_PATH;
+define('BASE_URL', $protocol . '://' . $host . $basePath);
 
 // Autoloader simples
 spl_autoload_register(function ($class) {
