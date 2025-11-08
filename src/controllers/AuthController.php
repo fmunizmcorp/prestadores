@@ -58,11 +58,11 @@ class AuthController {
             }
             
             // Criar sessão
-            $_SESSION['user_id'] = $usuario['id'];  // Corrigido para user_id
+            $_SESSION['user_id'] = $usuario['id'];
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['usuario_nome'] = $usuario['nome'];
             $_SESSION['usuario_email'] = $usuario['email'];
-            $_SESSION['usuario_perfil'] = $usuario['perfil'];
+            $_SESSION['usuario_perfil'] = $usuario['role'] ?? $usuario['perfil'] ?? 'usuario';
             $_SESSION['empresa_id'] = $usuario['empresa_id'] ?? null;
             
             // Atualizar último acesso
