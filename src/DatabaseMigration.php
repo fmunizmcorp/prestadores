@@ -97,30 +97,53 @@ class DatabaseMigration {
         $this->db->beginTransaction();
         
         try {
-            for ($version = $from + 1; $version <= $to; $version++) {
-                $migrationFile = $this->migrationsPath . sprintf('%03d_migration.sql', $version);
-                
-                if (file_exists($migrationFile)) {
-                    $sql = file_get_contents($migrationFile);
+            // Escaneia todos os arquivos .sql disponíveis
+            $migrationFiles = glob($this->migrationsPath . '*.sql');
+            sort($migrationFiles);
+            
+            foreach ($migrationFiles as $migrationFile) {
+                // Extrai o número da versão do nome do arquivo
+                $basename = basename($migrationFile);
+                if (preg_match('/^(\d+)_/', $basename, $matches)) {
+                    $fileVersion = (int)$matches[1];
                     
-                    // Divide por ; e executa cada statement
-                    $statements = array_filter(
-                        array_map('trim', explode(';', $sql)),
-                        function($s) { return !empty($s); }
-                    );
-                    
-                    foreach ($statements as $statement) {
-                        if (!empty(trim($statement))) {
-                            $this->db->exec($statement);
+                    // Só executa se estiver no range necessário
+                    if ($fileVersion > $from && $fileVersion <= $to) {
+                        error_log("Executando migration: $basename");
+                        
+                        $sql = file_get_contents($migrationFile);
+                        
+                        // Remove comentários SQL
+                        $sql = preg_replace('/^--.*$/m', '', $sql);
+                        
+                        // Divide por ; e executa cada statement
+                        $statements = array_filter(
+                            array_map('trim', explode(';', $sql)),
+                            function($s) { return !empty($s) && !preg_match('/^\s*$/', $s); }
+                        );
+                        
+                        foreach ($statements as $statement) {
+                            if (!empty(trim($statement))) {
+                                try {
+                                    $this->db->exec($statement);
+                                } catch (\PDOException $stmtError) {
+                                    // Ignora erros de "já existe" mas loga outros
+                                    if (strpos($stmtError->getMessage(), 'already exists') === false && 
+                                        strpos($stmtError->getMessage(), 'Duplicate entry') === false) {
+                                        error_log("Erro no statement: " . $stmtError->getMessage());
+                                        throw $stmtError;
+                                    }
+                                }
+                            }
                         }
+                        
+                        error_log("Migration $fileVersion ($basename) aplicada com sucesso");
                     }
-                    
-                    // Atualiza versão
-                    $this->updateVersion($version);
-                    
-                    error_log("Migration $version aplicada com sucesso");
                 }
             }
+            
+            // Atualiza versão final
+            $this->updateVersion($to);
             
             $this->db->commit();
             

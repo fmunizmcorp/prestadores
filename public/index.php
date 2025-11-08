@@ -53,8 +53,13 @@ require ROOT_PATH . '/config/version.php';
 
 // Executar migrações automaticamente
 use App\DatabaseMigration;
-$migration = new DatabaseMigration();
-$migration->runMigrations();
+try {
+    $migration = new DatabaseMigration();
+    $migration->checkAndMigrate();
+} catch (Exception $e) {
+    error_log("Erro ao executar migrations: " . $e->getMessage());
+    // Continua mesmo com erro - permite visualizar página de erro
+}
 
 // Obter URL requisitada
 $request_uri = $_SERVER['REQUEST_URI'];
