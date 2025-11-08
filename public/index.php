@@ -18,6 +18,10 @@ date_default_timezone_set('America/Sao_Paulo');
 // Definir diretório raiz
 define('ROOT_PATH', dirname(__DIR__));
 
+// Definir BASE_PATH para URLs (detecta automaticamente se está em subpasta)
+$scriptName = dirname($_SERVER['SCRIPT_NAME']);
+define('BASE_PATH', $scriptName !== '/' ? $scriptName : '');
+
 // Autoloader simples
 spl_autoload_register(function ($class) {
     $prefix = 'App\\';

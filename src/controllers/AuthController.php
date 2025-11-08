@@ -32,7 +32,7 @@ class AuthController {
         
         if (empty($email) || empty($senha)) {
             $_SESSION['erro'] = 'E-mail e senha são obrigatórios.';
-            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
+            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
             exit;
         }
         
@@ -41,19 +41,19 @@ class AuthController {
             
             if (!$usuario) {
                 $_SESSION['erro'] = 'E-mail ou senha inválidos.';
-                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
+                header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
                 exit;
             }
             
             if (!password_verify($senha, $usuario['senha'])) {
                 $_SESSION['erro'] = 'E-mail ou senha inválidos.';
-                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
+                header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
                 exit;
             }
             
             if (!$usuario['ativo']) {
                 $_SESSION['erro'] = 'Usuário inativo. Entre em contato com o administrador.';
-                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
+                header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
                 exit;
             }
             
@@ -69,13 +69,13 @@ class AuthController {
             $this->model->updateLastLogin($usuario['id']);
             
             $_SESSION['sucesso'] = 'Bem-vindo(a), ' . $usuario['nome'] . '!';
-            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=dashboard');
+            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/dashboard');
             exit;
             
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao fazer login. Tente novamente.';
             error_log($e->getMessage());
-            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
+            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
             exit;
         }
     }
@@ -85,7 +85,7 @@ class AuthController {
      */
     public function logout() {
         session_destroy();
-        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
+        header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
         exit;
     }
     
@@ -94,7 +94,7 @@ class AuthController {
      */
     public static function checkAuth() {
         if (!isset($_SESSION['usuario_id'])) {
-            header('Location: /login');
+            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
             exit;
         }
     }
@@ -104,13 +104,13 @@ class AuthController {
      */
     public static function checkRole($roles) {
         if (!isset($_SESSION['usuario_perfil'])) {
-            header('Location: /login');
+            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
             exit;
         }
         
         if (!in_array($_SESSION['usuario_perfil'], (array)$roles)) {
             $_SESSION['erro'] = 'Você não tem permissão para acessar esta página.';
-            header('Location: /');
+            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/dashboard');
             exit;
         }
     }
