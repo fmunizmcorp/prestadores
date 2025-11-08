@@ -9,14 +9,14 @@ namespace App\Controllers;
 abstract class BaseController
 {
     /**
-     * Redirecionar para uma rota
+     * Redirecionar para uma rota (USA ABSOLUTE URL)
      * 
      * @param string $route Rota para redirecionar (ex: 'projetos', 'contratos/1/edit')
      */
     protected function redirect($route)
     {
-        $basePath = defined('BASE_PATH') ? BASE_PATH : '';
-        $url = $basePath . '/' . ltrim($route, '/');
+        $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+        $url = $baseUrl . '/' . ltrim($route, '/');
         header('Location: ' . $url);
         exit;
     }

@@ -10,7 +10,7 @@ class EmpresaTomadoraController {
     public function __construct() {
         // Verificar se usuário está autenticado
         if (!isset($_SESSION['usuario_id'])) {
-            header('Location: /login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
         
@@ -53,14 +53,14 @@ class EmpresaTomadoraController {
     // SALVAR NOVA EMPRESA
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /empresas-tomadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
         }
         
         // Validar CSRF Token
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header('Location: /empresas-tomadoras/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras/create');
             exit;
         }
         
@@ -99,7 +99,7 @@ class EmpresaTomadoraController {
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
             $_SESSION['form_data'] = $_POST;
-            header('Location: /empresas-tomadoras/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras/create');
             exit;
         }
         
@@ -112,7 +112,7 @@ class EmpresaTomadoraController {
             } else {
                 $_SESSION['erro'] = $upload['erro'];
                 $_SESSION['form_data'] = $_POST;
-                header('Location: /empresas-tomadoras/create');
+                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras/create');
                 exit;
             }
         }
@@ -155,12 +155,12 @@ class EmpresaTomadoraController {
         try {
             $id = $this->model->create($data);
             $_SESSION['sucesso'] = 'Empresa Tomadora cadastrada com sucesso!';
-            header("Location: /empresas-tomadoras/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$id");
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao cadastrar empresa: ' . $e->getMessage();
             $_SESSION['form_data'] = $_POST;
-            header('Location: /empresas-tomadoras/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras/create');
             exit;
         }
     }
@@ -171,7 +171,7 @@ class EmpresaTomadoraController {
         
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
-            header('Location: /empresas-tomadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
         }
         
@@ -200,7 +200,7 @@ class EmpresaTomadoraController {
         
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
-            header('Location: /empresas-tomadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
         }
         
@@ -210,21 +210,21 @@ class EmpresaTomadoraController {
     // ATUALIZAR EMPRESA
     public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /empresas-tomadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
         }
         
         // Validar CSRF Token
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header("Location: /empresas-tomadoras/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$id/edit");
             exit;
         }
         
         $empresa = $this->model->findById($id);
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
-            header('Location: /empresas-tomadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
         }
         
@@ -261,7 +261,7 @@ class EmpresaTomadoraController {
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
             $_SESSION['form_data'] = $_POST;
-            header("Location: /empresas-tomadoras/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$id/edit");
             exit;
         }
         
@@ -316,12 +316,12 @@ class EmpresaTomadoraController {
         try {
             $this->model->update($id, $data);
             $_SESSION['sucesso'] = 'Empresa atualizada com sucesso!';
-            header("Location: /empresas-tomadoras/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$id");
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao atualizar empresa: ' . $e->getMessage();
             $_SESSION['form_data'] = $_POST;
-            header("Location: /empresas-tomadoras/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$id/edit");
             exit;
         }
     }
@@ -329,32 +329,32 @@ class EmpresaTomadoraController {
     // EXCLUIR EMPRESA (SOFT DELETE)
     public function destroy($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /empresas-tomadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
         }
         
         // Validar CSRF Token
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header('Location: /empresas-tomadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
         }
         
         $empresa = $this->model->findById($id);
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
-            header('Location: /empresas-tomadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
         }
         
         try {
             $this->model->delete($id);
             $_SESSION['sucesso'] = 'Empresa excluída com sucesso!';
-            header('Location: /empresas-tomadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao excluir empresa: ' . $e->getMessage();
-            header("Location: /empresas-tomadoras/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$id");
             exit;
         }
     }
@@ -362,7 +362,7 @@ class EmpresaTomadoraController {
     // RESPONSÁVEIS
     public function addResponsavel($empresaId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /empresas-tomadoras/$empresaId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId");
             exit;
         }
         
@@ -374,7 +374,7 @@ class EmpresaTomadoraController {
         
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
-            header("Location: /empresas-tomadoras/$empresaId#responsaveis");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId#responsaveis");
             exit;
         }
         
@@ -401,13 +401,13 @@ class EmpresaTomadoraController {
             $_SESSION['erro'] = 'Erro ao adicionar responsável: ' . $e->getMessage();
         }
         
-        header("Location: /empresas-tomadoras/$empresaId#responsaveis");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId#responsaveis");
         exit;
     }
     
     public function deleteResponsavel($empresaId, $responsavelId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /empresas-tomadoras/$empresaId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId");
             exit;
         }
         
@@ -418,28 +418,28 @@ class EmpresaTomadoraController {
             $_SESSION['erro'] = 'Erro ao remover responsável: ' . $e->getMessage();
         }
         
-        header("Location: /empresas-tomadoras/$empresaId#responsaveis");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId#responsaveis");
         exit;
     }
     
     // DOCUMENTOS
     public function addDocumento($empresaId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /empresas-tomadoras/$empresaId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId");
             exit;
         }
         
         // Validar arquivo
         if (!isset($_FILES['arquivo']) || $_FILES['arquivo']['error'] !== UPLOAD_ERR_OK) {
             $_SESSION['erro'] = 'Arquivo é obrigatório.';
-            header("Location: /empresas-tomadoras/$empresaId#documentos");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId#documentos");
             exit;
         }
         
         $upload = $this->uploadDocumento($_FILES['arquivo']);
         if (!$upload['success']) {
             $_SESSION['erro'] = $upload['erro'];
-            header("Location: /empresas-tomadoras/$empresaId#documentos");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId#documentos");
             exit;
         }
         
@@ -464,13 +464,13 @@ class EmpresaTomadoraController {
             $_SESSION['erro'] = 'Erro ao adicionar documento: ' . $e->getMessage();
         }
         
-        header("Location: /empresas-tomadoras/$empresaId#documentos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId#documentos");
         exit;
     }
     
     public function deleteDocumento($empresaId, $documentoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /empresas-tomadoras/$empresaId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId");
             exit;
         }
         
@@ -481,7 +481,7 @@ class EmpresaTomadoraController {
             $_SESSION['erro'] = 'Erro ao remover documento: ' . $e->getMessage();
         }
         
-        header("Location: /empresas-tomadoras/$empresaId#documentos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$empresaId#documentos");
         exit;
     }
     

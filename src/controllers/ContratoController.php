@@ -17,7 +17,7 @@ class ContratoController {
     
     public function __construct() {
         if (!isset($_SESSION['usuario_id'])) {
-            header('Location: /login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
         
@@ -76,13 +76,13 @@ class ContratoController {
     // SALVAR NOVO CONTRATO
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         }
         
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header('Location: /contratos/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos/create');
             exit;
         }
         
@@ -92,7 +92,7 @@ class ContratoController {
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
             $_SESSION['form_data'] = $_POST;
-            header('Location: /contratos/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos/create');
             exit;
         }
         
@@ -121,12 +121,12 @@ class ContratoController {
             ]);
             
             $_SESSION['sucesso'] = 'Contrato cadastrado com sucesso!';
-            header("Location: /contratos/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id");
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao cadastrar contrato: ' . $e->getMessage();
             $_SESSION['form_data'] = $_POST;
-            header('Location: /contratos/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos/create');
             exit;
         }
     }
@@ -137,7 +137,7 @@ class ContratoController {
         
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         }
         
@@ -155,7 +155,7 @@ class ContratoController {
         
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         }
         
@@ -169,20 +169,20 @@ class ContratoController {
     // ATUALIZAR CONTRATO
     public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         }
         
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header("Location: /contratos/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id/edit");
             exit;
         }
         
         $contrato = $this->model->findById($id);
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         }
         
@@ -191,7 +191,7 @@ class ContratoController {
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
             $_SESSION['form_data'] = $_POST;
-            header("Location: /contratos/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id/edit");
             exit;
         }
         
@@ -223,12 +223,12 @@ class ContratoController {
             ]);
             
             $_SESSION['sucesso'] = 'Contrato atualizado com sucesso!';
-            header("Location: /contratos/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id");
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao atualizar contrato: ' . $e->getMessage();
             $_SESSION['form_data'] = $_POST;
-            header("Location: /contratos/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id/edit");
             exit;
         }
     }
@@ -236,31 +236,31 @@ class ContratoController {
     // EXCLUIR
     public function destroy($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         }
         
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         }
         
         $contrato = $this->model->findById($id);
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         }
         
         try {
             $this->model->delete($id);
             $_SESSION['sucesso'] = 'Contrato excluído com sucesso!';
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao excluir contrato: ' . $e->getMessage();
-            header("Location: /contratos/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id");
             exit;
         }
     }
@@ -268,7 +268,7 @@ class ContratoController {
     // SERVIÇOS DO CONTRATO
     public function addServico($contratoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /contratos/$contratoId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId");
             exit;
         }
         
@@ -279,7 +279,7 @@ class ContratoController {
         
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
-            header("Location: /contratos/$contratoId#servicos");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId#servicos");
             exit;
         }
         
@@ -318,13 +318,13 @@ class ContratoController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /contratos/$contratoId#servicos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId#servicos");
         exit;
     }
     
     public function deleteServico($contratoId, $servicoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /contratos/$contratoId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId");
             exit;
         }
         
@@ -344,14 +344,14 @@ class ContratoController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /contratos/$contratoId#servicos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId#servicos");
         exit;
     }
     
     // ADITIVOS
     public function addAditivo($contratoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /contratos/$contratoId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId");
             exit;
         }
         
@@ -363,7 +363,7 @@ class ContratoController {
         
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
-            header("Location: /contratos/$contratoId#aditivos");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId#aditivos");
             exit;
         }
         
@@ -420,13 +420,13 @@ class ContratoController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /contratos/$contratoId#aditivos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId#aditivos");
         exit;
     }
     
     public function deleteAditivo($contratoId, $aditivoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /contratos/$contratoId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId");
             exit;
         }
         
@@ -446,14 +446,14 @@ class ContratoController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /contratos/$contratoId#aditivos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId#aditivos");
         exit;
     }
     
     // VALORES POR PERÍODO
     public function addValorPeriodo($contratoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /contratos/$contratoId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId");
             exit;
         }
         
@@ -476,7 +476,7 @@ class ContratoController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /contratos/$contratoId#valores");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$contratoId#valores");
         exit;
     }
     
@@ -501,7 +501,7 @@ class ContratoController {
         
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
-            header('Location: /contratos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
         }
         
@@ -519,7 +519,7 @@ class ContratoController {
             require __DIR__ . '/../views/contratos/faturamento.php';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao gerar relatório de faturamento: ' . $e->getMessage();
-            header("Location: /contratos/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id");
             exit;
         }
     }
@@ -527,13 +527,13 @@ class ContratoController {
     // GERAR FATURA RECORRENTE MANUALMENTE
     public function gerarFatura($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /contratos/$id/faturamento");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id/faturamento");
             exit;
         }
         
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header("Location: /contratos/$id/faturamento");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id/faturamento");
             exit;
         }
         
@@ -563,7 +563,7 @@ class ContratoController {
             $_SESSION['erro'] = 'Erro ao gerar fatura: ' . $e->getMessage();
         }
         
-        header("Location: /contratos/$id/faturamento");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/contratos/$id/faturamento");
         exit;
     }
     

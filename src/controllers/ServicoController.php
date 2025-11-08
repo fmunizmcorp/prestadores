@@ -9,7 +9,7 @@ class ServicoController {
     
     public function __construct() {
         if (!isset($_SESSION['usuario_id'])) {
-            header('Location: /login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
         
@@ -59,13 +59,13 @@ class ServicoController {
     // SALVAR NOVO SERVIÇO
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /servicos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
         }
         
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header('Location: /servicos/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos/create');
             exit;
         }
         
@@ -75,7 +75,7 @@ class ServicoController {
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
             $_SESSION['form_data'] = $_POST;
-            header('Location: /servicos/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos/create');
             exit;
         }
         
@@ -99,12 +99,12 @@ class ServicoController {
         try {
             $id = $this->model->create($data);
             $_SESSION['sucesso'] = 'Serviço cadastrado com sucesso!';
-            header("Location: /servicos/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$id");
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao cadastrar serviço: ' . $e->getMessage();
             $_SESSION['form_data'] = $_POST;
-            header('Location: /servicos/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos/create');
             exit;
         }
     }
@@ -115,7 +115,7 @@ class ServicoController {
         
         if (!$servico) {
             $_SESSION['erro'] = 'Serviço não encontrado.';
-            header('Location: /servicos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
         }
         
@@ -132,7 +132,7 @@ class ServicoController {
         
         if (!$servico) {
             $_SESSION['erro'] = 'Serviço não encontrado.';
-            header('Location: /servicos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
         }
         
@@ -145,20 +145,20 @@ class ServicoController {
     // ATUALIZAR SERVIÇO
     public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /servicos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
         }
         
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header("Location: /servicos/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$id/edit");
             exit;
         }
         
         $servico = $this->model->findById($id);
         if (!$servico) {
             $_SESSION['erro'] = 'Serviço não encontrado.';
-            header('Location: /servicos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
         }
         
@@ -168,7 +168,7 @@ class ServicoController {
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
             $_SESSION['form_data'] = $_POST;
-            header("Location: /servicos/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$id/edit");
             exit;
         }
         
@@ -192,12 +192,12 @@ class ServicoController {
         try {
             $this->model->update($id, $data);
             $_SESSION['sucesso'] = 'Serviço atualizado com sucesso!';
-            header("Location: /servicos/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$id");
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao atualizar serviço: ' . $e->getMessage();
             $_SESSION['form_data'] = $_POST;
-            header("Location: /servicos/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$id/edit");
             exit;
         }
     }
@@ -205,31 +205,31 @@ class ServicoController {
     // EXCLUIR
     public function destroy($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /servicos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
         }
         
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header('Location: /servicos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
         }
         
         $servico = $this->model->findById($id);
         if (!$servico) {
             $_SESSION['erro'] = 'Serviço não encontrado.';
-            header('Location: /servicos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
         }
         
         try {
             $this->model->delete($id);
             $_SESSION['sucesso'] = 'Serviço excluído com sucesso!';
-            header('Location: /servicos');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao excluir serviço: ' . $e->getMessage();
-            header("Location: /servicos/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$id");
             exit;
         }
     }
@@ -237,7 +237,7 @@ class ServicoController {
     // REQUISITOS
     public function addRequisito($servicoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /servicos/$servicoId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId");
             exit;
         }
         
@@ -247,7 +247,7 @@ class ServicoController {
         
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
-            header("Location: /servicos/$servicoId#requisitos");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId#requisitos");
             exit;
         }
         
@@ -268,13 +268,13 @@ class ServicoController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /servicos/$servicoId#requisitos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId#requisitos");
         exit;
     }
     
     public function deleteRequisito($servicoId, $requisitoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /servicos/$servicoId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId");
             exit;
         }
         
@@ -285,14 +285,14 @@ class ServicoController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /servicos/$servicoId#requisitos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId#requisitos");
         exit;
     }
     
     // VALORES DE REFERÊNCIA
     public function addValorReferencia($servicoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /servicos/$servicoId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId");
             exit;
         }
         
@@ -306,7 +306,7 @@ class ServicoController {
         
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
-            header("Location: /servicos/$servicoId#valores");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId#valores");
             exit;
         }
         
@@ -330,13 +330,13 @@ class ServicoController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /servicos/$servicoId#valores");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId#valores");
         exit;
     }
     
     public function deleteValorReferencia($servicoId, $valorId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /servicos/$servicoId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId");
             exit;
         }
         
@@ -347,7 +347,7 @@ class ServicoController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /servicos/$servicoId#valores");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$servicoId#valores");
         exit;
     }
     

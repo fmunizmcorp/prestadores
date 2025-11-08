@@ -12,7 +12,7 @@ class EmpresaPrestadoraController {
     public function __construct() {
         // Verificar se usuário está autenticado
         if (!isset($_SESSION['usuario_id'])) {
-            header('Location: /login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
         
@@ -61,14 +61,14 @@ class EmpresaPrestadoraController {
     // SALVAR NOVA EMPRESA
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /empresas-prestadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
         }
         
         // Validar CSRF Token
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header('Location: /empresas-prestadoras/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras/create');
             exit;
         }
         
@@ -78,7 +78,7 @@ class EmpresaPrestadoraController {
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
             $_SESSION['form_data'] = $_POST;
-            header('Location: /empresas-prestadoras/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras/create');
             exit;
         }
         
@@ -106,12 +106,12 @@ class EmpresaPrestadoraController {
             }
             
             $_SESSION['sucesso'] = 'Empresa Prestadora cadastrada com sucesso!';
-            header("Location: /empresas-prestadoras/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$id");
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao cadastrar empresa: ' . $e->getMessage();
             $_SESSION['form_data'] = $_POST;
-            header('Location: /empresas-prestadoras/create');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras/create');
             exit;
         }
     }
@@ -122,7 +122,7 @@ class EmpresaPrestadoraController {
         
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
-            header('Location: /empresas-prestadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
         }
         
@@ -140,7 +140,7 @@ class EmpresaPrestadoraController {
         
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
-            header('Location: /empresas-prestadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
         }
         
@@ -154,21 +154,21 @@ class EmpresaPrestadoraController {
     // ATUALIZAR EMPRESA
     public function update($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /empresas-prestadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
         }
         
         // Validar CSRF Token
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header("Location: /empresas-prestadoras/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$id/edit");
             exit;
         }
         
         $empresa = $this->model->findById($id);
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
-            header('Location: /empresas-prestadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
         }
         
@@ -178,7 +178,7 @@ class EmpresaPrestadoraController {
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
             $_SESSION['form_data'] = $_POST;
-            header("Location: /empresas-prestadoras/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$id/edit");
             exit;
         }
         
@@ -214,12 +214,12 @@ class EmpresaPrestadoraController {
             }
             
             $_SESSION['sucesso'] = 'Empresa atualizada com sucesso!';
-            header("Location: /empresas-prestadoras/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$id");
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao atualizar empresa: ' . $e->getMessage();
             $_SESSION['form_data'] = $_POST;
-            header("Location: /empresas-prestadoras/$id/edit");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$id/edit");
             exit;
         }
     }
@@ -227,31 +227,31 @@ class EmpresaPrestadoraController {
     // EXCLUIR
     public function destroy($id) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /empresas-prestadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
         }
         
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             $_SESSION['erro'] = 'Token de segurança inválido.';
-            header('Location: /empresas-prestadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
         }
         
         $empresa = $this->model->findById($id);
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
-            header('Location: /empresas-prestadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
         }
         
         try {
             $this->model->delete($id);
             $_SESSION['sucesso'] = 'Empresa excluída com sucesso!';
-            header('Location: /empresas-prestadoras');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao excluir empresa: ' . $e->getMessage();
-            header("Location: /empresas-prestadoras/$id");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$id");
             exit;
         }
     }
@@ -259,7 +259,7 @@ class EmpresaPrestadoraController {
     // REPRESENTANTES
     public function addRepresentante($empresaId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /empresas-prestadoras/$empresaId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId");
             exit;
         }
         
@@ -270,7 +270,7 @@ class EmpresaPrestadoraController {
         
         if (!empty($erros)) {
             $_SESSION['erros'] = $erros;
-            header("Location: /empresas-prestadoras/$empresaId#representantes");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId#representantes");
             exit;
         }
         
@@ -296,13 +296,13 @@ class EmpresaPrestadoraController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /empresas-prestadoras/$empresaId#representantes");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId#representantes");
         exit;
     }
     
     public function deleteRepresentante($empresaId, $representanteId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /empresas-prestadoras/$empresaId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId");
             exit;
         }
         
@@ -313,27 +313,27 @@ class EmpresaPrestadoraController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /empresas-prestadoras/$empresaId#representantes");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId#representantes");
         exit;
     }
     
     // DOCUMENTOS
     public function addDocumento($empresaId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /empresas-prestadoras/$empresaId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId");
             exit;
         }
         
         if (!isset($_FILES['arquivo']) || $_FILES['arquivo']['error'] !== UPLOAD_ERR_OK) {
             $_SESSION['erro'] = 'Arquivo é obrigatório.';
-            header("Location: /empresas-prestadoras/$empresaId#documentos");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId#documentos");
             exit;
         }
         
         $upload = $this->uploadDocumento($_FILES['arquivo']);
         if (!$upload['success']) {
             $_SESSION['erro'] = $upload['erro'];
-            header("Location: /empresas-prestadoras/$empresaId#documentos");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId#documentos");
             exit;
         }
         
@@ -358,13 +358,13 @@ class EmpresaPrestadoraController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /empresas-prestadoras/$empresaId#documentos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId#documentos");
         exit;
     }
     
     public function deleteDocumento($empresaId, $documentoId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /empresas-prestadoras/$empresaId");
+            header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId");
             exit;
         }
         
@@ -375,7 +375,7 @@ class EmpresaPrestadoraController {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
         }
         
-        header("Location: /empresas-prestadoras/$empresaId#documentos");
+        header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-prestadoras/$empresaId#documentos");
         exit;
     }
     

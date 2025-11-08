@@ -32,7 +32,7 @@ class AuthController {
         
         if (empty($email) || empty($senha)) {
             $_SESSION['erro'] = 'E-mail e senha são obrigatórios.';
-            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
         
@@ -41,19 +41,19 @@ class AuthController {
             
             if (!$usuario) {
                 $_SESSION['erro'] = 'E-mail ou senha inválidos.';
-                header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
+                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
                 exit;
             }
             
             if (!password_verify($senha, $usuario['senha'])) {
                 $_SESSION['erro'] = 'E-mail ou senha inválidos.';
-                header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
+                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
                 exit;
             }
             
             if (!$usuario['ativo']) {
                 $_SESSION['erro'] = 'Usuário inativo. Entre em contato com o administrador.';
-                header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
+                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
                 exit;
             }
             
@@ -68,14 +68,20 @@ class AuthController {
             // Atualizar último acesso
             $this->model->updateLastLogin($usuario['id']);
             
+            // DEBUG LOG
+            $redirectUrl = (defined('BASE_URL') ? BASE_URL : '') . '/dashboard';
+            error_log("LOGIN SUCCESS - User: {$usuario['email']} - Redirecting to: {$redirectUrl}");
+            error_log("BASE_URL constant: " . (defined('BASE_URL') ? BASE_URL : 'NOT DEFINED'));
+            error_log("Session created - usuario_id: {$_SESSION['usuario_id']}, usuario_perfil: {$_SESSION['usuario_perfil']}");
+            
             $_SESSION['sucesso'] = 'Bem-vindo(a), ' . $usuario['nome'] . '!';
-            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/dashboard');
+            header('Location: ' . $redirectUrl);
             exit;
             
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao fazer login. Tente novamente.';
             error_log($e->getMessage());
-            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
     }
@@ -85,7 +91,7 @@ class AuthController {
      */
     public function logout() {
         session_destroy();
-        header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
+        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
         exit;
     }
     
@@ -94,7 +100,7 @@ class AuthController {
      */
     public static function checkAuth() {
         if (!isset($_SESSION['usuario_id'])) {
-            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
     }
@@ -104,13 +110,13 @@ class AuthController {
      */
     public static function checkRole($roles) {
         if (!isset($_SESSION['usuario_perfil'])) {
-            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/login');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
         
         if (!in_array($_SESSION['usuario_perfil'], (array)$roles)) {
             $_SESSION['erro'] = 'Você não tem permissão para acessar esta página.';
-            header('Location: ' . (defined('BASE_PATH') ? BASE_PATH : '') . '/dashboard');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/dashboard');
             exit;
         }
     }

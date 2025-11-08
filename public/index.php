@@ -22,6 +22,12 @@ define('ROOT_PATH', dirname(__DIR__));
 $scriptName = dirname($_SERVER['SCRIPT_NAME']);
 define('BASE_PATH', $scriptName !== '/' ? $scriptName : '');
 
+// Definir BASE_URL com domínio completo (ABSOLUTE URL)
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'clinfec.com.br';
+$basePath = BASE_PATH;
+define('BASE_URL', $protocol . '://' . $host . $basePath);
+
 // Autoloader simples
 spl_autoload_register(function ($class) {
     $prefix = 'App\\';
@@ -531,7 +537,7 @@ try {
     
     if (isset($_SESSION['usuario_id'])) {
         $_SESSION['erro'] = 'Erro interno: ' . $e->getMessage();
-        header('Location: /');
+        header('Location: ' . BASE_URL . '/');
     } else {
         echo '<h1>500 - Erro Interno do Servidor</h1>';
         echo '<p>Ocorreu um erro ao processar sua solicitação.</p>';
