@@ -7,7 +7,7 @@
 return [
     'name' => 'Sistema de Gestão de Prestadores',
     'version' => '1.0.0',
-    'url' => 'https://clinfec.com.br/prestadores',
+    'url' => 'https://prestadores.clinfec.com.br',
     'timezone' => 'America/Sao_Paulo',
     
     // Configurações de sessão

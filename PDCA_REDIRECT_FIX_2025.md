@@ -8,7 +8,7 @@
 ## 📋 EXECUTIVE SUMMARY
 
 ### Problema Reportado
-Após login, o sistema estava redirecionando para `clinfec.com.br/login` ao invés de `clinfec.com.br/prestadores/dashboard`.
+Após login, o sistema estava redirecionando para `clinfec.com.br/login` ao invés de `prestadores.clinfec.com.br/dashboard`.
 
 ### Causa Raiz Identificada
 O sistema utilizava **URLs RELATIVAS** em todos os redirects:
@@ -18,12 +18,12 @@ header('Location: /prestadores/dashboard');
 
 O Apache/navegador estava **removendo o prefixo `/prestadores/`**, resultando em:
 - ❌ `clinfec.com.br/login` (ERRADO)
-- ✅ `clinfec.com.br/prestadores/dashboard` (CORRETO)
+- ✅ `prestadores.clinfec.com.br/dashboard` (CORRETO)
 
 ### Solução Implementada
 Conversão de **TODOS os redirects** para **URLs ABSOLUTAS** com domínio completo:
 ```php
-header('Location: https://clinfec.com.br/prestadores/dashboard');
+header('Location: https://prestadores.clinfec.com.br/dashboard');
 ```
 
 ### Resultado
@@ -84,10 +84,10 @@ URLs relativas como `/prestadores/dashboard` são interpretadas pelo navegador/A
 
 **Solução:**
 URLs absolutas com domínio completo:
-1. Sistema envia: `Location: https://clinfec.com.br/prestadores/dashboard`
+1. Sistema envia: `Location: https://prestadores.clinfec.com.br/dashboard`
 2. Navegador interpreta: "Ir EXATAMENTE para este endereço completo"
 3. Apache NÃO pode modificar (é URL completa)
-4. Resultado final: `clinfec.com.br/prestadores/dashboard` ✅
+4. Resultado final: `prestadores.clinfec.com.br/dashboard` ✅
 
 ---
 
@@ -124,7 +124,7 @@ define('BASE_URL', $protocol . '://' . $host . $basePath);
 
 **Resultado:**
 ```
-BASE_URL = "https://clinfec.com.br/prestadores"
+BASE_URL = "https://prestadores.clinfec.com.br"
 ```
 
 #### 2.2. Atualização do AuthController
@@ -292,8 +292,8 @@ error_log("Session created - usuario_id: {$_SESSION['usuario_id']}, usuario_perf
 1. Acessar servidor de produção
 2. Realizar login
 3. Verificar logs do PHP (error_log)
-4. Confirmar que BASE_URL = "https://clinfec.com.br/prestadores"
-5. Confirmar que redirect URL = "https://clinfec.com.br/prestadores/dashboard"
+4. Confirmar que BASE_URL = "https://prestadores.clinfec.com.br"
+5. Confirmar que redirect URL = "https://prestadores.clinfec.com.br/dashboard"
 
 #### 3.3. Checklist de Verificação
 
@@ -323,21 +323,21 @@ error_log("Session created - usuario_id: {$_SESSION['usuario_id']}, usuario_perf
 
 **Exemplos de URLs geradas:**
 ```
-https://clinfec.com.br/prestadores/login
-https://clinfec.com.br/prestadores/dashboard
-https://clinfec.com.br/prestadores/empresas-tomadoras
-https://clinfec.com.br/prestadores/empresas-prestadoras
-https://clinfec.com.br/prestadores/contratos
-https://clinfec.com.br/prestadores/servicos
+https://prestadores.clinfec.com.br/login
+https://prestadores.clinfec.com.br/dashboard
+https://prestadores.clinfec.com.br/empresas-tomadoras
+https://prestadores.clinfec.com.br/empresas-prestadoras
+https://prestadores.clinfec.com.br/contratos
+https://prestadores.clinfec.com.br/servicos
 ```
 
 **Fluxo de Login Esperado:**
-1. Usuário acessa: `https://clinfec.com.br/prestadores/login`
-2. Submete formulário para: `https://clinfec.com.br/prestadores/login` (POST)
+1. Usuário acessa: `https://prestadores.clinfec.com.br/login`
+2. Submete formulário para: `https://prestadores.clinfec.com.br/login` (POST)
 3. AuthController valida credenciais
 4. Login SUCCESS → Debug log registrado
-5. Redirect para: `https://clinfec.com.br/prestadores/dashboard`
-6. Navegador vai EXATAMENTE para: `https://clinfec.com.br/prestadores/dashboard` ✅
+5. Redirect para: `https://prestadores.clinfec.com.br/dashboard`
+6. Navegador vai EXATAMENTE para: `https://prestadores.clinfec.com.br/dashboard` ✅
 
 **Benefícios:**
 - ✅ Navegador não pode interpretar erroneamente a URL
@@ -349,28 +349,28 @@ https://clinfec.com.br/prestadores/servicos
 #### 4.2. Testes Recomendados
 
 **Teste 1: Login Flow**
-1. Acessar: `https://clinfec.com.br/prestadores/login`
+1. Acessar: `https://prestadores.clinfec.com.br/login`
 2. Login com: `master@clinfec.com.br` / `password`
-3. ✅ Verificar redirect para: `https://clinfec.com.br/prestadores/dashboard`
+3. ✅ Verificar redirect para: `https://prestadores.clinfec.com.br/dashboard`
 4. ✅ Verificar que dashboard carrega corretamente
 5. ✅ Verificar mensagem de sucesso: "Bem-vindo(a), Master!"
 
 **Teste 2: Direct Dashboard Access (Unauthenticated)**
 1. Logout do sistema
-2. Acessar diretamente: `https://clinfec.com.br/prestadores/dashboard`
-3. ✅ Verificar redirect para: `https://clinfec.com.br/prestadores/login`
+2. Acessar diretamente: `https://prestadores.clinfec.com.br/dashboard`
+3. ✅ Verificar redirect para: `https://prestadores.clinfec.com.br/login`
 4. ✅ Verificar mensagem de erro apropriada
 
 **Teste 3: Navigation Between Modules**
 1. Login no sistema
 2. Clicar em "Empresas Tomadoras"
-3. ✅ Verificar URL: `https://clinfec.com.br/prestadores/empresas-tomadoras`
+3. ✅ Verificar URL: `https://prestadores.clinfec.com.br/empresas-tomadoras`
 4. Clicar em "Criar Nova"
-5. ✅ Verificar URL: `https://clinfec.com.br/prestadores/empresas-tomadoras/create`
+5. ✅ Verificar URL: `https://prestadores.clinfec.com.br/empresas-tomadoras/create`
 
 **Teste 4: Logout Flow**
 1. Estando logado, clicar em Logout
-2. ✅ Verificar redirect para: `https://clinfec.com.br/prestadores/login`
+2. ✅ Verificar redirect para: `https://prestadores.clinfec.com.br/login`
 3. ✅ Verificar que sessão foi destruída
 
 **Teste 5: Debug Logs**
@@ -379,8 +379,8 @@ https://clinfec.com.br/prestadores/servicos
 3. Verificar logs do PHP (geralmente /var/log/php-fpm/ ou similar)
 4. ✅ Confirmar presença de logs:
    ```
-   LOGIN SUCCESS - User: master@clinfec.com.br - Redirecting to: https://clinfec.com.br/prestadores/dashboard
-   BASE_URL constant: https://clinfec.com.br/prestadores
+   LOGIN SUCCESS - User: master@clinfec.com.br - Redirecting to: https://prestadores.clinfec.com.br/dashboard
+   BASE_URL constant: https://prestadores.clinfec.com.br
    Session created - usuario_id: 1, usuario_perfil: master
    ```
 

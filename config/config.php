@@ -1,8 +1,8 @@
 <?php
 /**
  * Clinfec Prestadores - Configurações Gerais
- * Hostinger - Subpasta prestadores
- * URL: https://clinfec.com.br/prestadores
+ * Hostinger - Domínio Dedicado
+ * URL: https://prestadores.clinfec.com.br
  */
 
 return [
@@ -11,15 +11,15 @@ return [
     'app_version' => '1.0.0',
     'app_description' => 'Sistema de Gestão de Prestadores de Serviço',
     
-    // URL Base - IMPORTANTE: Incluir /prestadores para subpasta
-    'base_url' => 'https://clinfec.com.br/prestadores',
+    // URL Base - Domínio dedicado (raiz)
+    'base_url' => 'https://prestadores.clinfec.com.br',
     
     // Timezone
     'timezone' => 'America/Sao_Paulo',
     
     // Caminhos
     'upload_path' => __DIR__ . '/../uploads/',  // Caminho absoluto no servidor
-    'upload_url' => '/prestadores/uploads/',    // URL relativa com /prestadores
+    'upload_url' => '/uploads/',    // URL relativa (raiz)
     
     // Upload de Arquivos
     'upload_max_size' => 10485760,  // 10MB em bytes

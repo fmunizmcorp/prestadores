@@ -35,9 +35,9 @@
 - **Frontend:** Bootstrap 5, jQuery, DataTables, Select2, Chart.js
 
 ### URLs
-- **Produção:** https://clinfec.com.br/prestadores
-- **Login:** https://clinfec.com.br/prestadores/?page=login
-- **Cadastro Inicial:** https://clinfec.com.br/prestadores/cadastroinicial.php
+- **Produção:** https://prestadores.clinfec.com.br
+- **Login:** https://prestadores.clinfec.com.br/?page=login
+- **Cadastro Inicial:** https://prestadores.clinfec.com.br/cadastroinicial.php
 
 ### Repositório
 - **GitHub:** https://github.com/fmunizmcorp/prestadores
@@ -99,7 +99,7 @@ App\
 ### Fluxo de Requisição
 
 ```
-1. User Request → https://clinfec.com.br/prestadores/?page=login
+1. User Request → https://prestadores.clinfec.com.br/?page=login
                                                               ↓
 2. .htaccess → RewriteBase /prestadores/
                                                               ↓
@@ -198,7 +198,7 @@ App\
 
 **URL de Login:**
 ```
-https://clinfec.com.br/prestadores/?page=login
+https://prestadores.clinfec.com.br/?page=login
 ```
 
 **Credenciais Master:**
@@ -423,7 +423,7 @@ prestadores/
 return [
     'app_name' => 'Clinfec Prestadores',
     'app_version' => '1.0.0',
-    'base_url' => 'https://clinfec.com.br/prestadores',  // ← Crítico
+    'base_url' => 'https://prestadores.clinfec.com.br',  // ← Crítico
     'timezone' => 'America/Sao_Paulo',
     'upload_path' => __DIR__ . '/../uploads/',
     'upload_url' => '/prestadores/uploads/',
@@ -777,7 +777,7 @@ mysql -u u673902663_admin -p u673902663_prestadores < backup_20241105.sql
 
 #### 1. ✅ Executar cadastroinicial.php
 ```
-Acesse: https://clinfec.com.br/prestadores/cadastroinicial.php
+Acesse: https://prestadores.clinfec.com.br/cadastroinicial.php
 ```
 
 **O que vai acontecer:**
@@ -793,7 +793,7 @@ Acesse: https://clinfec.com.br/prestadores/cadastroinicial.php
 
 #### 2. ✅ Primeiro Login
 ```
-URL: https://clinfec.com.br/prestadores/?page=login
+URL: https://prestadores.clinfec.com.br/?page=login
 Email: flavio@clinfec.com.br
 Senha: admin123
 ```
@@ -1062,7 +1062,7 @@ case 'novo':
 
 **1. Acesse o sistema:**
 ```
-https://clinfec.com.br/prestadores/?page=login
+https://prestadores.clinfec.com.br/?page=login
 ```
 
 **2. Faça login com as credenciais fornecidas**
@@ -1560,7 +1560,7 @@ Sprint 4 → Sprint 5 → Sprint 6 → Sprint 7 → Sprint 8 → Sprint 9 → CO
 **🔄 Última atualização:** 05 de Novembro de 2024  
 **✍️ Autor:** Sistema Automatizado (Claude Code + GenSpark)  
 **📧 Contato:** flavio@clinfec.com.br  
-**🌐 Website:** https://clinfec.com.br/prestadores  
+**🌐 Website:** https://prestadores.clinfec.com.br  
 **💻 GitHub:** https://github.com/fmunizmcorp/prestadores  
 **📖 Versão:** 1.0.0 - CONSOLIDAÇÃO COMPLETA
 

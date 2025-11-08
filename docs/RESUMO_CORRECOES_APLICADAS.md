@@ -6,7 +6,7 @@ Este documento consolida **todas as correções** aplicadas ao sistema Clinfec P
 
 **Data das Correções:** 04-05 de Novembro de 2024  
 **Status:** ✅ Todas as correções aplicadas e testadas  
-**Sistema Funcional:** https://clinfec.com.br/prestadores
+**Sistema Funcional:** https://prestadores.clinfec.com.br
 
 ---
 
@@ -243,7 +243,7 @@ define('BASE_URL', '/prestadores');  // Critical for subfolder
 
 **config/config.php:**
 ```php
-'base_url' => 'https://clinfec.com.br/prestadores',
+'base_url' => 'https://prestadores.clinfec.com.br',
 ```
 
 ### 📝 Arquivos Alterados:
@@ -428,7 +428,7 @@ da648df - fix(session): padronizar variáveis
 ## ✅ CHECKLIST DE VALIDAÇÃO
 
 ### Sistema Funcionando:
-- [x] Acesso à URL: https://clinfec.com.br/prestadores
+- [x] Acesso à URL: https://prestadores.clinfec.com.br
 - [x] Página de login carrega corretamente
 - [x] Login com credenciais funciona
 - [x] Redirecionamento pós-login correto
@@ -502,7 +502,7 @@ da648df - fix(session): padronizar variáveis
 ## 📞 INFORMAÇÕES DE SUPORTE
 
 ### Sistema:
-- **URL:** https://clinfec.com.br/prestadores
+- **URL:** https://prestadores.clinfec.com.br
 - **Banco:** u673902663_prestadores
 - **Servidor:** Hostinger
 - **PHP:** 7.4+

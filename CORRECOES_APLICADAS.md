@@ -115,7 +115,7 @@ Esta pasta armazena todos os arquivos enviados pelos usuários:
 ## 🧪 TESTE APÓS CORREÇÃO
 
 1. **Delete test.php** (se ainda existir)
-2. **Acesse:** https://clinfec.com.br/prestadores/
+2. **Acesse:** https://prestadores.clinfec.com.br/
 3. **Resultado esperado:** Tela de login
 4. **Login:** admin / admin123
 

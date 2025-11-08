@@ -34,7 +34,7 @@ Edite **APENAS** o arquivo `config/database.php`:
 ```
 
 ### 3️⃣ ACESSAR
-- URL: `https://clinfec.com.br/prestadores/`
+- URL: `https://prestadores.clinfec.com.br/`
 - O sistema se instala sozinho! ✨
 - Login: `admin@clinfec.com.br` / `admin`
 

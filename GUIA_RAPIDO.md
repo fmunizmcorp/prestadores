@@ -4,7 +4,7 @@
 
 ### URL de Acesso
 ```
-https://clinfec.com.br/prestadores/
+https://prestadores.clinfec.com.br/
 ```
 
 ### Credenciais Master (Primeira vez)

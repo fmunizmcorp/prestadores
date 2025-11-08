@@ -26,7 +26,7 @@ Perfil: MASTER (acesso total)
 
 1. **Acesse a URL:**
    ```
-   https://clinfec.com.br/prestadores/cadastroinicial.php
+   https://prestadores.clinfec.com.br/cadastroinicial.php
    ```
 
 2. **O script irá:**
@@ -37,7 +37,7 @@ Perfil: MASTER (acesso total)
 
 3. **Após executar:**
    - Anote as credenciais
-   - Acesse o login: `https://clinfec.com.br/prestadores/?page=login`
+   - Acesse o login: `https://prestadores.clinfec.com.br/?page=login`
    - Faça login com email e senha exibidos
    - **DELETE o arquivo `cadastroinicial.php` imediatamente!**
 
@@ -63,7 +63,7 @@ rm cadastroinicial.php
 
 2. **Acesse pelo navegador:**
    ```
-   https://clinfec.com.br/prestadores/cadastroinicial.php
+   https://prestadores.clinfec.com.br/cadastroinicial.php
    ```
 
 3. **Delete o arquivo** via FTP após uso
@@ -186,7 +186,7 @@ WHERE email = 'flavio@clinfec.com.br';
 
 ## 📱 Após criar o usuário:
 
-1. ✅ Acesse: `https://clinfec.com.br/prestadores/?page=login`
+1. ✅ Acesse: `https://prestadores.clinfec.com.br/?page=login`
 2. ✅ Digite:
    - Email: `flavio@clinfec.com.br`
    - Senha: `admin123`
@@ -221,4 +221,4 @@ Se tiver problemas:
 
 **Criado em:** 2024-11-05  
 **Sistema:** Clinfec Prestadores v1.0.0  
-**Ambiente:** Hostinger (https://clinfec.com.br/prestadores)
+**Ambiente:** Hostinger (https://prestadores.clinfec.com.br)

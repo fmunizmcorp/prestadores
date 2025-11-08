@@ -67,7 +67,7 @@ Edite: `config/app.php` (linhas 33-36)
 
 ### 4. Acesso
 ```
-URL: https://clinfec.com.br/prestadores/
+URL: https://prestadores.clinfec.com.br/
 
 O sistema irá se auto-instalar na primeira execução!
 ```

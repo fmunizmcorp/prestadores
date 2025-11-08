@@ -325,7 +325,7 @@ log_activity()      // Log de atividades
 
 ### 3. Fazer Primeiro Login
 ```
-URL: https://clinfec.com.br/prestadores/login
+URL: https://prestadores.clinfec.com.br/login
 Email: admin@clinfec.com.br
 Senha: Master@2024
 ```

@@ -1,6 +1,6 @@
 # 🚀 INSTALAÇÃO CLINFEC - HOSTINGER
 
-## URL: https://clinfec.com.br/prestadores
+## URL: https://prestadores.clinfec.com.br
 ## Data: 2025-11-04
 ## Status: ARQUIVOS CORRIGIDOS E PRONTOS
 
@@ -10,7 +10,7 @@
 
 Todos os arquivos foram atualizados para funcionar em:
 - **Local:** `public_html/prestadores/`
-- **URL:** `https://clinfec.com.br/prestadores`
+- **URL:** `https://prestadores.clinfec.com.br`
 
 ---
 
@@ -138,14 +138,14 @@ phpinfo();
 ?>
 ```
 
-Acesse: **https://clinfec.com.br/prestadores/test.php**
+Acesse: **https://prestadores.clinfec.com.br/test.php**
 
 - ✅ Deve mostrar informações do PHP
 - ❌ Se der erro 403/500, verifique permissões
 
 ### Teste 2: Sistema
 
-Acesse: **https://clinfec.com.br/prestadores/**
+Acesse: **https://prestadores.clinfec.com.br/**
 
 - ✅ Deve redirecionar para login
 - ❌ Se der erro 500, veja o log de erro (próximo passo)
@@ -183,7 +183,7 @@ ini_set('display_errors', 1);  // Habilitado
 
 ### Login Padrão:
 
-Acesse: **https://clinfec.com.br/prestadores/**
+Acesse: **https://prestadores.clinfec.com.br/**
 
 ```
 Usuário: admin
@@ -224,22 +224,22 @@ Antes de considerar instalado, verifique:
 
 ```
 Login:
-https://clinfec.com.br/prestadores/
+https://prestadores.clinfec.com.br/
 
 Dashboard:
-https://clinfec.com.br/prestadores/?page=dashboard
+https://prestadores.clinfec.com.br/?page=dashboard
 
 Empresas Tomadoras:
-https://clinfec.com.br/prestadores/?page=empresas-tomadoras
+https://prestadores.clinfec.com.br/?page=empresas-tomadoras
 
 Empresas Prestadoras:
-https://clinfec.com.br/prestadores/?page=empresas-prestadoras
+https://prestadores.clinfec.com.br/?page=empresas-prestadoras
 
 Serviços:
-https://clinfec.com.br/prestadores/?page=servicos
+https://prestadores.clinfec.com.br/?page=servicos
 
 Contratos:
-https://clinfec.com.br/prestadores/?page=contratos
+https://prestadores.clinfec.com.br/?page=contratos
 ```
 
 ---
@@ -260,7 +260,7 @@ https://clinfec.com.br/prestadores/?page=contratos
 - ✅ Gzip habilitado
 
 ### config/config.php (NOVO)
-- ✅ base_url = 'https://clinfec.com.br/prestadores'
+- ✅ base_url = 'https://prestadores.clinfec.com.br'
 - ✅ upload_url = '/prestadores/uploads/'
 - ✅ Todas configurações corretas
 
@@ -313,7 +313,7 @@ prestadores/uploads → 777
 **Causa:** base_url incorreto
 
 **Solução:**
-- Verifique config.php tem: `'base_url' => 'https://clinfec.com.br/prestadores'`
+- Verifique config.php tem: `'base_url' => 'https://prestadores.clinfec.com.br'`
 
 ---
 
@@ -363,4 +363,4 @@ No repositório você encontra:
 
 **FIM DO GUIA DE INSTALAÇÃO** ✅
 
-Sistema pronto para uso em: **https://clinfec.com.br/prestadores**
+Sistema pronto para uso em: **https://prestadores.clinfec.com.br**

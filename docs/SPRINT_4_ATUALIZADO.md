@@ -66,7 +66,7 @@ spl_autoload_register(function ($class) {
 #### 3. BASE_URL para Subfolder ✅
 ```php
 // config/config.php
-'base_url' => 'https://clinfec.com.br/prestadores',
+'base_url' => 'https://prestadores.clinfec.com.br',
 
 // .htaccess
 RewriteBase /prestadores/

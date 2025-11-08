@@ -193,7 +193,7 @@ prestadores/
 ### Fluxo de Login:
 
 ```
-1. Usuário acessa: https://clinfec.com.br/prestadores/
+1. Usuário acessa: https://prestadores.clinfec.com.br/
    └─> index.php verifica SESSION['user_id']
        └─> Não existe? Redirect para ?page=login
 

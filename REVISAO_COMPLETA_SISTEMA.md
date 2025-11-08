@@ -163,7 +163,7 @@ $_SESSION['usuario_id'] = $usuario['id'];  // Para compatibilidade
 
 ### Passo 3: Testar Sistema
 ```bash
-1. Acesse: https://clinfec.com.br/prestadores/
+1. Acesse: https://prestadores.clinfec.com.br/
 2. Deve mostrar tela de login
 3. Login: admin / admin123
 4. Deve entrar no dashboard
@@ -200,7 +200,7 @@ ini_set('display_errors', 0);
 
 ### URLs (config/config.php):
 ```php
-'base_url' => 'https://clinfec.com.br/prestadores',
+'base_url' => 'https://prestadores.clinfec.com.br',
 'upload_url' => '/prestadores/uploads/',
 ```
 

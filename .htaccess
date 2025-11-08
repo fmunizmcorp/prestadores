@@ -1,10 +1,10 @@
-# Clinfec Prestadores - Hostinger Subpasta
+# Clinfec Prestadores - Domínio Dedicado
 # Local: public_html/prestadores/.htaccess
-# URL: https://clinfec.com.br/prestadores
+# URL: https://prestadores.clinfec.com.br (raiz)
 
 # Ativar RewriteEngine
 RewriteEngine On
-RewriteBase /prestadores/
+# RewriteBase / não é necessário (padrão para raiz)
 
 # Forçar HTTPS
 RewriteCond %{HTTPS} off

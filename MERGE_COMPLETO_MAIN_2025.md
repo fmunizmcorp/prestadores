@@ -248,7 +248,7 @@ nothing to commit, working tree clean
 #### 4.2. Fix Crítico de Redirects (Commit 60e9fea)
 
 **Problema Resolvido:**
-Sistema redirecionava para `clinfec.com.br/login` ao invés de `clinfec.com.br/prestadores/dashboard`.
+Sistema redirecionava para `clinfec.com.br/login` ao invés de `prestadores.clinfec.com.br/dashboard`.
 
 **Causa Raiz:**
 - 185+ redirects usando URLs RELATIVAS
@@ -260,7 +260,7 @@ Sistema redirecionava para `clinfec.com.br/login` ao invés de `clinfec.com.br/p
 header('Location: /prestadores/dashboard');
 
 // DEPOIS (URL absoluta)
-header('Location: https://clinfec.com.br/prestadores/dashboard');
+header('Location: https://prestadores.clinfec.com.br/dashboard');
 ```
 
 **Mudanças:**
@@ -361,9 +361,9 @@ git pull origin main
 ```
 
 ### 2. Testar Login Flow
-1. Acessar: `https://clinfec.com.br/prestadores/login`
+1. Acessar: `https://prestadores.clinfec.com.br/login`
 2. Login com: `master@clinfec.com.br` / `password`
-3. ✅ Verificar redirect para: `https://clinfec.com.br/prestadores/dashboard`
+3. ✅ Verificar redirect para: `https://prestadores.clinfec.com.br/dashboard`
 4. ✅ Verificar que dashboard carrega corretamente
 
 ### 3. Verificar Debug Logs

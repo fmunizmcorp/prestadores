@@ -23,8 +23,9 @@ $scriptName = dirname($_SERVER['SCRIPT_NAME']);
 define('BASE_PATH', $scriptName !== '/' ? $scriptName : '');
 
 // Definir BASE_URL com domínio completo (ABSOLUTE URL)
+// Novo domínio: prestadores.clinfec.com.br (raiz, sem subpasta)
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-$host = $_SERVER['HTTP_HOST'] ?? 'clinfec.com.br';
+$host = $_SERVER['HTTP_HOST'] ?? 'prestadores.clinfec.com.br';
 $basePath = BASE_PATH;
 define('BASE_URL', $protocol . '://' . $host . $basePath);
 

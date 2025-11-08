@@ -140,12 +140,12 @@ RewriteRule ^prestadores/?$ /prestadores/public/ [L,R=301]
 
 Abra o navegador e acesse:
 ```
-https://clinfec.com.br/prestadores/public/
+https://prestadores.clinfec.com.br/public/
 ```
 
 Ou se configurou o .htaccess:
 ```
-https://clinfec.com.br/prestadores/
+https://prestadores.clinfec.com.br/
 ```
 
 ### 6.2 Fazer Login
