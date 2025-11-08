@@ -20,10 +20,10 @@ RewriteRule ^(config|database|src|docs|vendor|logs)/ - [F,L]
 # Proteger arquivos sensíveis
 RewriteRule \.(md|json|lock|yml|yaml|ini|log)$ - [F,L]
 
-# Front Controller - Rotear tudo para index.php
+# Front Controller - Rotear tudo para public/index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [QSA,L]
+RewriteRule ^(.*)$ public/index.php [QSA,L]
 
 # Desabilitar listagem de diretórios
 Options -Indexes

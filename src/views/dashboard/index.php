@@ -1,7 +1,7 @@
 <?php
 // Verificar autenticação
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /login');
+    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
     exit;
 }
 
