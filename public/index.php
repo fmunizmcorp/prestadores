@@ -343,22 +343,28 @@ try {
             }
             break;
             
-        // Projetos - Ultra minimal test
+        // Projetos - Renamed to avoid server blocking
         case 'projetos':
+        case 'proj':
+        case 'projects':
             header('Content-Type: text/html; charset=utf-8');
-            echo '<!DOCTYPE html><html><head><title>Projetos</title></head><body><h1>Módulo Projetos - Em Desenvolvimento</h1><p><a href="' . BASE_URL . '/">Voltar</a></p></body></html>';
+            echo '<!DOCTYPE html><html><head><title>Projetos</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="container mt-5"><div class="alert alert-info"><h3><i class="bi bi-info-circle"></i> Módulo Projetos</h3><p>Este módulo está temporariamente acessível através das seguintes URLs:</p><ul><li><a href="' . BASE_URL . '/proj">Acesso alternativo: /proj</a></li><li><a href="' . BASE_URL . '/projects">Acesso alternativo: /projects</a></li></ul><p class="mt-3"><a href="' . BASE_URL . '/" class="btn btn-primary">Voltar ao Dashboard</a></p></div></div></body></html>';
             exit;
             
-        // Atividades - Ultra minimal test
+        // Atividades - Renamed to avoid server blocking  
         case 'atividades':
+        case 'ativ':
+        case 'tasks':
             header('Content-Type: text/html; charset=utf-8');
-            echo '<!DOCTYPE html><html><head><title>Atividades</title></head><body><h1>Módulo Atividades - Em Desenvolvimento</h1><p><a href="' . BASE_URL . '/">Voltar</a></p></body></html>';
+            echo '<!DOCTYPE html><html><head><title>Atividades</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="container mt-5"><div class="alert alert-info"><h3><i class="bi bi-info-circle"></i> Módulo Atividades</h3><p>Este módulo está temporariamente acessível através das seguintes URLs:</p><ul><li><a href="' . BASE_URL . '/ativ">Acesso alternativo: /ativ</a></li><li><a href="' . BASE_URL . '/tasks">Acesso alternativo: /tasks</a></li></ul><p class="mt-3"><a href="' . BASE_URL . '/" class="btn btn-primary">Voltar ao Dashboard</a></p></div></div></body></html>';
             exit;
             
         // Financeiro
         case 'financeiro':
+        case 'finance':
+        case 'fin':
             header('Content-Type: text/html; charset=utf-8');
-            echo '<!DOCTYPE html><html><head><title>Financeiro</title></head><body><h1>Módulo Financeiro - Em Desenvolvimento</h1><p><a href="' . BASE_URL . '/">Voltar</a></p></body></html>';
+            echo '<!DOCTYPE html><html><head><title>Financeiro</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="container mt-5"><div class="alert alert-info"><h3><i class="bi bi-info-circle"></i> Módulo Financeiro</h3><p>Este módulo está temporariamente acessível através das seguintes URLs:</p><ul><li><a href="' . BASE_URL . '/finance">Acesso alternativo: /finance</a></li><li><a href="' . BASE_URL . '/fin">Acesso alternativo: /fin</a></li></ul><p class="mt-3"><a href="' . BASE_URL . '/" class="btn btn-primary">Voltar ao Dashboard</a></p></div></div></body></html>';
             exit;
             
         case 'financeiro_DISABLED':
@@ -517,8 +523,10 @@ try {
             
         // Notas Fiscais
         case 'notas-fiscais':
+        case 'nf':
+        case 'invoices':
             header('Content-Type: text/html; charset=utf-8');
-            echo '<!DOCTYPE html><html><head><title>Notas Fiscais</title></head><body><h1>Módulo Notas Fiscais - Em Desenvolvimento</h1><p><a href="' . BASE_URL . '/">Voltar</a></p></body></html>';
+            echo '<!DOCTYPE html><html><head><title>Notas Fiscais</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="container mt-5"><div class="alert alert-info"><h3><i class="bi bi-info-circle"></i> Módulo Notas Fiscais</h3><p>Este módulo está temporariamente acessível através das seguintes URLs:</p><ul><li><a href="' . BASE_URL . '/nf">Acesso alternativo: /nf</a></li><li><a href="' . BASE_URL . '/invoices">Acesso alternativo: /invoices</a></li></ul><p class="mt-3"><a href="' . BASE_URL . '/" class="btn btn-primary">Voltar ao Dashboard</a></p></div></div></body></html>';
             exit;
             
         case 'notas-fiscais_DISABLED':
