@@ -22,6 +22,13 @@ if (function_exists('opcache_invalidate')) {
 // Iniciar sessão
 session_start();
 
+// DEBUG ULTRA EARLY - antes de qualquer coisa
+$debug_route = $_SERVER['REQUEST_URI'] ?? 'unknown';
+@file_put_contents(dirname(__DIR__) . '/early_debug.log', 
+    date('Y-m-d H:i:s') . " - URI: $debug_route - Session started\n", 
+    FILE_APPEND
+);
+
 // Gerar CSRF Token se não existir
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -69,10 +76,24 @@ require ROOT_PATH . '/config/version.php';
 // Executar migrações automaticamente
 use App\DatabaseMigration;
 try {
+    @file_put_contents(dirname(__DIR__) . '/early_debug.log', 
+        date('Y-m-d H:i:s') . " - Before migration\n", 
+        FILE_APPEND
+    );
+    
     $migration = new DatabaseMigration();
     $migration->checkAndMigrate();
+    
+    @file_put_contents(dirname(__DIR__) . '/early_debug.log', 
+        date('Y-m-d H:i:s') . " - After migration\n", 
+        FILE_APPEND
+    );
 } catch (Exception $e) {
     error_log("Erro ao executar migrations: " . $e->getMessage());
+    @file_put_contents(dirname(__DIR__) . '/early_debug.log', 
+        date('Y-m-d H:i:s') . " - Migration error: " . $e->getMessage() . "\n", 
+        FILE_APPEND
+    );
     // Continua mesmo com erro - permite visualizar página de erro
 }
 
@@ -85,7 +106,14 @@ $url = parse_url($url, PHP_URL_PATH);
 
 // Separar URL em partes
 $parts = explode('/', $url);
-$route = $parts[0] ?? 'dashboard';
+
+// SOLUÇÃO: Rotas bloqueadas pela Hostinger - usar query string
+// Se vier via query string ?route=, usar isso
+if (isset($_GET['route'])) {
+    $route = $_GET['route'];
+} else {
+    $route = $parts[0] ?? 'dashboard';
+}
 
 // EMERGENCY DEBUG - Show route info
 if (isset($_GET['__debug'])) {
@@ -122,6 +150,12 @@ if (isset($_GET['_debug']) && $_GET['_debug'] === '1') {
         echo "\nSession mocked with master user\n";
     }
 }
+
+// DEBUG: Log route antes do switch
+file_put_contents(__DIR__ . '/../route_debug.log', 
+    date('Y-m-d H:i:s') . " - Route: $route - URL: $url\n", 
+    FILE_APPEND
+);
 
 // Roteamento
 try {

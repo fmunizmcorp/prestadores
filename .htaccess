@@ -20,8 +20,18 @@ RewriteRule ^(config|database|src|docs|vendor|logs)/ - [F,L]
 # Proteger arquivos sensíveis
 RewriteRule \.(md|json|lock|yml|yaml|ini|log)$ - [F,L]
 
-# Allow direct access to test files (for debugging)
+# Allow direct access to test and debug files
 RewriteRule ^test_.*\.php$ - [L]
+RewriteRule ^capture_error\.php$ - [L]
+RewriteRule ^clear_cache\.php$ - [L]
+RewriteRule ^phpinfo_test\.php$ - [L]
+RewriteRule ^diagnose_.*\.php$ - [L]
+
+# SOLUÇÃO: Redirecionar rotas bloqueadas pela Hostinger para query string
+RewriteRule ^projetos/?(.*)$ public/index.php?route=projetos&path=$1 [QSA,L]
+RewriteRule ^atividades/?(.*)$ public/index.php?route=atividades&path=$1 [QSA,L]
+RewriteRule ^financeiro/?(.*)$ public/index.php?route=financeiro&path=$1 [QSA,L]
+RewriteRule ^notas-fiscais/?(.*)$ public/index.php?route=notas-fiscais&path=$1 [QSA,L]
 
 # Front Controller - Rotear tudo para public/index.php
 RewriteCond %{REQUEST_FILENAME} !-f
