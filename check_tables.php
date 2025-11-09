@@ -1,30 +1,56 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
+// Can be run locally to check database
 define('ROOT_PATH', __DIR__);
 
-require_once ROOT_PATH . '/vendor/autoload.php';
-require_once ROOT_PATH . '/config/database.php';
+// Autoloader
+spl_autoload_register(function ($class) {
+    $prefix = 'App\\';
+    $base_dir = ROOT_PATH . '/src/';
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) return;
+    $relative_class = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    if (file_exists($file)) require $file;
+});
 
 try {
-    $db = new Database();
-    $conn = $db->getConnection();
+    echo "Connecting to database...\n";
+    $db = App\Database::getInstance()->getConnection();
     
-    $tables = ['projetos', 'atividades', 'notas_fiscais', 'projeto_categorias', 'projeto_financeiro'];
+    echo "✓ Connected!\n\n";
     
+    // Get all tables
+    $stmt = $db->query("SHOW TABLES");
+    $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    echo "Total tables: " . count($tables) . "\n\n";
+    echo "Tables in database:\n";
+    echo "==================\n";
     foreach ($tables as $table) {
-        $stmt = $conn->query("SHOW TABLES LIKE '$table'");
-        $exists = $stmt->rowCount() > 0;
-        echo ($exists ? "✅" : "❌") . " $table\n";
-        
-        if ($exists) {
-            $stmt = $conn->query("SELECT COUNT(*) as count FROM $table");
-            $result = $stmt->fetch();
-            echo "   Rows: " . $result['count'] . "\n";
-        }
+        echo "  - $table\n";
+    }
+    
+    // Check specific tables required by failing routes
+    echo "\n\nChecking tables for failing routes:\n";
+    echo "====================================\n";
+    
+    $requiredTables = [
+        'projetos' => 'ProjetoController',
+        'projeto_categorias' => 'ProjetoController',
+        'atividades' => 'AtividadeController',
+        'lancamentos_financeiros' => 'FinanceiroController',
+        'categorias_financeiras' => 'FinanceiroController',
+        'notas_fiscais' => 'NotaFiscalController',
+        'fornecedores' => 'NotaFiscalController (Fornecedor model)',
+        'clientes' => 'NotaFiscalController (Cliente model)',
+    ];
+    
+    foreach ($requiredTables as $table => $controller) {
+        $exists = in_array($table, $tables);
+        $status = $exists ? '✓' : '✗';
+        echo "$status $table ($controller)\n";
     }
     
 } catch (Exception $e) {
-    echo "❌ Database Error: " . $e->getMessage() . "\n";
+    echo "Error: " . $e->getMessage() . "\n";
 }

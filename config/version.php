@@ -5,9 +5,9 @@
  */
 
 return [
-    'version' => '1.9.0',
-    'release_date' => '2025-11-10',
-    'db_version' => 15, // Versão do schema do banco de dados (última migration = 015)
+    'version' => '1.8.0',
+    'release_date' => '2025-11-08',
+    'db_version' => 11, // Versão do schema do banco de dados (última migration = 011)
     
     'changelog' => [
         '1.4.0' => [
