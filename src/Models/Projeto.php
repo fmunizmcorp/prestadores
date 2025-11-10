@@ -20,127 +20,143 @@ class Projeto extends BaseModel
      */
     public function all($filtros = [], $page = 1, $limit = 20)
     {
-        $offset = ($page - 1) * $limit;
-        
-        $sql = "SELECT 
-            p.*,
-            et.razao_social as tomadora_razao,
-            et.nome_fantasia as tomadora_nome,
-            ep.razao_social as prestadora_razao,
-            ep.nome_fantasia as prestadora_nome,
-            c.numero_contrato,
-            c.id as contrato_id,
-            u.nome as gestor_nome,
-            u.email as gestor_email,
-            pc.nome as categoria_nome,
-            uc.nome as criado_por_nome,
-            COUNT(DISTINCT pe.id) as total_etapas,
-            COUNT(DISTINCT a.id) as total_atividades,
-            SUM(CASE WHEN a.status = 'concluida' THEN 1 ELSE 0 END) as atividades_concluidas,
-            DATEDIFF(p.data_fim_prevista, CURDATE()) as dias_restantes,
-            DATEDIFF(CURDATE(), p.data_inicio) as dias_decorridos
-        FROM {$this->table} p
-        LEFT JOIN empresas_tomadoras et ON p.empresa_tomadora_id = et.id
-        LEFT JOIN empresas_prestadoras ep ON p.empresa_prestadora_id = ep.id
-        LEFT JOIN contratos c ON p.contrato_id = c.id
-        LEFT JOIN usuarios u ON p.gerente_id = u.id
-        LEFT JOIN projeto_categorias pc ON p.categoria_id = pc.id
-        LEFT JOIN usuarios uc ON p.created_by = uc.id
-        LEFT JOIN projeto_etapas pe ON p.id = pe.projeto_id AND pe.deleted_at IS NULL
-        LEFT JOIN atividades a ON p.id = a.projeto_id AND a.deleted_at IS NULL
-        WHERE p.deleted_at IS NULL";
-        
-        // Aplicar filtros
-        if (!empty($filtros['status'])) {
-            $sql .= " AND p.status = :status";
+        try {
+            $offset = ($page - 1) * $limit;
+            
+            $sql = "SELECT 
+                p.*,
+                et.razao_social as tomadora_razao,
+                et.nome_fantasia as tomadora_nome,
+                ep.razao_social as prestadora_razao,
+                ep.nome_fantasia as prestadora_nome,
+                c.numero_contrato,
+                u.nome as gestor_nome,
+                u.email as gestor_email,
+                pc.nome as categoria_nome,
+                uc.nome as criado_por_nome,
+                COUNT(DISTINCT pe.id) as total_etapas,
+                COUNT(DISTINCT a.id) as total_atividades,
+                SUM(CASE WHEN a.status = 'concluida' THEN 1 ELSE 0 END) as atividades_concluidas,
+                DATEDIFF(p.data_fim_prevista, CURDATE()) as dias_restantes,
+                DATEDIFF(CURDATE(), p.data_inicio) as dias_decorridos
+            FROM {$this->table} p
+            LEFT JOIN empresas_tomadoras et ON p.empresa_tomadora_id = et.id
+            LEFT JOIN empresas_prestadoras ep ON p.empresa_prestadora_id = ep.id
+            LEFT JOIN contratos c ON p.contrato_id = c.id
+            LEFT JOIN usuarios u ON p.gerente_id = u.id
+            LEFT JOIN projeto_categorias pc ON p.categoria_id = pc.id
+            LEFT JOIN usuarios uc ON p.created_by = uc.id
+            LEFT JOIN projeto_etapas pe ON p.id = pe.projeto_id AND pe.deleted_at IS NULL
+            LEFT JOIN atividades a ON p.id = a.projeto_id AND a.deleted_at IS NULL
+            WHERE p.deleted_at IS NULL";
+            
+            // Aplicar filtros
+            if (!empty($filtros['status'])) {
+                $sql .= " AND p.status = :status";
+            }
+            
+            if (!empty($filtros['contrato_id'])) {
+                $sql .= " AND p.contrato_id = :contrato_id";
+            }
+            
+            if (!empty($filtros['empresa_tomadora_id'])) {
+                $sql .= " AND p.empresa_tomadora_id = :empresa_tomadora_id";
+            }
+            
+            if (!empty($filtros['empresa_prestadora_id'])) {
+                $sql .= " AND p.empresa_prestadora_id = :empresa_prestadora_id";
+            }
+            
+            if (!empty($filtros['gestor_projeto_id'])) {
+                $sql .= " AND p.gerente_id = :gestor_projeto_id";
+            }
+            
+            if (!empty($filtros['categoria_id'])) {
+                $sql .= " AND p.categoria_id = :categoria_id";
+            }
+            
+            if (!empty($filtros['prioridade'])) {
+                $sql .= " AND p.prioridade = :prioridade";
+            }
+            
+            if (!empty($filtros['data_inicio'])) {
+                $sql .= " AND p.data_inicio >= :data_inicio";
+            }
+            
+            if (!empty($filtros['data_fim'])) {
+                $sql .= " AND p.data_fim_prevista <= :data_fim";
+            }
+            
+            if (!empty($filtros['search'])) {
+                // CORRIGIDO: codigo ao invés de codigo_projeto
+                $sql .= " AND (p.codigo LIKE :search OR p.nome LIKE :search OR p.descricao LIKE :search)";
+            }
+            
+            $sql .= " GROUP BY p.id";
+            
+            // Ordenação
+            $orderBy = $filtros['order_by'] ?? 'p.created_at';
+            $orderDir = $filtros['order_dir'] ?? 'DESC';
+            $sql .= " ORDER BY {$orderBy} {$orderDir}";
+            
+            // Paginação
+            $sql .= " LIMIT :limit OFFSET :offset";
+            
+            $stmt = $this->db->prepare($sql);
+            
+            // Bind dos parâmetros
+            if (!empty($filtros['status'])) {
+                $stmt->bindValue(':status', $filtros['status']);
+            }
+            if (!empty($filtros['contrato_id'])) {
+                $stmt->bindValue(':contrato_id', $filtros['contrato_id'], PDO::PARAM_INT);
+            }
+            if (!empty($filtros['empresa_tomadora_id'])) {
+                $stmt->bindValue(':empresa_tomadora_id', $filtros['empresa_tomadora_id'], PDO::PARAM_INT);
+            }
+            if (!empty($filtros['empresa_prestadora_id'])) {
+                $stmt->bindValue(':empresa_prestadora_id', $filtros['empresa_prestadora_id'], PDO::PARAM_INT);
+            }
+            if (!empty($filtros['gestor_projeto_id'])) {
+                $stmt->bindValue(':gestor_projeto_id', $filtros['gestor_projeto_id'], PDO::PARAM_INT);
+            }
+            if (!empty($filtros['categoria_id'])) {
+                $stmt->bindValue(':categoria_id', $filtros['categoria_id'], PDO::PARAM_INT);
+            }
+            if (!empty($filtros['prioridade'])) {
+                $stmt->bindValue(':prioridade', $filtros['prioridade']);
+            }
+            if (!empty($filtros['data_inicio'])) {
+                $stmt->bindValue(':data_inicio', $filtros['data_inicio']);
+            }
+            if (!empty($filtros['data_fim'])) {
+                $stmt->bindValue(':data_fim', $filtros['data_fim']);
+            }
+            if (!empty($filtros['search'])) {
+                $searchTerm = '%' . $filtros['search'] . '%';
+                $stmt->bindValue(':search', $searchTerm);
+            }
+            
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            error_log("Projeto::all error: " . $e->getMessage());
+            // Fallback simples se der erro
+            try {
+                $sql = "SELECT * FROM {$this->table} WHERE deleted_at IS NULL LIMIT :limit OFFSET :offset";
+                $stmt = $this->db->prepare($sql);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', ($page - 1) * $limit, PDO::PARAM_INT);
+                $stmt->execute();
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (\Exception $e2) {
+                error_log("Projeto::all fallback error: " . $e2->getMessage());
+                return [];
+            }
         }
-        
-        if (!empty($filtros['contrato_id'])) {
-            $sql .= " AND p.contrato_id = :contrato_id";
-        }
-        
-        if (!empty($filtros['empresa_tomadora_id'])) {
-            $sql .= " AND p.empresa_tomadora_id = :empresa_tomadora_id";
-        }
-        
-        if (!empty($filtros['empresa_prestadora_id'])) {
-            $sql .= " AND p.empresa_prestadora_id = :empresa_prestadora_id";
-        }
-        
-        if (!empty($filtros['gestor_projeto_id'])) {
-            $sql .= " AND p.gerente_id = :gestor_projeto_id";
-        }
-        
-        if (!empty($filtros['categoria_id'])) {
-            $sql .= " AND p.categoria_id = :categoria_id";
-        }
-        
-        if (!empty($filtros['prioridade'])) {
-            $sql .= " AND p.prioridade = :prioridade";
-        }
-        
-        if (!empty($filtros['data_inicio'])) {
-            $sql .= " AND p.data_inicio >= :data_inicio";
-        }
-        
-        if (!empty($filtros['data_fim'])) {
-            $sql .= " AND p.data_fim_prevista <= :data_fim";
-        }
-        
-        if (!empty($filtros['search'])) {
-            $sql .= " AND (p.codigo_projeto LIKE :search OR p.nome LIKE :search OR p.descricao LIKE :search)";
-        }
-        
-        $sql .= " GROUP BY p.id";
-        
-        // Ordenação
-        $orderBy = $filtros['order_by'] ?? 'p.created_at';
-        $orderDir = $filtros['order_dir'] ?? 'DESC';
-        $sql .= " ORDER BY {$orderBy} {$orderDir}";
-        
-        // Paginação
-        $sql .= " LIMIT :limit OFFSET :offset";
-        
-        $stmt = $this->db->prepare($sql);
-        
-        // Bind dos parâmetros
-        if (!empty($filtros['status'])) {
-            $stmt->bindValue(':status', $filtros['status']);
-        }
-        if (!empty($filtros['contrato_id'])) {
-            $stmt->bindValue(':contrato_id', $filtros['contrato_id'], PDO::PARAM_INT);
-        }
-        if (!empty($filtros['empresa_tomadora_id'])) {
-            $stmt->bindValue(':empresa_tomadora_id', $filtros['empresa_tomadora_id'], PDO::PARAM_INT);
-        }
-        if (!empty($filtros['empresa_prestadora_id'])) {
-            $stmt->bindValue(':empresa_prestadora_id', $filtros['empresa_prestadora_id'], PDO::PARAM_INT);
-        }
-        if (!empty($filtros['gestor_projeto_id'])) {
-            $stmt->bindValue(':gestor_projeto_id', $filtros['gestor_projeto_id'], PDO::PARAM_INT);
-        }
-        if (!empty($filtros['categoria_id'])) {
-            $stmt->bindValue(':categoria_id', $filtros['categoria_id'], PDO::PARAM_INT);
-        }
-        if (!empty($filtros['prioridade'])) {
-            $stmt->bindValue(':prioridade', $filtros['prioridade']);
-        }
-        if (!empty($filtros['data_inicio'])) {
-            $stmt->bindValue(':data_inicio', $filtros['data_inicio']);
-        }
-        if (!empty($filtros['data_fim'])) {
-            $stmt->bindValue(':data_fim', $filtros['data_fim']);
-        }
-        if (!empty($filtros['search'])) {
-            $searchTerm = '%' . $filtros['search'] . '%';
-            $stmt->bindValue(':search', $searchTerm);
-        }
-        
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     /**

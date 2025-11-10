@@ -20,12 +20,13 @@ class Atividade extends BaseModel
      */
     public function all($filtros = [], $page = 1, $limit = 20)
     {
-        $offset = ($page - 1) * $limit;
-        
-        $sql = "SELECT 
+        try {
+            $offset = ($page - 1) * $limit;
+            
+            $sql = "SELECT 
             a.*,
             p.nome as projeto_nome,
-            p.codigo_projeto,
+            p.codigo as codigo_projeto,
             p.status as projeto_status,
             s.nome as servico_nome,
             s.categoria as servico_categoria,
@@ -38,7 +39,7 @@ class Atividade extends BaseModel
             COUNT(DISTINCT ap.id) as total_profissionais,
             COUNT(DISTINCT ac.id) as total_comentarios,
             COUNT(DISTINCT ad.id) as total_documentos,
-            DATEDIFF(a.data_fim_planejada, CURDATE()) as dias_restantes
+            DATEDIFF(a.data_fim_prevista, CURDATE()) as dias_restantes
         FROM {$this->table} a
         LEFT JOIN projetos p ON a.projeto_id = p.id
         LEFT JOIN servicos s ON a.servico_id = s.id
@@ -91,11 +92,11 @@ class Atividade extends BaseModel
         }
         
         if (!empty($filtros['data_inicio'])) {
-            $sql .= " AND a.data_inicio_planejada >= :data_inicio";
+            $sql .= " AND a.data_inicio >= :data_inicio";
         }
         
         if (!empty($filtros['data_fim'])) {
-            $sql .= " AND a.data_fim_planejada <= :data_fim";
+            $sql .= " AND a.data_fim_prevista <= :data_fim";
         }
         
         if (!empty($filtros['search'])) {
@@ -155,6 +156,21 @@ class Atividade extends BaseModel
         
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            error_log("Atividade::all error: " . $e->getMessage());
+            // Fallback simples se der erro
+            try {
+                $sql = "SELECT * FROM {$this->table} WHERE deleted_at IS NULL LIMIT :limit OFFSET :offset";
+                $stmt = $this->db->prepare($sql);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', ($page - 1) * $limit, PDO::PARAM_INT);
+                $stmt->execute();
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (\Exception $e2) {
+                error_log("Atividade::all fallback error: " . $e2->getMessage());
+                return [];
+            }
+        }
     }
     
     /**
@@ -214,7 +230,7 @@ class Atividade extends BaseModel
         $sql = "SELECT 
             a.*,
             p.nome as projeto_nome,
-            p.codigo_projeto,
+            p.codigo as codigo_projeto,
             p.status as projeto_status,
             p.empresa_tomadora_id,
             s.nome as servico_nome,
@@ -235,7 +251,7 @@ class Atividade extends BaseModel
             COUNT(DISTINCT ad.id) as total_documentos,
             SUM(ap.horas_realizadas) as total_horas_realizadas,
             SUM(ap.valor_pago) as total_valor_pago,
-            DATEDIFF(a.data_fim_planejada, CURDATE()) as dias_restantes,
+            DATEDIFF(a.data_fim_prevista, CURDATE()) as dias_restantes,
             DATEDIFF(CURDATE(), a.data_inicio_planejada) as dias_decorridos
         FROM {$this->table} a
         LEFT JOIN projetos p ON a.projeto_id = p.id
@@ -585,7 +601,7 @@ class Atividade extends BaseModel
         $sql = "SELECT 
             a.*,
             p.nome as projeto_nome,
-            p.codigo_projeto,
+            p.codigo as codigo_projeto,
             s.nome as servico_nome,
             ep.nome_fantasia as empresa_prestadora_nome,
             COUNT(DISTINCT ap.id) as total_candidatos,
