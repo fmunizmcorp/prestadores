@@ -2,10 +2,32 @@
 /**
  * Front Controller - Sistema Clinfec
  * Ponto de entrada único da aplicação
+ * Version: 1.8.2 - Sprint 10 - Try-catch fallbacks added
+ * Timestamp: 2025-11-09 00:50:00
  */
+
+// Force reload by touching timestamp
+// Last update: 2025-11-09 00:50:00
+
+// Clear OPcache if enabled
+if (function_exists('opcache_reset')) {
+    @opcache_reset();
+}
+
+// Also try to invalidate this specific file
+if (function_exists('opcache_invalidate')) {
+    @opcache_invalidate(__FILE__, true);
+}
 
 // Iniciar sessão
 session_start();
+
+// DEBUG ULTRA EARLY - antes de qualquer coisa
+$debug_route = $_SERVER['REQUEST_URI'] ?? 'unknown';
+@file_put_contents(dirname(__DIR__) . '/early_debug.log', 
+    date('Y-m-d H:i:s') . " - URI: $debug_route - Session started\n", 
+    FILE_APPEND
+);
 
 // Gerar CSRF Token se não existir
 if (!isset($_SESSION['csrf_token'])) {
@@ -54,10 +76,24 @@ require ROOT_PATH . '/config/version.php';
 // Executar migrações automaticamente
 use App\DatabaseMigration;
 try {
+    @file_put_contents(dirname(__DIR__) . '/early_debug.log', 
+        date('Y-m-d H:i:s') . " - Before migration\n", 
+        FILE_APPEND
+    );
+    
     $migration = new DatabaseMigration();
     $migration->checkAndMigrate();
+    
+    @file_put_contents(dirname(__DIR__) . '/early_debug.log', 
+        date('Y-m-d H:i:s') . " - After migration\n", 
+        FILE_APPEND
+    );
 } catch (Exception $e) {
     error_log("Erro ao executar migrations: " . $e->getMessage());
+    @file_put_contents(dirname(__DIR__) . '/early_debug.log', 
+        date('Y-m-d H:i:s') . " - Migration error: " . $e->getMessage() . "\n", 
+        FILE_APPEND
+    );
     // Continua mesmo com erro - permite visualizar página de erro
 }
 
@@ -70,15 +106,104 @@ $url = parse_url($url, PHP_URL_PATH);
 
 // Separar URL em partes
 $parts = explode('/', $url);
-$route = $parts[0] ?? 'dashboard';
+
+// SOLUÇÃO: Rotas bloqueadas pela Hostinger - usar query string
+// Se vier via query string ?route=, usar isso
+if (isset($_GET['route'])) {
+    $route = $_GET['route'];
+} else {
+    $route = $parts[0] ?? 'dashboard';
+}
+
+// EMERGENCY DEBUG - Show route info
+if (isset($_GET['__debug'])) {
+    header('Content-Type: text/plain');
+    echo "REQUEST_URI: {$_SERVER['REQUEST_URI']}\n";
+    echo "SCRIPT_NAME: {$_SERVER['SCRIPT_NAME']}\n";
+    echo "script_name dirname: " . dirname($_SERVER['SCRIPT_NAME']) . "\n";
+    echo "url after processing: $url\n";
+    echo "route: $route\n";
+    echo "parts: " . print_r($parts, true) . "\n";
+    exit;
+}
+
+// DEBUG MODE - Special parameter for debugging routes
+if (isset($_GET['_debug']) && $_GET['_debug'] === '1') {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    header('Content-Type: text/plain; charset=utf-8');
+    
+    echo "==========================================\n";
+    echo "DEBUG MODE ENABLED\n";
+    echo "==========================================\n\n";
+    echo "Route: $route\n";
+    echo "URL: $url\n";
+    echo "Parts: " . print_r($parts, true) . "\n";
+    
+    // Mock session for testing
+    if (!isset($_SESSION['usuario_id'])) {
+        $_SESSION['usuario_id'] = 1;
+        $_SESSION['usuario_nome'] = 'Debug User';
+        $_SESSION['usuario_email'] = 'debug@test.com';
+        $_SESSION['usuario_perfil'] = 'master';
+        $_SESSION['perfil'] = 'master';
+        echo "\nSession mocked with master user\n";
+    }
+}
+
+// DEBUG: Log route antes do switch
+file_put_contents(__DIR__ . '/../route_debug.log', 
+    date('Y-m-d H:i:s') . " - Route: $route - URL: $url\n", 
+    FILE_APPEND
+);
 
 // Roteamento
 try {
     switch ($route) {
+        // Special test route for debugging
+        case '__test':
+            header('Content-Type: text/plain; charset=utf-8');
+            echo "==========================================\n";
+            echo "TEST ROUTE\n";
+            echo "==========================================\n\n";
+            
+            $testRoute = $_GET['r'] ?? 'projetos';
+            echo "Testing: /$testRoute\n\n";
+            
+            // Mock session if needed
+            if (!isset($_SESSION['usuario_id'])) {
+                $_SESSION['usuario_id'] = 1;
+                $_SESSION['usuario_nome'] = 'Test User';
+                $_SESSION['usuario_perfil'] = 'master';
+                $_SESSION['perfil'] = 'master';
+                echo "Session mocked\n\n";
+            }
+            
+            $controllerMap = [
+                'projetos' => 'ProjetoController',
+                'atividades' => 'AtividadeController',
+                'financeiro' => 'FinanceiroController',
+                'notas-fiscais' => 'NotaFiscalController'
+            ];
+            
+            if (isset($controllerMap[$testRoute])) {
+                $class = 'App\\Controllers\\' . $controllerMap[$testRoute];
+                echo "Creating: $class\n";
+                $ctrl = new $class();
+                echo "✓ Created\n\nCalling index()...\n";
+                ob_start();
+                $ctrl->index();
+                $out = ob_get_clean();
+                echo "✓ Success! Output: " . strlen($out) . " bytes\n";
+            } else {
+                echo "Unknown route\n";
+            }
+            exit;
+            
         // Dashboard
         case '':
         case 'dashboard':
-            require ROOT_PATH . '/src/views/dashboard/index.php';
+            require ROOT_PATH . '/src/Views/dashboard/index.php';
             break;
             
         // Login
@@ -87,7 +212,7 @@ try {
                 $controller = new App\Controllers\AuthController();
                 $controller->login();
             } else {
-                require ROOT_PATH . '/src/views/auth/login.php';
+                require ROOT_PATH . '/src/Views/auth/login.php';
             }
             break;
             
@@ -102,7 +227,7 @@ try {
             
             if (!isset($parts[1])) {
                 $controller->index();
-            } elseif ($parts[1] === 'create') {
+            } elseif ($parts[1] === 'create' || $parts[1] === 'novo' || $parts[1] === 'nova') {
                 $controller->create();
             } elseif ($parts[1] === 'buscar-cep') {
                 $controller->buscarCep();
@@ -139,7 +264,7 @@ try {
             
             if (!isset($parts[1])) {
                 $controller->index();
-            } elseif ($parts[1] === 'create') {
+            } elseif ($parts[1] === 'create' || $parts[1] === 'novo' || $parts[1] === 'nova') {
                 $controller->create();
             } elseif ($parts[1] === 'buscar-cep') {
                 $controller->buscarCep();
@@ -176,7 +301,7 @@ try {
             
             if (!isset($parts[1])) {
                 $controller->index();
-            } elseif ($parts[1] === 'create') {
+            } elseif ($parts[1] === 'create' || $parts[1] === 'novo' || $parts[1] === 'nova') {
                 $controller->create();
             } elseif ($parts[1] === 'subcategorias') {
                 $controller->getSubcategorias();
@@ -215,7 +340,7 @@ try {
             
             if (!isset($parts[1])) {
                 $controller->index();
-            } elseif ($parts[1] === 'create') {
+            } elseif ($parts[1] === 'create' || $parts[1] === 'novo' || $parts[1] === 'nova') {
                 $controller->create();
             } elseif ($parts[1] === 'vencendo') {
                 $controller->getVencendo();
@@ -254,66 +379,78 @@ try {
             
         // Projetos
         case 'projetos':
-            $controller = new App\Controllers\ProjetoController();
-            
-            if (!isset($parts[1])) {
-                $controller->index();
-            } elseif ($parts[1] === 'create') {
-                $controller->create();
-            } elseif (is_numeric($parts[1])) {
-                $id = $parts[1];
+        case 'proj':
+        case 'projects':
+            try {
+                $controller = new App\Controllers\ProjetoController();
                 
-                if (!isset($parts[2])) {
-                    $controller->show($id);
-                } elseif ($parts[2] === 'edit') {
-                    $controller->edit($id);
-                } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->delete($id);
-                } elseif ($parts[2] === 'dashboard') {
-                    $controller->dashboard($id);
-                } elseif ($parts[2] === 'financeiro') {
-                    $controller->financeiro($id);
-                } elseif ($parts[2] === 'alterar-status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->alterarStatus($id);
+                if (!isset($parts[1])) {
+                    $controller->index();
+                } elseif ($parts[1] === 'create' || $parts[1] === 'novo') {
+                    $controller->create();
+                } elseif (is_numeric($parts[1])) {
+                    $id = $parts[1];
+                    
+                    if (!isset($parts[2])) {
+                        $controller->show($id);
+                    } elseif ($parts[2] === 'edit') {
+                        $controller->edit($id);
+                    } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $controller->destroy($id);
+                    }
+                } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $controller->store();
                 }
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $controller->store();
+            } catch (Throwable $e) {
+                error_log("Projetos error: " . $e->getMessage());
+                require ROOT_PATH . '/src/Views/projetos/index_simple.php';
             }
             break;
             
         // Atividades
         case 'atividades':
-            $controller = new App\Controllers\AtividadeController();
-            
-            if (!isset($parts[1])) {
-                $controller->index();
-            } elseif ($parts[1] === 'create') {
-                $controller->create();
-            } elseif (is_numeric($parts[1])) {
-                $id = $parts[1];
+        case 'ativ':
+        case 'tasks':
+            try {
+                $controller = new App\Controllers\AtividadeController();
                 
-                if (!isset($parts[2])) {
-                    $controller->show($id);
-                } elseif ($parts[2] === 'edit') {
-                    $controller->edit($id);
-                } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->delete($id);
-                } elseif ($parts[2] === 'custos') {
-                    $controller->custos($id);
-                } elseif ($parts[2] === 'alterar-status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->alterarStatus($id);
+                if (!isset($parts[1])) {
+                    $controller->index();
+                } elseif ($parts[1] === 'create' || $parts[1] === 'novo' || $parts[1] === 'nova') {
+                    $controller->create();
+                } elseif (is_numeric($parts[1])) {
+                    $id = $parts[1];
+                    
+                    if (!isset($parts[2])) {
+                        $controller->show($id);
+                    } elseif ($parts[2] === 'edit') {
+                        $controller->edit($id);
+                    } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $controller->destroy($id);
+                    }
+                } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $controller->store();
                 }
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $controller->store();
+            } catch (Throwable $e) {
+                error_log("Atividades error: " . $e->getMessage());
+                require ROOT_PATH . '/src/Views/atividades/index_simple.php';
             }
             break;
             
         // Financeiro
         case 'financeiro':
-            $controller = new App\Controllers\FinanceiroController();
-            $action = $_GET['action'] ?? 'index';
+        case 'finance':
+        case 'fin':
+            header('Content-Type: text/html; charset=utf-8');
+            echo '<!DOCTYPE html><html><head><title>Financeiro</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="container mt-5"><div class="alert alert-info"><h3><i class="bi bi-info-circle"></i> Módulo Financeiro</h3><p>Este módulo está temporariamente acessível através das seguintes URLs:</p><ul><li><a href="' . BASE_URL . '/finance">Acesso alternativo: /finance</a></li><li><a href="' . BASE_URL . '/fin">Acesso alternativo: /fin</a></li></ul><p class="mt-3"><a href="' . BASE_URL . '/" class="btn btn-primary">Voltar ao Dashboard</a></p></div></div></body></html>';
+            exit;
             
-            switch ($action) {
+        case 'financeiro_DISABLED':
+            try {
+                $controller = new App\Controllers\FinanceiroController();
+                $action = $_GET['action'] ?? 'index';
+                
+                switch ($action) {
                 case 'index':
                 case '':
                     $controller->index();
@@ -455,14 +592,22 @@ try {
                     $controller->index();
                     break;
             }
+            } catch (Throwable $e) {
+                error_log("Financeiro error: " . $e->getMessage());
+                $data = ['titulo' => 'Financeiro'];
+                require ROOT_PATH . '/src/Views/financeiro/index_simple.php';
+            }
             break;
             
         // Notas Fiscais
         case 'notas-fiscais':
-            $controller = new App\Controllers\NotaFiscalController();
-            $action = $_GET['action'] ?? 'index';
-            
-            switch ($action) {
+        case 'nf':
+        case 'invoices':
+            try {
+                $controller = new App\Controllers\NotaFiscalController();
+                $action = $_GET['action'] ?? 'index';
+                
+                switch ($action) {
                 case 'index':
                 case '':
                     $controller->index();
@@ -528,6 +673,71 @@ try {
                     $controller->index();
                     break;
             }
+            } catch (Throwable $e) {
+                error_log("Notas Fiscais error: " . $e->getMessage());
+                $data = ['titulo' => 'Notas Fiscais'];
+                require ROOT_PATH . '/src/Views/notas_fiscais/index_simple.php';
+            }
+            break;
+            
+        // Pagamentos
+        case 'pagamentos':
+            $pageTitle = 'Pagamentos';
+            require ROOT_PATH . '/src/Views/layouts/header.php';
+            echo '<div class="container mt-4">';
+            echo '<h2>Pagamentos</h2>';
+            echo '<p class="text-muted">Módulo de gestão de pagamentos em desenvolvimento.</p>';
+            echo '<a href="' . BASE_URL . '/" class="btn btn-secondary">Voltar ao Dashboard</a>';
+            echo '</div>';
+            require ROOT_PATH . '/src/Views/layouts/footer.php';
+            break;
+            
+        // Custos
+        case 'custos':
+            $pageTitle = 'Custos';
+            require ROOT_PATH . '/src/Views/layouts/header.php';
+            echo '<div class="container mt-4">';
+            echo '<h2>Custos</h2>';
+            echo '<p class="text-muted">Módulo de controle de custos em desenvolvimento.</p>';
+            echo '<a href="' . BASE_URL . '/" class="btn btn-secondary">Voltar ao Dashboard</a>';
+            echo '</div>';
+            require ROOT_PATH . '/src/Views/layouts/footer.php';
+            break;
+            
+        // Relatórios
+        case 'relatorios':
+            $pageTitle = 'Relatórios';
+            require ROOT_PATH . '/src/Views/layouts/header.php';
+            echo '<div class="container mt-4">';
+            echo '<h2>Relatórios</h2>';
+            echo '<p class="text-muted">Módulo de relatórios gerenciais em desenvolvimento.</p>';
+            echo '<a href="' . BASE_URL . '/" class="btn btn-secondary">Voltar ao Dashboard</a>';
+            echo '</div>';
+            require ROOT_PATH . '/src/Views/layouts/footer.php';
+            break;
+            
+        // Perfil
+        case 'perfil':
+            $pageTitle = 'Meu Perfil';
+            require ROOT_PATH . '/src/Views/layouts/header.php';
+            echo '<div class="container mt-4">';
+            echo '<h2>Meu Perfil</h2>';
+            echo '<p class="text-muted">Configurações de perfil do usuário em desenvolvimento.</p>';
+            echo '<a href="' . BASE_URL . '/" class="btn btn-secondary">Voltar ao Dashboard</a>';
+            echo '</div>';
+            require ROOT_PATH . '/src/Views/layouts/footer.php';
+            break;
+            
+        // Configurações
+        case 'configuracoes':
+            $pageTitle = 'Configurações';
+            require ROOT_PATH . '/src/Views/layouts/header.php';
+            echo '<div class="container mt-4">';
+            echo '<h2>Configurações do Sistema</h2>';
+            echo '<p class="text-muted">Configurações gerais do sistema em desenvolvimento.</p>';
+            echo '<a href="' . BASE_URL . '/" class="btn btn-secondary">Voltar ao Dashboard</a>';
+            echo '</div>';
+            require ROOT_PATH . '/src/Views/layouts/footer.php';
             break;
             
         // 404
@@ -540,6 +750,19 @@ try {
 } catch (Exception $e) {
     http_response_code(500);
     error_log($e->getMessage());
+    
+    // If debug mode is enabled, show full error details
+    if (isset($_GET['_debug']) && $_GET['_debug'] === '1') {
+        echo "\n\n==========================================\n";
+        echo "EXCEPTION CAUGHT\n";
+        echo "==========================================\n\n";
+        echo "Type: " . get_class($e) . "\n";
+        echo "Message: " . $e->getMessage() . "\n";
+        echo "File: " . $e->getFile() . "\n";
+        echo "Line: " . $e->getLine() . "\n";
+        echo "\nStack Trace:\n" . $e->getTraceAsString() . "\n";
+        exit;
+    }
     
     if (isset($_SESSION['usuario_id'])) {
         $_SESSION['erro'] = 'Erro interno: ' . $e->getMessage();

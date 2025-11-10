@@ -1,0 +1,38 @@
+FAILING ROUTES ANALYSIS:
+========================
+
+Route: /projetos (HTTP 500)
+Controller: src/Controllers/ProjetoController.php
+Dependencies:
+  - src/Models/Projeto.php
+  - src/Models/ProjetoCategoria.php
+  - src/Models/EmpresaTomadora.php
+  - src/Models/Contrato.php
+  - src/Models/Usuario.php
+  - src/Models/ProjetoFinanceiro.php
+
+Route: /atividades (HTTP 500)
+Controller: src/Controllers/AtividadeController.php
+Dependencies: (needs to be checked)
+
+Route: /financeiro (HTTP 500)
+Controller: src/Controllers/FinanceiroController.php
+Dependencies:
+  - src/Models/CategoriaFinanceira.php
+  - src/Models/CentroCusto.php
+  - src/Models/Boleto.php
+  - src/Models/Pagamento.php
+  - src/Models/ContaPagar.php
+  - src/Models/ContaReceber.php
+  - src/Models/LancamentoFinanceiro.php
+  - src/Models/ConciliacaoBancaria.php
+  - src/Helpers/FluxoCaixaHelper.php
+
+Route: /notas-fiscais (HTTP 500)
+Controller: src/Controllers/NotaFiscalController.php
+Dependencies: (needs to be checked)
+
+ALL FILES EXIST LOCALLY - Issue might be:
+1. Files not uploaded to server
+2. Files uploaded with wrong case
+3. PHP error in one of the dependencies

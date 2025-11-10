@@ -94,9 +94,8 @@ class DatabaseMigration {
      * Executa as migrations necessárias
      */
     private function runMigrations($from, $to) {
-        $this->db->beginTransaction();
-        
         try {
+            $this->db->beginTransaction();
             // Escaneia todos os arquivos .sql disponíveis
             $migrationFiles = glob($this->migrationsPath . '*.sql');
             sort($migrationFiles);
@@ -148,7 +147,9 @@ class DatabaseMigration {
             $this->db->commit();
             
         } catch (\Exception $e) {
-            $this->db->rollBack();
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
             throw new \Exception("Erro ao aplicar migration: " . $e->getMessage());
         }
     }

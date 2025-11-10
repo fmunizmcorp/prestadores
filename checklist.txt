@@ -1,0 +1,298 @@
+CHECKLIST  T É CNICO  DE  CORRE ÇÕ ES  -  
+SISTEMA  PRESTADORES  CLINFEC
+Data: 09/11/2025
+Versão: 3.0
+Prioridade: 🔴 CRÍTICA
+🔴 PRIORIDADE MÁXIMA - FAZER HOJE
+1. Banco de Dados - Migrations
+Responsável: Equipe de Backend/DBA
+Tempo Estimado: 2-4 horas
+Ações:
+1.1 Fazer backup do banco de dados atual
+1.2 Veriﬁcar arquivos de migration existentes
+1.3 Executar migrations
+1.4 Se migrations falharem, criar tabelas manualmente:
+Criar tabela empresas_prestadoras:
+SQL
+CREATE TABLE IF NOT EXISTS `empresas_prestadoras`  (
+  `id` bigint( 20) UNSIGNED NOT NULL  AUTO_INCREMENT,
+  `nome` varchar( 255) NOT NULL ,
+  `razao_social`  varchar( 255) DEFAULT NULL,
+  `cnpj` varchar( 18) UNIQUE DEFAULT NULL,
+  `email` varchar( 255) DEFAULT NULL,
+  `telefone`  varchar( 20) DEFAULT NULL,
+  `endereco`  text DEFAULT NULL,
+  `cidade`  varchar( 100) DEFAULT NULL,
+  `estado`  varchar( 2) DEFAULT NULL,
+  `cep` varchar( 9) DEFAULT NULL,
+  `status`  enum('ativa','inativa' ) DEFAULT 'ativa',
+  `created_at`  timestamp  NULL DEFAULT NULL,
+  `updated_at`  timestamp  NULL DEFAULT NULL,
+  `deleted_at`  timestamp  NULL DEFAULT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+1.5 Adicionar coluna deleted_at em tabelas necessárias:
+SQL
+-- Verificar quais tabelas precisam
+SHOW TABLES;
+-- Adicionar deleted_at onde necessário
+ALTER TABLE `servicos`  ADD COLUMN `deleted_at`  TIMESTAMP  NULL DEFAULT NULL;
+ALTER TABLE `contratos`  ADD COLUMN `deleted_at`  TIMESTAMP  NULL DEFAULT NULL;
+ALTER TABLE `projetos`  ADD COLUMN `deleted_at`  TIMESTAMP  NULL DEFAULT NULL;
+ALTER TABLE `atividades`  ADD COLUMN `deleted_at`  TIMESTAMP  NULL DEFAULT NULL;
+1.6 Veriﬁcar estrutura completa do banco
+1.7 Popular banco com dados de teste
+1.8 Testar conexão e queries básicas
+2. Correção de Erros de API
+Responsável: Equipe de Backend
+Tempo Estimado: 2-4 horas
+PROBLEMA-001: Erro ao Carregar Empresas Tomadoras
+2.1 Veriﬁcar controller de Empresas Tomadoras
+2.2 Veriﬁcar query SQL
+•Adicionar try-catch para capturar erros
+•Retornar array vazio em vez de erro quando não há dados
+•Log de erros detalhado
+2.3 Testar endpoint diretamente
+PROBLEMA-004: Erro de Coluna deleted_at em Serviços
+2.4 Veriﬁcar modelo Servico
+2.5 Opção A: Adicionar coluna no banco (já feito no passo 1.5 )
+2.6 Opção B: Remover SoftDeletes do modelo
+PROBLEMA-005: Erro ao Carregar Contratos
+2.7 Veriﬁcar controller de Contratos
+2.8 Veriﬁcar relacionamentos e eager loading
+•Veriﬁcar se há relacionamentos faltando
+•Adicionar try-catch
+•Log de erros
+2.9 Testar endpoint
+3. Correção de Formulário em Branco
+Responsável: Equipe de Frontend
+Tempo Estimado: 2-4 horas
+PROBLEMA-002: Página de Nova Empresa em Branco
+3.1 Veriﬁcar componente React
+3.2 Veriﬁcar se componente existe
+3.3 Se não existir, criar componente básico:
+3.4 Veriﬁcar rota no web.php ou api.php
+3.5 Compilar assets
+3.6 Limpar cache
+🟡 PRIORIDADE ALTA - FAZER ESTA SEMANA
+4. Implementar Módulos com Placeholder
+Responsável: Equipe Full Stack
+Tempo Estimado: 20-40 horas
+PROBLEMA-006: Módulo Projetos Não Implementado
+4.1 Remover páginas placeholder
+4.2 Criar estrutura de módulo Projetos
+Model: app/Models/Projeto.php
+Migration: database/migrations/xxxx_create_projetos_table.php
+Controller: app/Http/Controllers/ProjetoController.php
+Componentes React: resources/js/Pages/Projetos/
+4.3 Implementar CRUD completo
+Listagem de projetos
+Formulário de novo projeto
+Edição de projeto
+Exclusão de projeto
+Visualização de detalhes
+4.4 Conﬁgurar rotas
+4.5 Decidir rota principal (/projetos, /proj ou /projects)
+•Recomendação: usar /projetos e redirecionar as outras
+4.6 Testar todas as funcionalidades
+PROBLEMA-007: Módulo Atividades Não Implementado
+4.7 Seguir mesmos passos do módulo Projetos
+Remover placeholder
+Criar Model, Migration, Controller
+Criar componentes React
+Implementar CRUD
+Conﬁgurar rotas
+Testar
+5. Implementar Módulos 404
+Responsável: Equipe Full Stack
+Tempo Estimado: 20-40 horas
+PROBLEMA-008: Módulo Financeiro Não Implementado
+Submódulo: Pagamentos
+5.1 Criar estrutura
+Model: app/Models/Pagamento.php
+Migration: database/migrations/xxxx_create_pagamentos_table.php
+Controller: app/Http/Controllers/PagamentoController.php
+Componentes: resources/js/Pages/Financeiro/Pagamentos/
+5.2 Implementar funcionalidades
+Listagem de pagamentos
+Registro de novo pagamento
+Edição de pagamento
+Exclusão de pagamento
+Filtros (data, status, valor)
+5.3 Conﬁgurar rotas
+Submódulo: Custos
+5.4 Criar estrutura similar a Pagamentos
+Model: app/Models/Custo.php
+Migration, Controller, Componentes
+5.5 Implementar funcionalidades
+Listagem de custos
+Registro de novo custo
+Edição e exclusão
+Filtros e relatórios
+PROBLEMA-009: Módulo Relatórios Não Implementado
+5.6 Criar página de relatórios
+Controller: app/Http/Controllers/RelatorioController.php
+Componente: resources/js/Pages/Relatorios/Index.jsx
+5.7 Implementar tipos de relatórios
+Relatório de empresas
+Relatório de contratos
+Relatório de projetos
+Relatório ﬁnanceiro
+Relatório de atividades
+5.8 Adicionar exportação
+PDF
+Excel
+CSV
+PROBLEMA-010: Módulos de Administração Não Implementados
+Meu Perﬁl
+5.9 Criar página de perﬁl
+Controller: app/Http/Controllers/PerﬁlController.php
+Componente: resources/js/Pages/Perﬁl/Index.jsx
+5.10 Implementar funcionalidades
+Visualizar dados do perﬁl
+Editar informações pessoais
+Alterar senha
+Upload de foto de perﬁl
+Conﬁgurações
+5.11 Criar página de conﬁgurações
+Controller: app/Http/Controllers/ConﬁguracaoController.php
+Componente: resources/js/Pages/Conﬁguracoes/Index.jsx
+5.12 Implementar funcionalidades
+Conﬁgurações gerais do sistema
+Preferências do usuário
+Notiﬁcações
+Segurança
+🟢 PRIORIDADE MÉDIA - MELHORIAS
+6. Dashboard com Widgets
+Responsável: Equipe de Frontend
+Tempo Estimado: 8-16 horas
+6.1 Criar widgets de estatísticas
+Total de empresas tomadoras
+Total de empresas prestadoras
+Contratos ativos
+Projetos em andamento
+Atividades pendentes
+Resumo ﬁnanceiro
+6.2 Adicionar gráﬁcos
+Gráﬁco de contratos por mês
+Gráﬁco de projetos por status
+Gráﬁco ﬁnanceiro (receitas vs custos)
+6.3 Adicionar lista de atividades recentes
+Últimos contratos criados
+Últimos projetos atualizados
+Últimas atividades concluídas
+6.4 Implementar API para dashboard
+7. Melhorias de UX e Tratamento de Erros
+Responsável: Equipe Full Stack
+Tempo Estimado: 4-8 horas
+7.1 Melhorar mensagens de erro
+Mensagens mais claras e especíﬁcas
+Diferenciar erro de API vs ausência de dados
+Adicionar sugestões de ação
+7.2 Adicionar loading states
+Spinners durante carregamento
+Skeleton screens
+Feedback visual de ações
+7.3 Implementar toasts/notiﬁcações
+Sucesso ao salvar
+Erro ao processar
+Avisos importantes
+7.4 Adicionar páginas de erro customizadas
+404 personalizado
+500 personalizado
+403 personalizado
+7.5 Implementar logs detalhados
+TESTES APÓS CORREÇÕES
+8. Checklist de Testes
+Responsável: QA / Tester
+Tempo Estimado: 4-8 horas
+8.1 Testar login
+Login com credenciais válidas
+Login com credenciais inválidas
+Logout
+8.2 Testar dashboard
+Widgets exibindo dados corretos
+Gráﬁcos funcionando
+Links de navegação
+8.3 Testar Empresas Tomadoras
+Listagem
+Cadastro (formulário completo)
+Edição
+Exclusão
+Filtros
+8.4 Testar Empresas Prestadoras
+Listagem
+CRUD completo
+Filtros
+8.5 Testar Serviços
+Listagem
+CRUD completo
+Soft deletes funcionando
+8.6 Testar Contratos
+Listagem
+CRUD completo
+Vinculação com empresas
+8.7 Testar Projetos
+Listagem
+CRUD completo
+Vinculação com contratos
+Status e acompanhamento
+8.8 Testar Atividades
+Listagem
+CRUD completo
+Vinculação com projetos
+Status e conclusão
+8.9 Testar Financeiro
+Pagamentos (CRUD)
+Custos (CRUD)
+Cálculos e totais
+8.10 Testar Relatórios
+Geração de relatórios
+Filtros
+Exportação (PDF, Excel)
+8.11 Testar Perﬁl e Conﬁgurações
+Visualização de perﬁl
+Edição de dados
+Alteração de senha
+Conﬁgurações do sistema
+8.12 Testar validações e erros
+Campos obrigatórios
+Formatos de dados (CNPJ, email, etc.)
+Mensagens de erro claras
+Tratamento de erros de API
+DEPLOY E FINALIZAÇÃO
+9. Preparação para Produção
+Responsável: DevOps / Equipe de Infraestrutura
+Tempo Estimado: 2-4 horas
+9.1 Conﬁgurar variáveis de ambiente
+9.2 Otimizar aplicação
+9.3 Conﬁgurar backups automáticos
+Backup diário do banco de dados
+Backup de arquivos uploaded
+Retenção de 30 dias
+9.4 Conﬁgurar monitoramento
+Logs de erro
+Alertas de downtime
+Métricas de performance
+9.5 Documentação
+Documentar APIs
+Criar manual do usuário
+Documentar processos de deploy
+9.6 Fazer deploy ﬁnal
+RESUMO DE PRIORIDADES
+Prioridade Tarefas Tempo Prazo
+🔴 MÁXIMA Itens 1-3 6-12h Hoje
+🟡 ALTA Itens 4-5 40-80h Esta semana
+🟢 MÉDIA Itens 6-7 12-24h Próxima semana
+✅ FINAL Itens 8-9 6-12h Após implementação
+TOTAL ESTIMADO: 64-128 horas (2-4 semanas )
+CONTATOS E RESPONSÁVEIS
+Área Responsável Contato
+Backend [Nome] [Email/Slack]
+Frontend [Nome] [Email/Slack]
+DevOps [Nome] [Email/Slack]
+QA [Nome] [Email/Slack]
+Gestão [Nome] [Email/Slack]
+Documento Criado: 09/11/2025
+Versão: 3.0
+Status: 🔴 ATIVO - CORREÇÕES URGENTES NECESSÁRIAS

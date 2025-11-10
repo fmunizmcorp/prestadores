@@ -1,0 +1,279 @@
+<html><head><meta charset='UTF-8'><title>Migrations Sprint 13</title></head><body><pre>================================================================
+SPRINT 13: EXECUÇÃO DE TODAS AS MIGRATIONS
+================================================================
+
+✅ Conectado ao banco: u673902663_prestadores
+
+✅ Migration consolidada carregada: 149,175 bytes
+   Arquivo: 013_executar_todas_migrations.sql
+
+📋 Total de comandos SQL: 172
+
+Executando statements...
+
+  📝 CREATE TABLE: empresas_tomadoras ... ✅
+  📝 CREATE TABLE: empresa_tomadora_responsaveis ... ✅
+  📝 CREATE TABLE: empresa_tomadora_documentos ... ✅
+  📝 CREATE TABLE: servico_categorias ... ✅
+  📥 INSERT ... ⚠️  (já existe)
+  📝 CREATE TABLE: servico_requisitos ... ✅
+  📝 CREATE TABLE: servico_valores_referencia ... ✅
+  📝 CREATE TABLE: contratos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`contratos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: contrato_aditivos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`contrato_aditivos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: contrato_servicos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`contrato_servicos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: contrato_historico ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`contrato_historico` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: servico_valores_periodo ... ❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'REFERENCIAS usuarios(id),
+    INDEX idx_servico (servico_id),
+    INDEX idx_c...' at line 32
+  📝 CREATE TABLE: empresas_tomadoras ... ✅
+  ⚠️  SKIP ALTER: empresas_prestadoras (tabela não existe)
+  ⚠️  SKIP ALTER: empresas_prestadoras (tabela não existe)
+  📇 CREATE INDEX ... ⚠️  (tabela não existe)
+  📇 CREATE INDEX ... ⚠️  (tabela não existe)
+  📝 CREATE TABLE: contratos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`contratos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: servico_valores ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`servico_valores` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: empresa_tomadora_responsaveis ... ✅
+  📝 CREATE TABLE: empresa_documentos ... ✅
+  📝 CREATE TABLE: contrato_historico ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`contrato_historico` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: contrato_aditivos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`contrato_aditivos` (errno: 150 "Foreign key constraint is incorrectly formed")
+❌
+     ERRO: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u673902663_prestadores.system_info' doesn't exist
+  📥 INSERT ... ❌
+     ERRO: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_by' in 'INSERT INTO'
+  📝 CREATE TABLE: projeto_categorias ... ✅
+  📝 CREATE TABLE: projetos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`projetos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: projeto_etapas ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`projeto_etapas` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: projeto_equipe ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`projeto_equipe` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: projeto_orcamento ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`projeto_orcamento` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: projeto_execucao ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`projeto_execucao` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: projeto_avaliacoes ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`projeto_avaliacoes` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: projeto_anexos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`projeto_anexos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: projeto_templates ... ✅
+  📝 CREATE TABLE: projeto_riscos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`projeto_riscos` (errno: 150 "Foreign key constraint is incorrectly formed")
+❌
+     ERRO: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'version' in 'SET'
+  📥 INSERT ... ✅
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'DECLARE soma_percentuais DECIMAL(10,2)' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END//
+DELIMITER' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END//
+DELIMITER' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END//
+DELIMITER' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'DECLARE imp_valor INT' at line 1
+❌
+     ERRO: SQLSTATE[HY000]: General error: 4081 Unknown structured system variable or ROW routine variable 'NEW'
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END//
+DELIMITER' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'DECLARE imp_valor INT' at line 1
+❌
+     ERRO: SQLSTATE[HY000]: General error: 4081 Unknown structured system variable or ROW routine variable 'NEW'
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END//
+DELIMITER' at line 1
+  📝 CREATE TABLE: atividades ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`atividades` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: atividade_equipe ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`atividade_equipe` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: atividade_recursos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`atividade_recursos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: atividade_tempo ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`atividade_tempo` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: atividade_anexos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`atividade_anexos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: atividade_comentarios ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`atividade_comentarios` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: atividade_checklist ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`atividade_checklist` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: atividade_historico ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`atividade_historico` (errno: 150 "Foreign key constraint is incorrectly formed")
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'ELSE
+        SET NEW.custo_hora = 0.00' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'DECLARE itens_concluidos INT' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'DECLARE percentual INT' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1327 Undeclared variable: total_itens
+❌
+     ERRO: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u673902663_prestadores.atividades' doesn't exist
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END//
+DELIMITER' at line 1
+  📝 CREATE TABLE: categorias_financeiras ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`categorias_financeiras` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: centros_custo ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`centros_custo` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: notas_fiscais ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`notas_fiscais` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: notas_fiscais_itens ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`notas_fiscais_itens` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: boletos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`boletos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: contas_receber ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1901 Function or expression 'curdate()' cannot be used in the GENERATED ALWAYS AS clause of `dias_atraso`
+  📝 CREATE TABLE: contas_pagar ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1901 Function or expression 'curdate()' cannot be used in the GENERATED ALWAYS AS clause of `dias_atraso`
+  📝 CREATE TABLE: pagamentos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`pagamentos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: lancamentos_financeiros ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`lancamentos_financeiros` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: contas_bancarias ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`contas_bancarias` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: conciliacoes_bancarias ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`conciliacoes_bancarias` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: extrato_bancario ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`extrato_bancario` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📥 INSERT ... ❌
+     ERRO: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u673902663_prestadores.categorias_financeiras' doesn't exist
+  📥 INSERT ... ❌
+     ERRO: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u673902663_prestadores.centros_custo' doesn't exist
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END$$
+DELIMITER' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END$$
+DELIMITER' at line 1
+  📥 INSERT ... ❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'DELIMITER $$
+CREATE TRIGGER criar_lancamento_recebimento
+AFTER INSERT ON paga...' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END$$
+DELIMITER' at line 1
+  📥 INSERT ... ❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'DELIMITER $$
+CREATE TRIGGER criar_lancamento_pagamento
+AFTER INSERT ON pagame...' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END$$
+DELIMITER' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END$$
+DELIMITER' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END$$
+DELIMITER' at line 1
+  ⚠️  SKIP ALTER: contas_pagar (tabela não existe)
+  ⚠️  SKIP ALTER: contas_receber (tabela não existe)
+  ⚠️  SKIP ALTER: lancamentos_financeiros (tabela não existe)
+  ⚠️  SKIP ALTER: notas_fiscais (tabela não existe)
+  ⚠️  SKIP ALTER: projetos (tabela não existe)
+  ⚠️  SKIP ALTER: contratos (tabela não existe)
+  ⚠️  SKIP ALTER: atividades (tabela não existe)
+  📝 CREATE TABLE: projeto_custos ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`projeto_custos` (errno: 150 "Foreign key constraint is incorrectly formed")
+  📝 CREATE TABLE: contrato_faturamento ... ❌
+     ERRO: SQLSTATE[HY000]: General error: 1005 Can't create table `u673902663_prestadores`.`contrato_faturamento` (errno: 150 "Foreign key constraint is incorrectly formed")
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END IF' at line 1
+❌
+     ERRO: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'END//
+DELIMITER' at line 1
+  📝 CREATE TABLE: empresas_prestadoras ... ✅
+  🔧 ALTER TABLE: servicos ... ✅
+  📇 CREATE INDEX ... ✅
+  ⚠️  SKIP ALTER: contratos (tabela não existe)
+  📇 CREATE INDEX ... ⚠️  (tabela não existe)
+  ⚠️  SKIP ALTER: projetos (tabela não existe)
+  📇 CREATE INDEX ... ⚠️  (tabela não existe)
+  ⚠️  SKIP ALTER: atividades (tabela não existe)
+  📇 CREATE INDEX ... ⚠️  (tabela não existe)
+  ⚠️  SKIP ALTER: notas_fiscais (tabela não existe)
+  📇 CREATE INDEX ... ⚠️  (tabela não existe)
+  📥 INSERT ... ✅
+  📥 INSERT ... ❌
+     ERRO: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'unidade' in 'INSERT INTO'
+
+================================================================
+RESULTADO DA EXECUÇÃO:
+================================================================
+✅ Comandos executados: 17
+⚠️  Comandos ignorados: 20
+❌ Erros: 85
+
+📊 Tabelas criadas (12):
+   - empresas_tomadoras
+   - empresa_tomadora_responsaveis
+   - empresa_tomadora_documentos
+   - servico_categorias
+   - servico_requisitos
+   - servico_valores_referencia
+   - empresa_documentos
+   - projeto_categorias
+   - projeto_templates
+   - empresas_prestadoras
+
+🔧 Tabelas alteradas (1):
+   - servicos
+
+================================================================
+VERIFICAÇÃO DE TABELAS CRÍTICAS:
+================================================================
+
+  ✅ usuarios [⚠ sem deleted_at] - 1 registro(s)
+  ✅ empresas_tomadoras [✓ deleted_at] - 0 registro(s)
+  ✅ empresas_prestadoras [✓ deleted_at] - 1 registro(s)
+  ✅ servicos [✓ deleted_at] - 0 registro(s)
+  ❌ contratos - NÃO EXISTE
+  ❌ projetos - NÃO EXISTE
+  ❌ atividades - NÃO EXISTE
+  ❌ notas_fiscais - NÃO EXISTE
+
+================================================================
+✅ MIGRATIONS CONCLUÍDAS!
+================================================================
+</pre></body></html>
