@@ -1,0 +1,7 @@
+NEW FILES CREATED IN SPRINT 9:
+==============================
+src/Views/atividades/index.php
+src/Models/Fornecedor.php
+src/Models/Cliente.php
+
+TOTAL: 3 files to upload
