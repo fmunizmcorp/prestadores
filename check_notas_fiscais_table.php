@@ -1,7 +1,6 @@
 <?php
 /**
- * COMPREHENSIVE DIAGNOSTIC AND DEPLOYMENT TOOL - UPDATED
- * Now deploys from main branch using direct RAW file downloads
+ * SELF-DEPLOYER - Downloads and writes corrected Models from GitHub
  */
 $pdo = new PDO("mysql:host=localhost;dbname=u673902663_prestadores;charset=utf8mb4", 
                'u673902663_admin', ';>?I4dtn~2Ga');
@@ -12,7 +11,6 @@ header('Content-Type: text/plain; charset=utf-8');
 $action = $_GET['action'] ?? 'diagnostic';
 
 if ($action === 'diagnostic') {
-    // COMPREHENSIVE DIAGNOSTICS
     echo "═══════════════════════════════════════════════════════════\n";
     echo "COMPREHENSIVE TABLE DIAGNOSTICS\n";
     echo "═══════════════════════════════════════════════════════════\n\n";
@@ -63,16 +61,18 @@ if ($action === 'diagnostic') {
     }
     
     echo "\n✅ DIAGNOSTIC COMPLETE\n";
-    echo "\nℹ️  Use ?action=deploy to deploy latest code from GitHub main branch\n";
+    echo "\nℹ️  Use ?action=deploy to deploy corrected Models from GitHub main\n";
 }
 
 elseif ($action === 'deploy') {
-    // DEPLOY CORRECTED MODELS FROM GITHUB RAW
     echo "═══════════════════════════════════════════════════════════\n";
     echo "DEPLOYING CORRECTED MODELS FROM GITHUB MAIN\n";
     echo "═══════════════════════════════════════════════════════════\n\n";
     
     set_time_limit(300);
+    
+    $base_path = getcwd();
+    echo "Working directory: $base_path\n\n";
     
     $files = [
         ['src/Models/NotaFiscal.php', 'https://raw.githubusercontent.com/fmunizmcorp/prestadores/main/src/Models/NotaFiscal.php'],
@@ -84,44 +84,62 @@ elseif ($action === 'deploy') {
     $failed = 0;
     
     foreach ($files as $f) {
-        echo "Deploying: {$f[0]}...";
+        $target_path = $base_path . '/' . $f[0];
+        echo "Deploying: {$f[0]}\n";
+        echo "  Target: $target_path\n";
+        echo "  Source: {$f[1]}\n";
         
         $content = @file_get_contents($f[1]);
         
         if ($content && strlen($content) > 100) {
-            $dir = dirname($f[0]);
+            echo "  Downloaded: " . number_format(strlen($content)) . " bytes\n";
+            
+            $dir = dirname($target_path);
             if (!is_dir($dir)) {
+                echo "  Creating directory: $dir\n";
                 @mkdir($dir, 0755, true);
             }
             
-            if (file_put_contents($f[0], $content)) {
-                echo " ✅ OK (" . number_format(strlen($content)) . " bytes)\n";
+            if (file_exists($target_path)) {
+                $old_size = filesize($target_path);
+                echo "  Replacing existing file ($old_size bytes)\n";
+            }
+            
+            if (file_put_contents($target_path, $content)) {
+                echo "  ✅ DEPLOYED SUCCESSFULLY\n\n";
                 $success++;
             } else {
-                echo " ❌ WRITE FAILED\n";
+                echo "  ❌ WRITE FAILED (check permissions)\n\n";
                 $failed++;
             }
         } else {
-            echo " ❌ DOWNLOAD FAILED\n";
+            echo "  ❌ DOWNLOAD FAILED\n\n";
             $failed++;
         }
     }
     
-    echo "\n═══════════════════════════════════════════════════════════\n";
+    echo "═══════════════════════════════════════════════════════════\n";
     echo "DEPLOYMENT SUMMARY:\n";
     echo "  ✅ Success: $success files\n";
     echo "  ❌ Failed: $failed files\n";
     echo "═══════════════════════════════════════════════════════════\n\n";
     
-    if ($success > 0) {
+    if ($success === 3) {
         echo "✅ DEPLOYMENT COMPLETE!\n\n";
         echo "Next steps:\n";
-        echo "1. Clear OPcache: access clear_cache.php\n";
+        echo "1. Clear OPcache: ?action=clear_cache\n";
         echo "2. Test routes: run test_all_routes.sh\n";
         echo "3. Expected result: 37/37 routes functional (100%)\n";
+    } elseif ($success > 0) {
+        echo "⚠️  PARTIAL DEPLOYMENT\n";
+        echo "Some files were deployed but others failed.\n";
+        echo "Check file permissions and try again.\n";
     } else {
         echo "❌ DEPLOYMENT FAILED!\n";
-        echo "Check file permissions and network connectivity.\n";
+        echo "Check:\n";
+        echo "  - File write permissions\n";
+        echo "  - Network connectivity to GitHub\n";
+        echo "  - Working directory path\n";
     }
 }
 
@@ -141,11 +159,12 @@ elseif ($action === 'clear_cache') {
     }
     
     echo "\n✅ CACHE CLEAR COMPLETE\n";
+    echo "\nNow test the routes to verify 100% functionality.\n";
 }
 
 else {
     echo "Invalid action. Available actions:\n";
     echo "  ?action=diagnostic   - Show database schemas\n";
-    echo "  ?action=deploy       - Deploy corrected Models from GitHub\n";
+    echo "  ?action=deploy       - Deploy corrected Models from GitHub main\n";
     echo "  ?action=clear_cache  - Clear PHP OPcache\n";
 }
