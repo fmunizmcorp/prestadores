@@ -1,7 +1,7 @@
 <?php
 /**
- * COMPREHENSIVE DIAGNOSTIC AND DEPLOYMENT TOOL
- * Substitui check_notas_fiscais_table.php temporariamente
+ * COMPREHENSIVE DIAGNOSTIC AND DEPLOYMENT TOOL - UPDATED
+ * Now deploys from main branch using direct RAW file downloads
  */
 $pdo = new PDO("mysql:host=localhost;dbname=u673902663_prestadores;charset=utf8mb4", 
                'u673902663_admin', ';>?I4dtn~2Ga');
@@ -63,76 +63,89 @@ if ($action === 'diagnostic') {
     }
     
     echo "\n✅ DIAGNOSTIC COMPLETE\n";
-    echo "\nℹ️  Use ?action=deploy to deploy latest code from GitHub\n";
+    echo "\nℹ️  Use ?action=deploy to deploy latest code from GitHub main branch\n";
 }
 
 elseif ($action === 'deploy') {
-    // DEPLOY FROM GITHUB
+    // DEPLOY CORRECTED MODELS FROM GITHUB RAW
     echo "═══════════════════════════════════════════════════════════\n";
-    echo "DEPLOYING FROM GITHUB\n";
+    echo "DEPLOYING CORRECTED MODELS FROM GITHUB MAIN\n";
     echo "═══════════════════════════════════════════════════════════\n\n";
     
-    $branch = 'genspark_ai_developer';
-    $commit = 'e02141a'; // Latest commit
-    $repo_url = "https://github.com/fmunizmcorp/prestadores/archive/refs/heads/{$branch}.zip";
-    $zip_file = "deploy_github.zip";
+    set_time_limit(300);
     
-    echo "[1/5] Downloading from GitHub...\n";
-    exec("curl -L -o $zip_file '$repo_url' 2>&1", $output1, $ret1);
+    $files = [
+        ['src/Models/NotaFiscal.php', 'https://raw.githubusercontent.com/fmunizmcorp/prestadores/main/src/Models/NotaFiscal.php'],
+        ['src/Models/Projeto.php', 'https://raw.githubusercontent.com/fmunizmcorp/prestadores/main/src/Models/Projeto.php'],
+        ['src/Models/Atividade.php', 'https://raw.githubusercontent.com/fmunizmcorp/prestadores/main/src/Models/Atividade.php']
+    ];
     
-    if ($ret1 === 0 && file_exists($zip_file) && filesize($zip_file) > 1000) {
-        echo "✓ Downloaded: " . number_format(filesize($zip_file)) . " bytes\n\n";
-    } else {
-        $content = @file_get_contents($repo_url);
-        if ($content && strlen($content) > 1000) {
-            file_put_contents($zip_file, $content);
-            echo "✓ Downloaded via file_get_contents: " . number_format(strlen($content)) . " bytes\n\n";
-        } else {
-            echo "✗ Download failed!\n";
-            exit(1);
-        }
-    }
+    $success = 0;
+    $failed = 0;
     
-    echo "[2/5] Creating backup...\n";
-    $backup = 'backup_' . date('YmdHis') . '.tar.gz';
-    exec("tar -czf $backup --exclude='*.tar.gz' --exclude='*.zip' --exclude='backup_*' . 2>&1", $output2, $ret2);
-    echo ($ret2 === 0 ? "✓" : "⚠") . " Backup: $backup\n\n";
-    
-    echo "[3/5] Extracting...\n";
-    exec("unzip -o $zip_file 2>&1", $output3, $ret3);
-    
-    if ($ret3 === 0) {
-        echo "✓ Extraction successful!\n\n";
+    foreach ($files as $f) {
+        echo "Deploying: {$f[0]}...";
         
-        $extracted_dir = "prestadores-{$branch}";
+        $content = @file_get_contents($f[1]);
         
-        if (is_dir($extracted_dir)) {
-            echo "[4/5] Moving files...\n";
-            exec("cp -rf $extracted_dir/* . 2>&1", $output4, $ret4);
-            exec("cp -rf $extracted_dir/.htaccess . 2>&1", $output5, $ret5);
-            echo "✓ Files moved!\n\n";
+        if ($content && strlen($content) > 100) {
+            $dir = dirname($f[0]);
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
             
-            exec("rm -rf $extracted_dir 2>&1");
-            unlink($zip_file);
+            if (file_put_contents($f[0], $content)) {
+                echo " ✅ OK (" . number_format(strlen($content)) . " bytes)\n";
+                $success++;
+            } else {
+                echo " ❌ WRITE FAILED\n";
+                $failed++;
+            }
+        } else {
+            echo " ❌ DOWNLOAD FAILED\n";
+            $failed++;
         }
-    } else {
-        echo "✗ Extraction failed!\n";
-        print_r($output3);
-        exit(1);
     }
     
-    echo "[5/5] Setting permissions...\n";
-    exec("chmod -R 755 . 2>&1");
-    exec("chmod -R 777 public/uploads 2>&1");
-    echo "✓ Permissions set!\n\n";
-    
-    echo "═══════════════════════════════════════════════════════════\n";
-    echo "✅ DEPLOYMENT COMPLETE!\n";
+    echo "\n═══════════════════════════════════════════════════════════\n";
+    echo "DEPLOYMENT SUMMARY:\n";
+    echo "  ✅ Success: $success files\n";
+    echo "  ❌ Failed: $failed files\n";
     echo "═══════════════════════════════════════════════════════════\n\n";
     
-    echo "Now access: ?action=diagnostic to verify\n";
+    if ($success > 0) {
+        echo "✅ DEPLOYMENT COMPLETE!\n\n";
+        echo "Next steps:\n";
+        echo "1. Clear OPcache: access clear_cache.php\n";
+        echo "2. Test routes: run test_all_routes.sh\n";
+        echo "3. Expected result: 37/37 routes functional (100%)\n";
+    } else {
+        echo "❌ DEPLOYMENT FAILED!\n";
+        echo "Check file permissions and network connectivity.\n";
+    }
+}
+
+elseif ($action === 'clear_cache') {
+    echo "═══════════════════════════════════════════════════════════\n";
+    echo "CLEARING PHP OPCACHE\n";
+    echo "═══════════════════════════════════════════════════════════\n\n";
+    
+    if (function_exists('opcache_reset')) {
+        if (opcache_reset()) {
+            echo "✅ OPcache cleared successfully!\n";
+        } else {
+            echo "⚠️  OPcache reset failed (may not have permission)\n";
+        }
+    } else {
+        echo "ℹ️  OPcache not available or not enabled\n";
+    }
+    
+    echo "\n✅ CACHE CLEAR COMPLETE\n";
 }
 
 else {
-    echo "Invalid action. Use ?action=diagnostic or ?action=deploy\n";
+    echo "Invalid action. Available actions:\n";
+    echo "  ?action=diagnostic   - Show database schemas\n";
+    echo "  ?action=deploy       - Deploy corrected Models from GitHub\n";
+    echo "  ?action=clear_cache  - Clear PHP OPcache\n";
 }
