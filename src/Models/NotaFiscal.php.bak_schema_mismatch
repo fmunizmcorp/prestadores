@@ -1,0 +1,1021 @@
+<?php
+namespace App\Models;
+
+use PDO;
+
+/**
+ * Class NotaFiscal
+ * 
+ * Model para gerenciar notas fiscais eletrônicas (NF-e, NFS-e) com cálculo
+ * completo de impostos brasileiros.
+ * 
+ * Funcionalidades:
+ * - Emissão de NF-e (Nota Fiscal Eletrônica)
+ * - Emissão de NFS-e (Nota Fiscal de Serviços Eletrônica)
+ * - Cálculo automático de impostos (ICMS, IPI, PIS, COFINS, ISS, INSS, IR, CSLL)
+ * - Geração de XML para SEFAZ
+ * - Cancelamento de notas
+ * - Carta de correção
+ * - Consulta de status na SEFAZ
+ * - Integração com contas a pagar/receber
+ * - Armazenamento de XML e DANFE
+ * 
+ * @package App\Models
+ */
+class NotaFiscal
+{
+    private $db;
+    private $table = 'notas_fiscais';
+    
+    // Tipos de nota
+    const TIPO_NFE = 'nfe';
+    const TIPO_NFSE = 'nfse';
+    const TIPO_NFCE = 'nfce';
+    
+    // Status da nota
+    const STATUS_RASCUNHO = 'rascunho';
+    const STATUS_EMITIDA = 'emitida';
+    const STATUS_AUTORIZADA = 'autorizada';
+    const STATUS_REJEITADA = 'rejeitada';
+    const STATUS_CANCELADA = 'cancelada';
+    
+    // Natureza da operação
+    const NATUREZA_VENDA = 'venda';
+    const NATUREZA_COMPRA = 'compra';
+    const NATUREZA_DEVOLUCAO = 'devolucao';
+    const NATUREZA_TRANSFERENCIA = 'transferencia';
+    const NATUREZA_SERVICO = 'servico';
+    
+    /**
+     * Construtor
+     */
+    public function __construct()
+    {
+        $this->db = \App\Database::getInstance()->getConnection();
+    }
+    
+    /**
+     * Cria uma nova nota fiscal
+     * 
+     * @param array $data Dados da nota fiscal
+     * @return int|false ID da nota criada ou false em caso de erro
+     */
+    public function create(array $data)
+    {
+        try {
+            // Validação de dados obrigatórios
+            $this->validarDados($data);
+            
+            // Gera número da nota se não fornecido
+            if (empty($data['numero'])) {
+                $data['numero'] = $this->gerarNumero($data['tipo']);
+            }
+            
+            // Calcula impostos automaticamente
+            $impostos = $this->calcularImpostos($data);
+            
+            // Define valores padrão
+            $data['status'] = $data['status'] ?? self::STATUS_RASCUNHO;
+            $data['data_emissao'] = $data['data_emissao'] ?? date('Y-m-d');
+            
+            $sql = "INSERT INTO {$this->table} (
+                numero, serie, tipo, natureza_operacao, data_emissao, data_saida_entrada,
+                emitente_id, emitente_tipo, destinatario_id, destinatario_tipo,
+                valor_produtos, valor_servicos, valor_desconto, valor_frete,
+                valor_seguro, valor_outras_despesas, valor_total,
+                valor_base_calculo, valor_icms, valor_icms_st, valor_ipi,
+                valor_pis, valor_cofins, valor_iss, valor_inss, valor_ir, valor_csll,
+                valor_liquido, chave_acesso, protocolo_autorizacao, xml_nfe,
+                pdf_danfe, observacoes, informacoes_adicionais, status,
+                criado_por, criado_em
+            ) VALUES (
+                :numero, :serie, :tipo, :natureza_operacao, :data_emissao, :data_saida_entrada,
+                :emitente_id, :emitente_tipo, :destinatario_id, :destinatario_tipo,
+                :valor_produtos, :valor_servicos, :valor_desconto, :valor_frete,
+                :valor_seguro, :valor_outras_despesas, :valor_total,
+                :valor_base_calculo, :valor_icms, :valor_icms_st, :valor_ipi,
+                :valor_pis, :valor_cofins, :valor_iss, :valor_inss, :valor_ir, :valor_csll,
+                :valor_liquido, :chave_acesso, :protocolo_autorizacao, :xml_nfe,
+                :pdf_danfe, :observacoes, :informacoes_adicionais, :status,
+                :criado_por, NOW()
+            )";
+            
+            $stmt = $this->db->prepare($sql);
+            
+            $params = [
+                'numero' => $data['numero'],
+                'serie' => $data['serie'] ?? '1',
+                'tipo' => $data['tipo'],
+                'natureza_operacao' => $data['natureza_operacao'],
+                'data_emissao' => $data['data_emissao'],
+                'data_saida_entrada' => $data['data_saida_entrada'] ?? $data['data_emissao'],
+                'emitente_id' => $data['emitente_id'],
+                'emitente_tipo' => $data['emitente_tipo'],
+                'destinatario_id' => $data['destinatario_id'],
+                'destinatario_tipo' => $data['destinatario_tipo'],
+                'valor_produtos' => $data['valor_produtos'] ?? 0.00,
+                'valor_servicos' => $data['valor_servicos'] ?? 0.00,
+                'valor_desconto' => $data['valor_desconto'] ?? 0.00,
+                'valor_frete' => $data['valor_frete'] ?? 0.00,
+                'valor_seguro' => $data['valor_seguro'] ?? 0.00,
+                'valor_outras_despesas' => $data['valor_outras_despesas'] ?? 0.00,
+                'valor_total' => $impostos['valor_total'],
+                'valor_base_calculo' => $impostos['base_calculo'],
+                'valor_icms' => $impostos['icms'],
+                'valor_icms_st' => $impostos['icms_st'],
+                'valor_ipi' => $impostos['ipi'],
+                'valor_pis' => $impostos['pis'],
+                'valor_cofins' => $impostos['cofins'],
+                'valor_iss' => $impostos['iss'],
+                'valor_inss' => $impostos['inss'],
+                'valor_ir' => $impostos['ir'],
+                'valor_csll' => $impostos['csll'],
+                'valor_liquido' => $impostos['valor_liquido'],
+                'chave_acesso' => $data['chave_acesso'] ?? null,
+                'protocolo_autorizacao' => $data['protocolo_autorizacao'] ?? null,
+                'xml_nfe' => $data['xml_nfe'] ?? null,
+                'pdf_danfe' => $data['pdf_danfe'] ?? null,
+                'observacoes' => $data['observacoes'] ?? '',
+                'informacoes_adicionais' => $data['informacoes_adicionais'] ?? '',
+                'status' => $data['status'],
+                'criado_por' => $data['criado_por'] ?? $_SESSION['user_id'] ?? null
+            ];
+            
+            if ($stmt->execute($params)) {
+                return $this->db->lastInsertId();
+            }
+            
+            return false;
+            
+        } catch (\Exception $e) {
+            error_log("Erro ao criar nota fiscal: " . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Emite nota fiscal (envia para SEFAZ)
+     * 
+     * @param int $id ID da nota fiscal
+     * @return array Resultado da emissão
+     */
+    public function emitir($id)
+    {
+        try {
+            $this->db->beginTransaction();
+            
+            $nota = $this->findById($id);
+            if (!$nota) {
+                throw new \Exception("Nota fiscal não encontrada");
+            }
+            
+            if ($nota['status'] !== self::STATUS_RASCUNHO) {
+                throw new \Exception("Apenas notas em rascunho podem ser emitidas");
+            }
+            
+            // Gera chave de acesso
+            $chaveAcesso = $this->gerarChaveAcesso($nota);
+            
+            // Gera XML da NF-e
+            $xml = $this->gerarXML($nota, $chaveAcesso);
+            
+            // Em produção, aqui seria feita a comunicação com SEFAZ
+            // Por ora, simula autorização
+            $resultado = $this->enviarSEFAZ($xml, $nota);
+            
+            if ($resultado['sucesso']) {
+                // Atualiza nota com dados de autorização
+                $this->update($id, [
+                    'status' => self::STATUS_AUTORIZADA,
+                    'chave_acesso' => $chaveAcesso,
+                    'protocolo_autorizacao' => $resultado['protocolo'],
+                    'xml_nfe' => $xml,
+                    'data_autorizacao' => date('Y-m-d H:i:s')
+                ]);
+                
+                // Gera DANFE (PDF)
+                $pdfPath = $this->gerarDANFE($nota, $chaveAcesso, $resultado['protocolo']);
+                
+                $this->update($id, ['pdf_danfe' => $pdfPath]);
+                
+                // Cria conta a receber/pagar se configurado
+                if (!empty($nota['criar_conta'])) {
+                    $this->criarConta($id, $nota);
+                }
+                
+                $this->db->commit();
+                
+                return [
+                    'sucesso' => true,
+                    'chave_acesso' => $chaveAcesso,
+                    'protocolo' => $resultado['protocolo'],
+                    'pdf_danfe' => $pdfPath
+                ];
+            } else {
+                $this->update($id, ['status' => self::STATUS_REJEITADA]);
+                $this->db->rollBack();
+                
+                return [
+                    'sucesso' => false,
+                    'erro' => $resultado['erro']
+                ];
+            }
+            
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            error_log("Erro ao emitir nota fiscal: " . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Cancela nota fiscal
+     * 
+     * @param int $id ID da nota fiscal
+     * @param string $motivo Motivo do cancelamento
+     * @return bool Sucesso da operação
+     */
+    public function cancelar($id, $motivo)
+    {
+        try {
+            $nota = $this->findById($id);
+            if (!$nota) {
+                throw new \Exception("Nota fiscal não encontrada");
+            }
+            
+            if ($nota['status'] !== self::STATUS_AUTORIZADA) {
+                throw new \Exception("Apenas notas autorizadas podem ser canceladas");
+            }
+            
+            // Valida prazo de cancelamento (24h)
+            $dataAutorizacao = new \DateTime($nota['data_autorizacao']);
+            $agora = new \DateTime();
+            $diff = $agora->diff($dataAutorizacao);
+            
+            if ($diff->h > 24 || $diff->days > 0) {
+                throw new \Exception("Prazo de cancelamento expirado (24h)");
+            }
+            
+            // Em produção, envia cancelamento para SEFAZ
+            $resultadoCancelamento = $this->enviarCancelamento($nota, $motivo);
+            
+            if ($resultadoCancelamento['sucesso']) {
+                $sql = "UPDATE {$this->table} SET 
+                        status = :status,
+                        data_cancelamento = :data_cancelamento,
+                        motivo_cancelamento = :motivo_cancelamento,
+                        protocolo_cancelamento = :protocolo_cancelamento,
+                        atualizado_por = :atualizado_por,
+                        atualizado_em = NOW()
+                        WHERE id = :id";
+                
+                $stmt = $this->db->prepare($sql);
+                
+                return $stmt->execute([
+                    'id' => $id,
+                    'status' => self::STATUS_CANCELADA,
+                    'data_cancelamento' => date('Y-m-d H:i:s'),
+                    'motivo_cancelamento' => $motivo,
+                    'protocolo_cancelamento' => $resultadoCancelamento['protocolo'],
+                    'atualizado_por' => $_SESSION['user_id'] ?? null
+                ]);
+            }
+            
+            return false;
+            
+        } catch (\Exception $e) {
+            error_log("Erro ao cancelar nota fiscal: " . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Busca nota fiscal por ID
+     * 
+     * @param int $id ID da nota
+     * @return array|false Dados da nota ou false se não encontrado
+     */
+    public function findById($id)
+    {
+        $sql = "SELECT nf.*,
+                u.nome as criador_nome
+                FROM {$this->table} nf
+                LEFT JOIN usuarios u ON nf.criado_por = u.id
+                WHERE nf.id = :id AND nf.ativo = TRUE";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    /**
+     * Lista notas fiscais com filtros e paginação
+     * 
+     * @param array $filtros Filtros a aplicar
+     * @param int $page Página atual
+     * @param int $limit Itens por página
+     * @return array Array com 'data' e 'total'
+     */
+    public function all(array $filtros = [], $page = 1, $limit = 50)
+    {
+        $where = ["nf.ativo = TRUE"];
+        $params = [];
+        
+        // Filtro por tipo
+        if (!empty($filtros['tipo'])) {
+            $where[] = "nf.tipo = :tipo";
+            $params['tipo'] = $filtros['tipo'];
+        }
+        
+        // Filtro por status
+        if (!empty($filtros['status'])) {
+            $where[] = "nf.status = :status";
+            $params['status'] = $filtros['status'];
+        }
+        
+        // Filtro por número
+        if (!empty($filtros['numero'])) {
+            $where[] = "nf.numero LIKE :numero";
+            $params['numero'] = '%' . $filtros['numero'] . '%';
+        }
+        
+        // Filtro por chave de acesso
+        if (!empty($filtros['chave_acesso'])) {
+            $where[] = "nf.chave_acesso = :chave_acesso";
+            $params['chave_acesso'] = $filtros['chave_acesso'];
+        }
+        
+        // Filtro por data de emissão
+        if (!empty($filtros['data_emissao_inicio'])) {
+            $where[] = "nf.data_emissao >= :data_emissao_inicio";
+            $params['data_emissao_inicio'] = $filtros['data_emissao_inicio'];
+        }
+        
+        if (!empty($filtros['data_emissao_fim'])) {
+            $where[] = "nf.data_emissao <= :data_emissao_fim";
+            $params['data_emissao_fim'] = $filtros['data_emissao_fim'];
+        }
+        
+        // Filtro por emitente
+        if (!empty($filtros['emitente_id'])) {
+            $where[] = "nf.emitente_id = :emitente_id";
+            $params['emitente_id'] = $filtros['emitente_id'];
+        }
+        
+        // Filtro por destinatário
+        if (!empty($filtros['destinatario_id'])) {
+            $where[] = "nf.destinatario_id = :destinatario_id";
+            $params['destinatario_id'] = $filtros['destinatario_id'];
+        }
+        
+        $whereClause = implode(' AND ', $where);
+        
+        // Query de contagem
+        $sqlCount = "SELECT COUNT(*) as total
+                    FROM {$this->table} nf
+                    WHERE {$whereClause}";
+        
+        $stmtCount = $this->db->prepare($sqlCount);
+        $stmtCount->execute($params);
+        $total = $stmtCount->fetch(PDO::FETCH_ASSOC)['total'];
+        
+        // Query de dados
+        $offset = ($page - 1) * $limit;
+        
+        $sql = "SELECT nf.*
+                FROM {$this->table} nf
+                WHERE {$whereClause}
+                ORDER BY nf.data_emissao DESC, nf.criado_em DESC
+                LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($sql);
+        
+        foreach ($params as $key => $value) {
+            $stmt->bindValue(':' . $key, $value);
+        }
+        
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        $notas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return [
+            'data' => $notas,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit,
+            'pages' => ceil($total / $limit)
+        ];
+    }
+    
+    /**
+     * Atualiza uma nota fiscal
+     * 
+     * @param int $id ID da nota
+     * @param array $data Dados a atualizar
+     * @return bool Sucesso da operação
+     */
+    public function update($id, array $data)
+    {
+        try {
+            $campos = [];
+            $params = ['id' => $id];
+            
+            $camposPermitidos = [
+                'valor_produtos', 'valor_servicos', 'valor_desconto', 'valor_frete',
+                'valor_seguro', 'valor_outras_despesas', 'valor_total', 'valor_liquido',
+                'chave_acesso', 'protocolo_autorizacao', 'xml_nfe', 'pdf_danfe',
+                'observacoes', 'informacoes_adicionais', 'status', 'data_autorizacao',
+                'protocolo_cancelamento', 'data_cancelamento', 'motivo_cancelamento'
+            ];
+            
+            foreach ($camposPermitidos as $campo) {
+                if (array_key_exists($campo, $data)) {
+                    $campos[] = "{$campo} = :{$campo}";
+                    $params[$campo] = $data[$campo];
+                }
+            }
+            
+            if (empty($campos)) {
+                return true;
+            }
+            
+            $campos[] = "atualizado_por = :atualizado_por";
+            $campos[] = "atualizado_em = NOW()";
+            $params['atualizado_por'] = $data['atualizado_por'] ?? $_SESSION['user_id'] ?? null;
+            
+            $sql = "UPDATE {$this->table} SET " . implode(', ', $campos) . " WHERE id = :id";
+            
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute($params);
+            
+        } catch (\Exception $e) {
+            error_log("Erro ao atualizar nota fiscal: " . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Calcula impostos da nota fiscal
+     * 
+     * @param array $data Dados da nota
+     * @return array Impostos calculados
+     */
+    private function calcularImpostos(array $data)
+    {
+        $valorProdutos = $data['valor_produtos'] ?? 0.00;
+        $valorServicos = $data['valor_servicos'] ?? 0.00;
+        $valorDesconto = $data['valor_desconto'] ?? 0.00;
+        $valorFrete = $data['valor_frete'] ?? 0.00;
+        $valorSeguro = $data['valor_seguro'] ?? 0.00;
+        $valorOutrasDespesas = $data['valor_outras_despesas'] ?? 0.00;
+        
+        // Base de cálculo
+        $baseCalculo = $valorProdutos + $valorServicos - $valorDesconto + $valorFrete + $valorSeguro + $valorOutrasDespesas;
+        
+        // Alíquotas (valores exemplo - devem vir de configuração)
+        $aliquotaICMS = $data['aliquota_icms'] ?? 18.00;
+        $aliquotaIPI = $data['aliquota_ipi'] ?? 0.00;
+        $aliquotaPIS = $data['aliquota_pis'] ?? 1.65;
+        $aliquotaCOFINS = $data['aliquota_cofins'] ?? 7.60;
+        $aliquotaISS = $data['aliquota_iss'] ?? 5.00;
+        $aliquotaINSS = $data['aliquota_inss'] ?? 0.00;
+        $aliquotaIR = $data['aliquota_ir'] ?? 0.00;
+        $aliquotaCSLL = $data['aliquota_csll'] ?? 0.00;
+        
+        // Cálculo de impostos
+        $icms = ($valorProdutos * $aliquotaICMS) / 100;
+        $icmsST = 0.00; // ICMS ST calculado conforme legislação específica
+        $ipi = ($valorProdutos * $aliquotaIPI) / 100;
+        $pis = ($baseCalculo * $aliquotaPIS) / 100;
+        $cofins = ($baseCalculo * $aliquotaCOFINS) / 100;
+        $iss = ($valorServicos * $aliquotaISS) / 100;
+        $inss = ($valorServicos * $aliquotaINSS) / 100;
+        $ir = ($valorServicos * $aliquotaIR) / 100;
+        $csll = ($valorServicos * $aliquotaCSLL) / 100;
+        
+        $totalImpostos = $icms + $icmsST + $ipi + $pis + $cofins + $iss + $inss + $ir + $csll;
+        $valorTotal = $baseCalculo + $ipi;
+        $valorLiquido = $valorTotal - $totalImpostos;
+        
+        return [
+            'base_calculo' => round($baseCalculo, 2),
+            'icms' => round($icms, 2),
+            'icms_st' => round($icmsST, 2),
+            'ipi' => round($ipi, 2),
+            'pis' => round($pis, 2),
+            'cofins' => round($cofins, 2),
+            'iss' => round($iss, 2),
+            'inss' => round($inss, 2),
+            'ir' => round($ir, 2),
+            'csll' => round($csll, 2),
+            'total_impostos' => round($totalImpostos, 2),
+            'valor_total' => round($valorTotal, 2),
+            'valor_liquido' => round($valorLiquido, 2)
+        ];
+    }
+    
+    /**
+     * Gera número único da nota
+     * 
+     * @param string $tipo Tipo da nota
+     * @return string Número da nota
+     */
+    private function gerarNumero($tipo)
+    {
+        $sql = "SELECT numero 
+                FROM {$this->table} 
+                WHERE tipo = :tipo 
+                ORDER BY numero DESC 
+                LIMIT 1";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['tipo' => $tipo]);
+        
+        $ultimo = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($ultimo) {
+            $ultimoNumero = (int)$ultimo['numero'];
+            $novoNumero = $ultimoNumero + 1;
+        } else {
+            $novoNumero = 1;
+        }
+        
+        return str_pad($novoNumero, 9, '0', STR_PAD_LEFT);
+    }
+    
+    /**
+     * Gera chave de acesso da NF-e
+     * 
+     * @param array $nota Dados da nota
+     * @return string Chave de acesso
+     */
+    private function gerarChaveAcesso($nota)
+    {
+        // Formato: UF+AAMM+CNPJ+MOD+SERIE+NUMERO+TPEMIS+CODIGO+DV
+        $uf = '35'; // São Paulo (exemplo)
+        $aamm = date('ym', strtotime($nota['data_emissao']));
+        $cnpj = '12345678000190'; // CNPJ do emitente (exemplo)
+        $mod = '55'; // Modelo 55 (NF-e)
+        $serie = str_pad($nota['serie'], 3, '0', STR_PAD_LEFT);
+        $numero = str_pad($nota['numero'], 9, '0', STR_PAD_LEFT);
+        $tpEmis = '1'; // Tipo emissão normal
+        $codigo = str_pad(rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
+        
+        $chave = $uf . $aamm . $cnpj . $mod . $serie . $numero . $tpEmis . $codigo;
+        
+        // Calcula dígito verificador
+        $dv = $this->calcularDVChaveAcesso($chave);
+        
+        return $chave . $dv;
+    }
+    
+    /**
+     * Calcula dígito verificador da chave de acesso
+     * 
+     * @param string $chave Chave sem DV
+     * @return string Dígito verificador
+     */
+    private function calcularDVChaveAcesso($chave)
+    {
+        $multiplicadores = [2, 3, 4, 5, 6, 7, 8, 9];
+        $soma = 0;
+        $posicao = 0;
+        
+        for ($i = strlen($chave) - 1; $i >= 0; $i--) {
+            $soma += $chave[$i] * $multiplicadores[$posicao % 8];
+            $posicao++;
+        }
+        
+        $resto = $soma % 11;
+        $dv = 11 - $resto;
+        
+        if ($dv == 10 || $dv == 11) {
+            $dv = 0;
+        }
+        
+        return (string)$dv;
+    }
+    
+    /**
+     * Gera XML da NF-e
+     * 
+     * @param array $nota Dados da nota
+     * @param string $chaveAcesso Chave de acesso
+     * @return string XML gerado
+     */
+    private function gerarXML($nota, $chaveAcesso)
+    {
+        // Em produção, usar biblioteca específica (ex: NFePHP)
+        // Aqui retorna XML simplificado para exemplo
+        
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xml .= '<nfeProc xmlns="http://www.portalfiscal.inf.br/nfe">';
+        $xml .= '<NFe>';
+        $xml .= '<infNFe Id="NFe' . $chaveAcesso . '" versao="4.00">';
+        $xml .= '<ide>';
+        $xml .= '<cUF>35</cUF>';
+        $xml .= '<cNF>' . substr($chaveAcesso, -9, 8) . '</cNF>';
+        $xml .= '<natOp>' . $nota['natureza_operacao'] . '</natOp>';
+        $xml .= '<mod>55</mod>';
+        $xml .= '<serie>' . $nota['serie'] . '</serie>';
+        $xml .= '<nNF>' . $nota['numero'] . '</nNF>';
+        $xml .= '<dhEmi>' . date('Y-m-d\TH:i:sP', strtotime($nota['data_emissao'])) . '</dhEmi>';
+        $xml .= '</ide>';
+        $xml .= '</infNFe>';
+        $xml .= '</NFe>';
+        $xml .= '</nfeProc>';
+        
+        return $xml;
+    }
+    
+    /**
+     * Envia NF-e para SEFAZ (simulado)
+     * 
+     * @param string $xml XML da nota
+     * @param array $nota Dados da nota
+     * @return array Resultado do envio
+     */
+    private function enviarSEFAZ($xml, $nota)
+    {
+        // Em produção, fazer comunicação real com SEFAZ
+        // Aqui simula autorização
+        
+        return [
+            'sucesso' => true,
+            'protocolo' => date('YmdHis') . rand(100000, 999999),
+            'data_autorizacao' => date('Y-m-d H:i:s')
+        ];
+    }
+    
+    /**
+     * Envia cancelamento para SEFAZ (simulado)
+     * 
+     * @param array $nota Dados da nota
+     * @param string $motivo Motivo do cancelamento
+     * @return array Resultado do cancelamento
+     */
+    private function enviarCancelamento($nota, $motivo)
+    {
+        // Em produção, fazer comunicação real com SEFAZ
+        
+        return [
+            'sucesso' => true,
+            'protocolo' => date('YmdHis') . rand(100000, 999999)
+        ];
+    }
+    
+    /**
+     * Gera DANFE (PDF da nota)
+     * 
+     * @param array $nota Dados da nota
+     * @param string $chaveAcesso Chave de acesso
+     * @param string $protocolo Protocolo de autorização
+     * @return string Caminho do PDF
+     */
+    private function gerarDANFE($nota, $chaveAcesso, $protocolo)
+    {
+        // Em produção, usar biblioteca de geração de PDF (ex: TCPDF, FPDF)
+        
+        $filename = "danfe_{$nota['numero']}_{$chaveAcesso}.pdf";
+        $filepath = "/uploads/notas_fiscais/{$filename}";
+        
+        // Aqui seria gerado o PDF real
+        
+        return $filepath;
+    }
+    
+    /**
+     * Cria conta a receber/pagar vinculada à nota
+     * 
+     * @param int $notaId ID da nota
+     * @param array $nota Dados da nota
+     * @return void
+     */
+    private function criarConta($notaId, $nota)
+    {
+        if ($nota['natureza_operacao'] === self::NATUREZA_VENDA || 
+            $nota['natureza_operacao'] === self::NATUREZA_SERVICO) {
+            // Cria conta a receber
+            $contaReceberModel = new ContaReceber();
+            $contaReceberModel->create([
+                'nota_fiscal_id' => $notaId,
+                'cliente_id' => $nota['destinatario_id'],
+                'descricao' => "NF-e {$nota['numero']} - {$nota['natureza_operacao']}",
+                'valor_original' => $nota['valor_total'],
+                'data_vencimento' => date('Y-m-d', strtotime('+30 days'))
+            ]);
+        } elseif ($nota['natureza_operacao'] === self::NATUREZA_COMPRA) {
+            // Cria conta a pagar
+            $contaPagarModel = new ContaPagar();
+            $contaPagarModel->create([
+                'nota_fiscal_id' => $notaId,
+                'fornecedor_id' => $nota['emitente_id'],
+                'descricao' => "NF-e {$nota['numero']} - {$nota['natureza_operacao']}",
+                'valor_original' => $nota['valor_total'],
+                'data_vencimento' => date('Y-m-d', strtotime('+30 days'))
+            ]);
+        }
+    }
+    
+    /**
+     * Valida dados obrigatórios
+     * 
+     * @param array $data Dados a validar
+     * @throws \Exception Se validação falhar
+     */
+    private function validarDados(array $data)
+    {
+        if (empty($data['tipo'])) {
+            throw new \Exception("Tipo da nota é obrigatório");
+        }
+        
+        if (empty($data['natureza_operacao'])) {
+            throw new \Exception("Natureza da operação é obrigatória");
+        }
+        
+        if (empty($data['emitente_id'])) {
+            throw new \Exception("Emitente é obrigatório");
+        }
+        
+        if (empty($data['destinatario_id'])) {
+            throw new \Exception("Destinatário é obrigatório");
+        }
+    }
+    
+    /**
+     * Soft delete de uma nota
+     * 
+     * @param int $id ID da nota
+     * @return bool Sucesso da operação
+     */
+    public function delete($id)
+    {
+        try {
+            $nota = $this->findById($id);
+            if (!$nota) {
+                throw new \Exception("Nota fiscal não encontrada");
+            }
+            
+            // Não permite excluir nota autorizada
+            if (in_array($nota['status'], [self::STATUS_AUTORIZADA, self::STATUS_CANCELADA])) {
+                throw new \Exception("Nota autorizada/cancelada não pode ser excluída");
+            }
+            
+            $sql = "UPDATE {$this->table} SET 
+                    ativo = FALSE,
+                    atualizado_por = :atualizado_por,
+                    atualizado_em = NOW()
+                    WHERE id = :id";
+            
+            $stmt = $this->db->prepare($sql);
+            
+            return $stmt->execute([
+                'id' => $id,
+                'atualizado_por' => $_SESSION['user_id'] ?? null
+            ]);
+            
+        } catch (\Exception $e) {
+            error_log("Erro ao excluir nota fiscal: " . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Obtém estatísticas de notas fiscais
+     * 
+     * @param array $filtros Filtros opcionais
+     * @return array Estatísticas
+     */
+    public function getEstatisticas(array $filtros = [])
+    {
+        $where = ["ativo = TRUE"];
+        $params = [];
+        
+        if (!empty($filtros['data_inicio'])) {
+            $where[] = "data_emissao >= :data_inicio";
+            $params['data_inicio'] = $filtros['data_inicio'];
+        }
+        
+        if (!empty($filtros['data_fim'])) {
+            $where[] = "data_emissao <= :data_fim";
+            $params['data_fim'] = $filtros['data_fim'];
+        }
+        
+        $whereClause = implode(' AND ', $where);
+        
+        $sql = "SELECT 
+                COUNT(*) as total,
+                COUNT(CASE WHEN tipo = 'nfe' THEN 1 END) as total_nfe,
+                COUNT(CASE WHEN tipo = 'nfse' THEN 1 END) as total_nfse,
+                COUNT(CASE WHEN status = 'autorizada' THEN 1 END) as autorizadas,
+                COUNT(CASE WHEN status = 'cancelada' THEN 1 END) as canceladas,
+                SUM(CASE WHEN status = 'autorizada' THEN valor_total ELSE 0 END) as valor_total_autorizado,
+                SUM(CASE WHEN status = 'autorizada' THEN valor_icms ELSE 0 END) as total_icms,
+                SUM(CASE WHEN status = 'autorizada' THEN valor_iss ELSE 0 END) as total_iss
+                FROM {$this->table}
+                WHERE {$whereClause}";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+}
+
+    // Métodos adicionais necessários para NotaFiscalController
+    
+    public function count($filtros = [])
+    {
+        $sql = "SELECT COUNT(*) as total FROM {$this->table} WHERE ativo = TRUE";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    }
+    
+    public function countPorStatus($status)
+    {
+        $sql = "SELECT COUNT(*) as total FROM {$this->table} WHERE status = :status AND ativo = TRUE";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':status', $status);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    }
+    
+    public function countMes($mes = null, $ano = null)
+    {
+        $mes = $mes ?? date('n');
+        $ano = $ano ?? date('Y');
+        $sql = "SELECT COUNT(*) as total FROM {$this->table} 
+                WHERE MONTH(data_emissao) = :mes AND YEAR(data_emissao) = :ano AND deleted_at IS NULL";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':mes', $mes, PDO::PARAM_INT);
+        $stmt->bindValue(':ano', $ano, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    }
+    
+    public function countMesPorStatus($status, $mes = null, $ano = null)
+    {
+        $mes = $mes ?? date('n');
+        $ano = $ano ?? date('Y');
+        $sql = "SELECT COUNT(*) as total FROM {$this->table} 
+                WHERE MONTH(data_emissao) = :mes AND YEAR(data_emissao) = :ano AND status = :status AND deleted_at IS NULL";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':mes', $mes, PDO::PARAM_INT);
+        $stmt->bindValue(':ano', $ano, PDO::PARAM_INT);
+        $stmt->bindValue(':status', $status);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    }
+    
+    public function getValorTotalMes($mes = null, $ano = null)
+    {
+        $mes = $mes ?? date('n');
+        $ano = $ano ?? date('Y');
+        $sql = "SELECT COALESCE(SUM(valor_total), 0) as total FROM {$this->table} 
+                WHERE MONTH(data_emissao) = :mes AND YEAR(data_emissao) = :ano AND status = 'autorizada' AND deleted_at IS NULL";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':mes', $mes, PDO::PARAM_INT);
+        $stmt->bindValue(':ano', $ano, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    }
+    
+    public function getTotalizadoresPorTipo()
+    {
+        $sql = "SELECT tipo, COUNT(*) as quantidade, SUM(valor_total) as valor_total
+                FROM {$this->table} WHERE status = 'autorizada' AND ativo = TRUE GROUP BY tipo";
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function getItens($notaFiscalId)
+    {
+        $sql = "SELECT * FROM nota_fiscal_itens WHERE nota_fiscal_id = :id ORDER BY numero_item";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $notaFiscalId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function addItem($notaFiscalId, $item)
+    {
+        $sql = "INSERT INTO nota_fiscal_itens (nota_fiscal_id, numero_item, descricao, quantidade, valor_unitario, valor_total)
+                VALUES (:nota_fiscal_id, :numero_item, :descricao, :quantidade, :valor_unitario, :valor_total)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':nota_fiscal_id' => $notaFiscalId,
+            ':numero_item' => $item['numero_item'],
+            ':descricao' => $item['descricao'],
+            ':quantidade' => $item['quantidade'],
+            ':valor_unitario' => $item['valor_unitario'],
+            ':valor_total' => $item['valor_total']
+        ]);
+    }
+    
+    public function deleteItens($notaFiscalId)
+    {
+        $sql = "DELETE FROM nota_fiscal_itens WHERE nota_fiscal_id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $notaFiscalId, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
+    public function getHistorico($notaFiscalId)
+    {
+        $sql = "SELECT * FROM nota_fiscal_historico WHERE nota_fiscal_id = :id ORDER BY created_at DESC LIMIT 100";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $notaFiscalId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function getCartasCorrecao($notaFiscalId)
+    {
+        $sql = "SELECT * FROM nota_fiscal_cartas_correcao WHERE nota_fiscal_id = :id ORDER BY created_at DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $notaFiscalId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function emitirCartaCorrecao($notaFiscalId, $correcao)
+    {
+        $sql = "INSERT INTO nota_fiscal_cartas_correcao (nota_fiscal_id, numero_sequencial, correcao, created_at)
+                VALUES (:nota_fiscal_id, :numero_sequencial, :correcao, NOW())";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':nota_fiscal_id' => $notaFiscalId,
+            ':numero_sequencial' => $correcao['numero_sequencial'],
+            ':correcao' => $correcao['correcao']
+        ]);
+    }
+    
+    public function podeCancelar($notaFiscalId)
+    {
+        $nf = $this->findById($notaFiscalId);
+        if (!$nf) return false;
+        
+        if ($nf['status'] !== 'autorizada') return false;
+        
+        $dataEmissao = strtotime($nf['data_emissao']);
+        $agora = time();
+        $diferencaHoras = ($agora - $dataEmissao) / 3600;
+        
+        return $diferencaHoras <= 24;
+    }
+    
+    public function consultarStatus($notaFiscalId)
+    {
+        $nf = $this->findById($notaFiscalId);
+        return $nf ? $nf['status'] : null;
+    }
+    
+    public function gerarDANFE($notaFiscalId)
+    {
+        return ['success' => true, 'pdf_path' => '/uploads/danfe/' . $notaFiscalId . '.pdf'];
+    }
+    
+    public function downloadDANFE($notaFiscalId)
+    {
+        return $this->gerarDANFE($notaFiscalId);
+    }
+    
+    public function downloadXML($notaFiscalId)
+    {
+        return ['success' => true, 'xml_path' => '/uploads/nfe/' . $notaFiscalId . '.xml'];
+    }
+    
+    public function getContasVinculadas($notaFiscalId)
+    {
+        $contas = [];
+        
+        try {
+            $sql = "SELECT 'pagar' as tipo, id, descricao, valor, data_vencimento, status 
+                    FROM contas_pagar WHERE nota_fiscal_id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $notaFiscalId, PDO::PARAM_INT);
+            $stmt->execute();
+            $contas = array_merge($contas, $stmt->fetchAll(PDO::FETCH_ASSOC));
+            
+            $sql = "SELECT 'receber' as tipo, id, descricao, valor, data_vencimento, status 
+                    FROM contas_receber WHERE nota_fiscal_id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $notaFiscalId, PDO::PARAM_INT);
+            $stmt->execute();
+            $contas = array_merge($contas, $stmt->fetchAll(PDO::FETCH_ASSOC));
+        } catch (\Exception $e) {
+            error_log("Erro ao buscar contas vinculadas: " . $e->getMessage());
+        }
+        
+        return $contas;
+    }
+}
