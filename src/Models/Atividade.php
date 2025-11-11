@@ -5,7 +5,8 @@ namespace App\Models;
 use App\Database;
 use PDO;
 
-class Atividade extends BaseModel
+// Updated: 2025-11-11 06:42 - Removed BaseModel inheritance
+class Atividade
 {
     protected $table = 'atividades';
     protected $db;

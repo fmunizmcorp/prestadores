@@ -5,7 +5,8 @@ namespace App\Models;
 use App\Database;
 use PDO;
 
-class Projeto extends BaseModel
+// Updated: 2025-11-11 06:42 - Removed BaseModel inheritance
+class Projeto
 {
     protected $table = 'projetos';
     protected $db;
