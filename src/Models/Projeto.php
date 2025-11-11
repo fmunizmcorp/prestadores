@@ -12,7 +12,7 @@ class Projeto extends BaseModel
     
     public function __construct()
     {
-        $this->db = Database::getInstance()->getConnection();
+        $this->db = Database::getInstance();
     }
     
     /**

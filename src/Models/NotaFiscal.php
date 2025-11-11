@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Database;
 use PDO;
 use Exception;
 
@@ -59,12 +60,7 @@ class NotaFiscal
      */
     public function __construct()
     {
-        try {
-            $this->db = \App\Database::getInstance()->getConnection();
-        } catch (Exception $e) {
-            error_log("NotaFiscal::__construct error: " . $e->getMessage());
-            $this->db = null;
-        }
+        $this->db = Database::getInstance();
     }
     
     /**
