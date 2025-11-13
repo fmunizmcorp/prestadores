@@ -12,17 +12,17 @@
                     <h6>Links Rápidos</h6>
                     <ul class="list-unstyled">
                         <li><a href="/" class="text-white-50">Dashboard</a></li>
-                        <li><a href="/empresas-tomadoras" class="text-white-50">Empresas Tomadoras</a></li>
-                        <li><a href="/empresas-prestadoras" class="text-white-50">Empresas Prestadoras</a></li>
-                        <li><a href="/contratos" class="text-white-50">Contratos</a></li>
+                        <li><a href="?page=empresas-tomadoras" class="text-white-50">Empresas Tomadoras</a></li>
+                        <li><a href="?page=empresas-prestadoras" class="text-white-50">Empresas Prestadoras</a></li>
+                        <li><a href="?page=contratos" class="text-white-50">Contratos</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
                     <h6>Suporte</h6>
                     <ul class="list-unstyled">
-                        <li><a href="/ajuda" class="text-white-50">Ajuda</a></li>
-                        <li><a href="/documentacao" class="text-white-50">Documentação</a></li>
-                        <li><a href="/contato" class="text-white-50">Contato</a></li>
+                        <li><a href="?page=ajuda" class="text-white-50">Ajuda</a></li>
+                        <li><a href="?page=documentacao" class="text-white-50">Documentação</a></li>
+                        <li><a href="?page=contato" class="text-white-50">Contato</a></li>
                     </ul>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                 <div class="col-md-6 text-md-end">
                     <p class="mb-0 text-muted">
                         Versão <?= $config['version'] ?? '1.0.0' ?> | 
-                        <a href="/changelog" class="text-white-50">Changelog</a>
+                        <a href="?page=changelog" class="text-white-50">Changelog</a>
                     </p>
                 </div>
             </div>

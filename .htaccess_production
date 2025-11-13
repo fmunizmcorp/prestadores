@@ -1,0 +1,45 @@
+# Clinfec Prestadores - Subdiretório /prestadores/
+# URL Base: https://clinfec.com.br/prestadores/
+
+# Ativar RewriteEngine
+RewriteEngine On
+RewriteBase /prestadores/
+
+# Forçar HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Proteger pastas sensíveis
+RewriteRule ^(config|database|src|docs|vendor|logs)/ - [F,L]
+
+# Proteger arquivos sensíveis
+RewriteRule \.(md|json|lock|yml|yaml|ini|log)$ - [F,L]
+
+# Allow direct access to specific PHP files
+RewriteRule ^clear_cache\.php$ - [L]
+RewriteRule ^cadastroinicial\.php$ - [L]
+RewriteRule ^api_test_.*\.php$ - [L]
+RewriteRule ^test_.*\.php$ - [L]
+RewriteRule ^diagnose_.*\.php$ - [L]
+
+# Front Controller - Route everything else to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Disable directory listing
+Options -Indexes
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# PHP settings
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+</IfModule>

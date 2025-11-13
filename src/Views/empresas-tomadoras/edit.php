@@ -3,8 +3,8 @@ $pageTitle = 'Editar Empresa Tomadora';
 $activeMenu = 'empresas-tomadoras';
 $breadcrumb = [
     ['label' => 'Empresas'],
-    ['label' => 'Empresas Tomadoras', 'url' => '/empresas-tomadoras'],
-    ['label' => $empresa['nome_fantasia'], 'url' => '/empresas-tomadoras/' . $empresa['id']],
+    ['label' => 'Empresas Tomadoras', 'url' => '?page=empresas-tomadoras'],
+    ['label' => $empresa['nome_fantasia'], 'url' => '?page=empresas-tomadoras&action=show&id=' . $empresa['id']],
     ['label' => 'Editar']
 ];
 
@@ -22,7 +22,7 @@ unset($_SESSION['form_data']);
     </div>
 </div>
 
-<form method="POST" action="/empresas-tomadoras/<?= $empresa['id'] ?>/update" enctype="multipart/form-data" class="needs-validation" novalidate>
+<form method="POST" action="?page=empresas-tomadoras&action=update&id=<?= $empresa['id'] ?>" enctype="multipart/form-data" class="needs-validation" novalidate>
     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
     
     <!-- Dados Principais -->
@@ -300,7 +300,7 @@ unset($_SESSION['form_data']);
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class="fas fa-save"></i> Salvar Empresa
                     </button>
-                    <a href="/empresas-tomadoras" class="btn btn-secondary btn-lg">
+                    <a href="?page=empresas-tomadoras" class="btn btn-secondary btn-lg">
                         <i class="fas fa-times"></i> Cancelar
                     </a>
                 </div>

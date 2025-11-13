@@ -56,10 +56,10 @@
                             <i class="fas fa-building"></i> Empresas
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/empresas-tomadoras">
+                            <li><a class="dropdown-item" href="?page=empresas-tomadoras">
                                 <i class="fas fa-briefcase"></i> Empresas Tomadoras
                             </a></li>
-                            <li><a class="dropdown-item" href="/empresas-prestadoras">
+                            <li><a class="dropdown-item" href="?page=empresas-prestadoras">
                                 <i class="fas fa-handshake"></i> Empresas Prestadoras
                             </a></li>
                         </ul>
@@ -67,28 +67,28 @@
                     
                     <!-- Serviços -->
                     <li class="nav-item">
-                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'servicos' ? 'active' : '' ?>" href="/servicos">
+                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'servicos' ? 'active' : '' ?>" href="?page=servicos">
                             <i class="fas fa-list"></i> Serviços
                         </a>
                     </li>
                     
                     <!-- Contratos -->
                     <li class="nav-item">
-                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'contratos' ? 'active' : '' ?>" href="/contratos">
+                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'contratos' ? 'active' : '' ?>" href="?page=contratos">
                             <i class="fas fa-file-contract"></i> Contratos
                         </a>
                     </li>
                     
                     <!-- Projetos -->
                     <li class="nav-item">
-                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'projetos' ? 'active' : '' ?>" href="/projetos">
+                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'projetos' ? 'active' : '' ?>" href="?page=projetos">
                             <i class="fas fa-project-diagram"></i> Projetos
                         </a>
                     </li>
                     
                     <!-- Atividades -->
                     <li class="nav-item">
-                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'atividades' ? 'active' : '' ?>" href="/atividades">
+                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'atividades' ? 'active' : '' ?>" href="?page=atividades">
                             <i class="fas fa-tasks"></i> Atividades
                         </a>
                     </li>
@@ -100,14 +100,14 @@
                             <i class="fas fa-dollar-sign"></i> Financeiro
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/pagamentos">
+                            <li><a class="dropdown-item" href="?page=pagamentos">
                                 <i class="fas fa-money-bill-wave"></i> Pagamentos
                             </a></li>
-                            <li><a class="dropdown-item" href="/custos">
+                            <li><a class="dropdown-item" href="?page=custos">
                                 <i class="fas fa-calculator"></i> Custos
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/relatorios-financeiros">
+                            <li><a class="dropdown-item" href="?page=relatorios-financeiros">
                                 <i class="fas fa-chart-line"></i> Relatórios
                             </a></li>
                         </ul>
@@ -115,7 +115,7 @@
                     
                     <!-- Relatórios -->
                     <li class="nav-item">
-                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'relatorios' ? 'active' : '' ?>" href="/relatorios">
+                        <a class="nav-link <?= isset($activeMenu) && $activeMenu === 'relatorios' ? 'active' : '' ?>" href="?page=relatorios">
                             <i class="fas fa-chart-bar"></i> Relatórios
                         </a>
                     </li>
@@ -129,14 +129,14 @@
                             <?= $_SESSION['usuario_nome'] ?? 'Usuário' ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/perfil">
+                            <li><a class="dropdown-item" href="?page=perfil">
                                 <i class="fas fa-user"></i> Meu Perfil
                             </a></li>
-                            <li><a class="dropdown-item" href="/configuracoes">
+                            <li><a class="dropdown-item" href="?page=configuracoes">
                                 <i class="fas fa-cog"></i> Configurações
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="/logout">
+                            <li><a class="dropdown-item text-danger" href="?page=logout">
                                 <i class="fas fa-sign-out-alt"></i> Sair
                             </a></li>
                         </ul>

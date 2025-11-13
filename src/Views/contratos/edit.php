@@ -17,8 +17,8 @@ require_once __DIR__ . '/../layouts/header.php';
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/contratos">Contratos</a></li>
+            <li class="breadcrumb-item"><a href="?page=dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="?page=contratos">Contratos</a></li>
             <li class="breadcrumb-item active">Editar Contrato</li>
         </ol>
     </nav>
@@ -29,7 +29,7 @@ require_once __DIR__ . '/../layouts/header.php';
             <h1 class="h2 mb-1">Editar Contrato</h1>
             <p class="text-muted mb-0">Atualize as informações do contrato</p>
         </div>
-        <a href="/contratos" class="btn btn-secondary">
+        <a href="?page=contratos" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i>Voltar
         </a>
     </div>
@@ -37,7 +37,7 @@ require_once __DIR__ . '/../layouts/header.php';
     <!-- Form Card -->
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="POST" action="/contratos/<?= $contrato['id'] ?>/update" id="formContrato" enctype="multipart/form-data" novalidate>
+            <form method="POST" action="?page=contratos&action=update&id=<?= $contrato['id'] ?>" id="formContrato" enctype="multipart/form-data" novalidate>
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
                 <!-- Section 1: Dados Principais -->
@@ -385,7 +385,7 @@ require_once __DIR__ . '/../layouts/header.php';
 
                 <!-- Form Actions -->
                 <div class="d-flex justify-content-between align-items-center pt-4 border-top">
-                    <a href="/contratos" class="btn btn-secondary">
+                    <a href="?page=contratos" class="btn btn-secondary">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </a>
                     <button type="submit" class="btn btn-primary btn-lg">

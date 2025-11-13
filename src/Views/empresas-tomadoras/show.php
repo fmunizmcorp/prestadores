@@ -3,7 +3,7 @@ $pageTitle = htmlspecialchars($empresa['nome_fantasia']);
 $activeMenu = 'empresas-tomadoras';
 $breadcrumb = [
     ['label' => 'Empresas'],
-    ['label' => 'Empresas Tomadoras', 'url' => '/empresas-tomadoras'],
+    ['label' => 'Empresas Tomadoras', 'url' => '?page=empresas-tomadoras'],
     ['label' => $empresa['nome_fantasia']]
 ];
 
@@ -21,7 +21,7 @@ require __DIR__ . '/../layouts/header.php';
         <p class="text-muted"><?= htmlspecialchars($empresa['razao_social']) ?></p>
     </div>
     <div class="col-md-4 text-end">
-        <a href="/empresas-tomadoras/<?= $empresa['id'] ?>/edit" class="btn btn-warning">
+        <a href="?page=empresas-tomadoras&action=edit&id=<?= $empresa['id'] ?>" class="btn btn-warning">
             <i class="fas fa-edit"></i> Editar
         </a>
         <button type="button" class="btn btn-danger" onclick="confirmarExclusao()">
@@ -293,7 +293,7 @@ require __DIR__ . '/../layouts/header.php';
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <form method="POST" action="/empresas-tomadoras/<?= $empresa['id'] ?>/responsaveis/<?= $resp['id'] ?>" style="display: inline;">
+                                        <form method="POST" action="?page=empresas-tomadoras&action=destroyResponsavel&id=<?= $empresa['id'] ?>&responsavel_id=<?= $resp['id'] ?>" style="display: inline;">
                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remover este responsável?')">
                                                 <i class="fas fa-trash"></i>
@@ -361,10 +361,10 @@ require __DIR__ . '/../layouts/header.php';
                                     </td>
                                     <td><span class="badge bg-<?= $doc['status'] === 'Ativo' ? 'success' : 'secondary' ?>"><?= $doc['status'] ?></span></td>
                                     <td>
-                                        <a href="/public/uploads/documentos/<?= $doc['arquivo'] ?>" class="btn btn-sm btn-info" target="_blank">
+                                        <a href="public/uploads/documentos/<?= $doc['arquivo'] ?>" class="btn btn-sm btn-info" target="_blank">
                                             <i class="fas fa-download"></i>
                                         </a>
-                                        <form method="POST" action="/empresas-tomadoras/<?= $empresa['id'] ?>/documentos/<?= $doc['id'] ?>" style="display: inline;">
+                                        <form method="POST" action="?page=empresas-tomadoras&action=destroyDocumento&id=<?= $empresa['id'] ?>&documento_id=<?= $doc['id'] ?>" style="display: inline;">
                                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remover este documento?')">
                                                 <i class="fas fa-trash"></i>
@@ -389,7 +389,7 @@ require __DIR__ . '/../layouts/header.php';
             </div>
             <div class="card-body">
                 <p class="text-muted">
-                    <a href="/contratos?empresa_tomadora_id=<?= $empresa['id'] ?>">
+                    <a href="?page=contratos&empresa_tomadora_id=<?= $empresa['id'] ?>">
                         Ver todos os contratos desta empresa (<?= $totalContratos ?>)
                     </a>
                 </p>
@@ -405,7 +405,7 @@ require __DIR__ . '/../layouts/header.php';
             </div>
             <div class="card-body">
                 <p class="text-muted">
-                    <a href="/projetos?empresa_tomadora_id=<?= $empresa['id'] ?>">
+                    <a href="?page=projetos&empresa_tomadora_id=<?= $empresa['id'] ?>">
                         Ver todos os projetos desta empresa (<?= $totalProjetos ?>)
                     </a>
                 </p>
@@ -418,7 +418,7 @@ require __DIR__ . '/../layouts/header.php';
 <div class="modal fade" id="modalResponsavel" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="POST" action="/empresas-tomadoras/<?= $empresa['id'] ?>/responsaveis/add">
+            <form method="POST" action="?page=empresas-tomadoras&action=storeResponsavel&id=<?= $empresa['id'] ?>">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div class="modal-header">
                     <h5 class="modal-title">Adicionar Responsável</h5>
@@ -467,7 +467,7 @@ require __DIR__ . '/../layouts/header.php';
 <div class="modal fade" id="modalDocumento" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="POST" action="/empresas-tomadoras/<?= $empresa['id'] ?>/documentos/add" enctype="multipart/form-data">
+            <form method="POST" action="?page=empresas-tomadoras&action=storeDocumento&id=<?= $empresa['id'] ?>" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div class="modal-header">
                     <h5 class="modal-title">Adicionar Documento</h5>
@@ -516,7 +516,7 @@ require __DIR__ . '/../layouts/header.php';
 </div>
 
 <!-- Form de exclusão -->
-<form id="deleteForm" method="POST" action="/empresas-tomadoras/<?= $empresa['id'] ?>/delete" style="display: none;">
+<form id="deleteForm" method="POST" action="?page=empresas-tomadoras&action=destroy&id=<?= $empresa['id'] ?>" style="display: none;">
     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 </form>
 

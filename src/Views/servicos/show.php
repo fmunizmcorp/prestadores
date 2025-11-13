@@ -18,8 +18,8 @@ require_once __DIR__ . '/../layouts/header.php';
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/servicos">Serviços</a></li>
+            <li class="breadcrumb-item"><a href="?page=dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="?page=servicos">Serviços</a></li>
             <li class="breadcrumb-item active"><?= htmlspecialchars($servico['nome']) ?></li>
         </ol>
     </nav>
@@ -43,11 +43,11 @@ require_once __DIR__ . '/../layouts/header.php';
             </p>
         </div>
         <div>
-            <a href="/servicos" class="btn btn-secondary">
+            <a href="?page=servicos" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Voltar
             </a>
             <?php if (App\Controllers\AuthController::checkRole(['Master', 'Admin'])): ?>
-            <a href="/servicos/<?= $servico['id'] ?>/edit" class="btn btn-warning">
+            <a href="?page=servicos&action=edit&id=<?= $servico['id'] ?>" class="btn btn-warning">
                 <i class="fas fa-edit me-2"></i>Editar
             </a>
             <?php endif; ?>
@@ -555,7 +555,7 @@ require_once __DIR__ . '/../layouts/header.php';
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center">
-                                        <a href="/contratos/<?= $contrato['id'] ?>" class="btn btn-sm btn-info" title="Ver Contrato">
+                                        <a href="?page=contratos&action=show&id=<?= $contrato['id'] ?>" class="btn btn-sm btn-info" title="Ver Contrato">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>

@@ -17,7 +17,7 @@ require_once __DIR__ . '/../layouts/header.php';
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="?page=dashboard">Dashboard</a></li>
             <li class="breadcrumb-item active">Serviços</li>
         </ol>
     </nav>
@@ -29,7 +29,7 @@ require_once __DIR__ . '/../layouts/header.php';
             <p class="text-muted mb-0">Gerencie todos os serviços disponíveis no sistema</p>
         </div>
         <?php if (App\Controllers\AuthController::checkRole(['Master', 'Admin'])): ?>
-        <a href="/servicos/create" class="btn btn-primary">
+        <a href="?page=servicos&action=create" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i>Novo Serviço
         </a>
         <?php endif; ?>
@@ -126,7 +126,7 @@ require_once __DIR__ . '/../layouts/header.php';
         </div>
         <div class="collapse show" id="filtrosCollapse">
             <div class="card-body">
-                <form method="GET" action="/servicos" class="row g-3">
+                <form method="GET" action="?page=servicos" class="row g-3">
                     <div class="col-md-4">
                         <label for="search" class="form-label">Buscar</label>
                         <input type="text" class="form-control" id="search" name="search" 
@@ -178,7 +178,7 @@ require_once __DIR__ . '/../layouts/header.php';
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search me-2"></i>Filtrar
                         </button>
-                        <a href="/servicos" class="btn btn-secondary">
+                        <a href="?page=servicos" class="btn btn-secondary">
                             <i class="fas fa-eraser me-2"></i>Limpar Filtros
                         </a>
                     </div>
@@ -280,14 +280,14 @@ require_once __DIR__ . '/../layouts/header.php';
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="/servicos/<?= $servico['id'] ?>" 
+                                        <a href="?page=servicos&action=show&id=<?= $servico['id'] ?>" 
                                            class="btn btn-info" 
                                            title="Visualizar"
                                            data-bs-toggle="tooltip">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <?php if (App\Controllers\AuthController::checkRole(['Master', 'Admin'])): ?>
-                                        <a href="/servicos/<?= $servico['id'] ?>/edit" 
+                                        <a href="?page=servicos&action=edit&id=<?= $servico['id'] ?>" 
                                            class="btn btn-warning" 
                                            title="Editar"
                                            data-bs-toggle="tooltip">

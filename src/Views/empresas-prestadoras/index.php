@@ -15,7 +15,7 @@ require __DIR__ . '/../layouts/header.php';
         <p class="text-muted">Gerenciamento de empresas clientes (prestadoras de serviço)</p>
     </div>
     <div class="col-md-4 text-end">
-        <a href="/empresas-prestadoras/create" class="btn btn-primary">
+        <a href="?page=empresas-prestadoras&action=create" class="btn btn-primary">
             <i class="fas fa-plus"></i> Nova Empresa
         </a>
     </div>
@@ -97,7 +97,7 @@ require __DIR__ . '/../layouts/header.php';
     </div>
     <div class="collapse show" id="filtrosCollapse">
         <div class="card-body">
-            <form method="GET" action="/empresas-prestadoras" class="row g-3">
+            <form method="GET" action="?page=empresas-prestadoras" class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Buscar</label>
                     <input type="text" name="search" class="form-control" 
@@ -151,7 +151,7 @@ require __DIR__ . '/../layouts/header.php';
         <?php if (empty($empresas)): ?>
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i> Nenhuma empresa encontrada.
-                <a href="/empresas-prestadoras/create" class="alert-link">Cadastrar primeira empresa</a>
+                <a href="?page=empresas-prestadoras&action=create" class="alert-link">Cadastrar primeira empresa</a>
             </div>
         <?php else: ?>
             <div class="table-responsive">
@@ -210,13 +210,13 @@ require __DIR__ . '/../layouts/header.php';
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="/empresas-prestadoras/<?= $empresa['id'] ?>" 
+                                        <a href="?page=empresas-prestadoras&action=show&id=<?= $empresa['id'] ?>" 
                                            class="btn btn-outline-info" 
                                            data-bs-toggle="tooltip" 
                                            title="Ver Detalhes">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="/empresas-prestadoras/<?= $empresa['id'] ?>/edit" 
+                                        <a href="?page=empresas-prestadoras&action=edit&id=<?= $empresa['id'] ?>" 
                                            class="btn btn-outline-primary" 
                                            data-bs-toggle="tooltip" 
                                            title="Editar">

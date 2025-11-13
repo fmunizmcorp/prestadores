@@ -17,7 +17,7 @@ require_once __DIR__ . '/../layouts/header.php';
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="?page=dashboard">Dashboard</a></li>
             <li class="breadcrumb-item active">Contratos</li>
         </ol>
     </nav>
@@ -29,7 +29,7 @@ require_once __DIR__ . '/../layouts/header.php';
             <p class="text-muted mb-0">Gerencie todos os contratos do sistema</p>
         </div>
         <?php if (App\Controllers\AuthController::checkRole(['Master', 'Admin'])): ?>
-        <a href="/contratos/create" class="btn btn-primary">
+        <a href="?page=contratos&action=create" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i>Novo Contrato
         </a>
         <?php endif; ?>
@@ -46,7 +46,7 @@ require_once __DIR__ . '/../layouts/header.php';
                 <strong><?= htmlspecialchars($cv['numero_contrato']) ?></strong> - 
                 <?= htmlspecialchars($cv['empresa_nome']) ?> - 
                 Vence em <?= date('d/m/Y', strtotime($cv['data_termino'])) ?>
-                <a href="/contratos/<?= $cv['id'] ?>" class="btn btn-sm btn-warning ms-2">Ver Detalhes</a>
+                <a href="?page=contratos&action=show&id=<?= $cv['id'] ?>" class="btn btn-sm btn-warning ms-2">Ver Detalhes</a>
             </li>
             <?php endforeach; ?>
         </ul>
@@ -145,7 +145,7 @@ require_once __DIR__ . '/../layouts/header.php';
         </div>
         <div class="collapse show" id="filtrosCollapse">
             <div class="card-body">
-                <form method="GET" action="/contratos" class="row g-3">
+                <form method="GET" action="?page=contratos" class="row g-3">
                     <div class="col-md-3">
                         <label for="search" class="form-label">Buscar</label>
                         <input type="text" class="form-control" id="search" name="search" 
@@ -202,7 +202,7 @@ require_once __DIR__ . '/../layouts/header.php';
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search me-2"></i>Filtrar
                         </button>
-                        <a href="/contratos" class="btn btn-secondary">
+                        <a href="?page=contratos" class="btn btn-secondary">
                             <i class="fas fa-eraser me-2"></i>Limpar Filtros
                         </a>
                     </div>
@@ -317,14 +317,14 @@ require_once __DIR__ . '/../layouts/header.php';
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="/contratos/<?= $contrato['id'] ?>" 
+                                        <a href="?page=contratos&action=show&id=<?= $contrato['id'] ?>" 
                                            class="btn btn-info" 
                                            title="Visualizar"
                                            data-bs-toggle="tooltip">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <?php if (App\Controllers\AuthController::checkRole(['Master', 'Admin'])): ?>
-                                        <a href="/contratos/<?= $contrato['id'] ?>/edit" 
+                                        <a href="?page=contratos&action=edit&id=<?= $contrato['id'] ?>" 
                                            class="btn btn-warning" 
                                            title="Editar"
                                            data-bs-toggle="tooltip">
