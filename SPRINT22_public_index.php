@@ -283,7 +283,7 @@ try {
         
         // ==================== AUTENTICAÇÃO ====================
         case 'login':
-            require_once SRC_PATH . '/Controllers/AuthController.php';
+            require_once SRC_PATH . '/controllers/AuthController.php';
             $controller = new App\Controllers\AuthController();
             
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -294,7 +294,7 @@ try {
             break;
             
         case 'logout':
-            require_once SRC_PATH . '/Controllers/AuthController.php';
+            require_once SRC_PATH . '/controllers/AuthController.php';
             $controller = new App\Controllers\AuthController();
             $controller->logout();
             break;
@@ -306,7 +306,7 @@ try {
             
         // ==================== EMPRESAS TOMADORAS ====================
         case 'empresas-tomadoras':
-            require_once SRC_PATH . '/Controllers/EmpresaTomadoraController.php';
+            require_once SRC_PATH . '/controllers/EmpresaTomadoraController.php';
             $controller = new App\Controllers\EmpresaTomadoraController();
             
             switch ($action) {
@@ -338,7 +338,7 @@ try {
             
         // ==================== EMPRESAS PRESTADORAS ====================
         case 'empresas-prestadoras':
-            require_once SRC_PATH . '/Controllers/EmpresaPrestadoraController.php';
+            require_once SRC_PATH . '/controllers/EmpresaPrestadoraController.php';
             $controller = new App\Controllers\EmpresaPrestadoraController();
             
             switch ($action) {
@@ -370,7 +370,7 @@ try {
             
         // ==================== SERVIÇOS ====================
         case 'servicos':
-            require_once SRC_PATH . '/Controllers/ServicoController.php';
+            require_once SRC_PATH . '/controllers/ServicoController.php';
             $controller = new App\Controllers\ServicoController();
             
             switch ($action) {
@@ -402,7 +402,7 @@ try {
             
         // ==================== CONTRATOS ====================
         case 'contratos':
-            require_once SRC_PATH . '/Controllers/ContratoController.php';
+            require_once SRC_PATH . '/controllers/ContratoController.php';
             $controller = new App\Controllers\ContratoController();
             
             switch ($action) {
@@ -434,7 +434,7 @@ try {
             
         // ==================== SERVICO VALORES ====================
         case 'servico-valores':
-            require_once SRC_PATH . '/Controllers/ServicoValorController.php';
+            require_once SRC_PATH . '/controllers/ServicoValorController.php';
             $controller = new App\Controllers\ServicoValorController();
             
             switch ($action) {
@@ -472,7 +472,7 @@ try {
             
         // ==================== PROJETOS ====================
         case 'projetos':
-            require_once SRC_PATH . '/Controllers/ProjetoController.php';
+            require_once SRC_PATH . '/controllers/ProjetoController.php';
             $controller = new App\Controllers\ProjetoController();
             
             switch ($action) {
@@ -510,7 +510,7 @@ try {
             
         // ==================== PROJETO ETAPAS (CRONOGRAMA) ====================
         case 'projeto-etapas':
-            require_once SRC_PATH . '/Controllers/ProjetoEtapaController.php';
+            require_once SRC_PATH . '/controllers/ProjetoEtapaController.php';
             $controller = new App\Controllers\ProjetoEtapaController();
             $projetoId = $_GET['projeto_id'] ?? $id;
             
@@ -540,7 +540,7 @@ try {
             
         // ==================== PROJETO EQUIPE ====================
         case 'projeto-equipe':
-            require_once SRC_PATH . '/Controllers/ProjetoEquipeController.php';
+            require_once SRC_PATH . '/controllers/ProjetoEquipeController.php';
             $controller = new App\Controllers\ProjetoEquipeController();
             $projetoId = $_GET['projeto_id'] ?? $id;
             
@@ -567,7 +567,7 @@ try {
             
         // ==================== PROJETO ORÇAMENTO ====================
         case 'projeto-orcamento':
-            require_once SRC_PATH . '/Controllers/ProjetoOrcamentoController.php';
+            require_once SRC_PATH . '/controllers/ProjetoOrcamentoController.php';
             $controller = new App\Controllers\ProjetoOrcamentoController();
             $projetoId = $_GET['projeto_id'] ?? $id;
             
@@ -594,7 +594,7 @@ try {
             
         // ==================== PROJETO EXECUÇÃO (APONTAMENTO) ====================
         case 'projeto-execucao':
-            require_once SRC_PATH . '/Controllers/ProjetoExecucaoController.php';
+            require_once SRC_PATH . '/controllers/ProjetoExecucaoController.php';
             $controller = new App\Controllers\ProjetoExecucaoController();
             $projetoId = $_GET['projeto_id'] ?? $id;
             
