@@ -1,0 +1,371 @@
+================================================================================
+🚀 SPRINT 21 - DEPLOY COMPLETO AUTOMÁTICO
+================================================================================
+Timestamp: 2025-11-13 11:09:13
+
+[94m📡 Conectando ao FTP...[0m
+   Host: ftp.clinfec.com.br
+   User: u673902663.genspark1
+
+[92m✓ Conectado com sucesso![0m
+
+
+================================================================================
+[1/3] Source code (Controllers, Models, Views)
+Local:  src
+Remote: /src
+================================================================================
+  📤 Database.php (2,584 bytes)
+  [92m✓[0m
+  📤 DatabaseMigration.php (10,693 bytes)
+  [92m✓[0m
+  📤 helpers.php (4,646 bytes)
+  [92m✓[0m
+  📁 Created: /src/middleware
+  📤 Controllers/AtividadeController.php (11,478 bytes)
+  [92m✓[0m
+  📤 Controllers/AuthController.php (4,177 bytes)
+  [92m✓[0m
+  📤 Controllers/BaseController.php (3,662 bytes)
+  [92m✓[0m
+  📤 Controllers/ContratoController.php (29,048 bytes)
+  [92m✓[0m
+  📤 Controllers/EmpresaPrestadoraController.php (21,742 bytes)
+  [92m✓[0m
+  📤 Controllers/EmpresaTomadoraController.php (24,511 bytes)
+  [92m✓[0m
+  📤 Controllers/FinanceiroController.php (52,449 bytes)
+  [92m✓[0m
+  📤 Controllers/NotaFiscalController.php (32,894 bytes)
+  [92m✓[0m
+  📤 Controllers/ProjetoController.php (15,240 bytes)
+  [92m✓[0m
+  📤 Controllers/ProjetoEquipeController.php (4,692 bytes)
+  [92m✓[0m
+  📤 Controllers/ProjetoEtapaController.php (5,410 bytes)
+  [92m✓[0m
+  📤 Controllers/ProjetoExecucaoController.php (5,127 bytes)
+  [92m✓[0m
+  📤 Controllers/ProjetoOrcamentoController.php (5,005 bytes)
+  [92m✓[0m
+  📤 Controllers/ServicoController.php (16,245 bytes)
+  [92m✓[0m
+  📤 Controllers/ServicoValorController.php (16,389 bytes)
+  [92m✓[0m
+  📤 Helpers/FluxoCaixaHelper.php (16,486 bytes)
+  [92m✓[0m
+  📤 Models/Atividade.php (26,200 bytes)
+  [92m✓[0m
+  📤 Models/AtividadeFinanceiro.php (8,500 bytes)
+  [92m✓[0m
+  📤 Models/Boleto.php (36,869 bytes)
+  [92m✓[0m
+  📤 Models/CategoriaFinanceira.php (17,587 bytes)
+  [92m✓[0m
+  📤 Models/CentroCusto.php (19,558 bytes)
+  [92m✓[0m
+  📤 Models/Cliente.php (6,884 bytes)
+  [92m✓[0m
+  📤 Models/ConciliacaoBancaria.php (28,287 bytes)
+  [92m✓[0m
+  📤 Models/ContaPagar.php (30,654 bytes)
+  [92m✓[0m
+  📤 Models/ContaReceber.php (34,906 bytes)
+  [92m✓[0m
+  📤 Models/Contrato.php (31,738 bytes)
+  [92m✓[0m
+  📤 Models/ContratoFinanceiro.php (14,677 bytes)
+  [92m✓[0m
+  📤 Models/Documento.php (11,842 bytes)
+  [92m✓[0m
+  📤 Models/Empresa.php (7,807 bytes)
+  [92m✓[0m
+  📤 Models/EmpresaPrestadora.php (17,049 bytes)
+  [92m✓[0m
+  📤 Models/EmpresaTomadora.php (27,985 bytes)
+  [92m✓[0m
+  📤 Models/Fornecedor.php (6,465 bytes)
+  [92m✓[0m
+  📤 Models/LancamentoFinanceiro.php (35,845 bytes)
+  [92m✓[0m
+  📤 Models/NotaFiscal.php (30,805 bytes)
+  [92m✓[0m
+  📤 Models/Pagamento.php (31,158 bytes)
+  [92m✓[0m
+  📤 Models/Projeto.php (30,457 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoAnexo.php (5,381 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoAvaliacao.php (6,035 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoCategoria.php (2,936 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoEquipe.php (12,851 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoEtapa.php (18,659 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoExecucao.php (9,483 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoFinanceiro.php (13,718 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoOrcamento.php (14,080 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoRisco.php (3,968 bytes)
+  [92m✓[0m
+  📤 Models/ProjetoTemplate.php (8,960 bytes)
+  [92m✓[0m
+  📤 Models/Responsavel.php (7,869 bytes)
+  [92m✓[0m
+  📤 Models/Servico.php (15,721 bytes)
+  [92m✓[0m
+  📤 Models/ServicoValor.php (16,651 bytes)
+  [92m✓[0m
+  📤 Models/Usuario.php (8,888 bytes)
+  [92m✓[0m
+  📤 Models/BaseModel.php (1,318 bytes)
+  [92m✓[0m
+  📤 Models/NotaFiscal.php.bak_fallback_v1 (9,218 bytes)
+  [92m✓[0m
+  📤 Models/NotaFiscal_SIMPLE_FALLBACK.php (9,218 bytes)
+  [92m✓[0m
+  📤 Models/Atividade_BACKUP.php (26,200 bytes)
+  [92m✓[0m
+  📤 Models/NotaFiscal_BACKUP.php (30,805 bytes)
+  [92m✓[0m
+  📤 Models/Projeto_BACKUP.php (30,457 bytes)
+  [92m✓[0m
+  📁 Created: /src/libraries
+  📁 Created: /src/libraries/tcpdf
+  📁 Created: /src/libraries/phpspreadsheet
+  📤 Views/atividades/custos.php (21,234 bytes)
+  [92m✓[0m
+  📤 Views/atividades/index.php (12,474 bytes)
+  [92m✓[0m
+  📤 Views/atividades/index_simple.php (1,344 bytes)
+  [92m✓[0m
+  📤 Views/atividades/minimal.php (1,794 bytes)
+  [92m✓[0m
+  📤 Views/auth/forgot_password.php (2,457 bytes)
+  [92m✓[0m
+  📤 Views/auth/login.php (8,613 bytes)
+  [92m✓[0m
+  📤 Views/auth/register.php (4,993 bytes)
+  [92m✓[0m
+  📤 Views/auth/reset_password.php (3,136 bytes)
+  [92m✓[0m
+  📁 Created: /src/Views/empresas
+  📁 Created: /src/Views/usuarios
+  📤 Views/contratos/create.php (24,254 bytes)
+  [92m✓[0m
+  📤 Views/contratos/edit.php (24,819 bytes)
+  [92m✓[0m
+  📤 Views/contratos/faturamento.php (17,631 bytes)
+  [92m✓[0m
+  📤 Views/contratos/index.php (26,144 bytes)
+  [92m✓[0m
+  📤 Views/contratos/show.php (32,461 bytes)
+  [92m✓[0m
+  📤 Views/dashboard/index.php (18,943 bytes)
+  [92m✓[0m
+  📤 Views/empresas-prestadoras/create.php (16,231 bytes)
+  [92m✓[0m
+  📤 Views/empresas-prestadoras/edit.php (16,734 bytes)
+  [92m✓[0m
+  📤 Views/empresas-prestadoras/index.php (16,143 bytes)
+  [92m✓[0m
+  📤 Views/empresas-prestadoras/show.php (28,832 bytes)
+  [92m✓[0m
+  📤 Views/empresas-tomadoras/create.php (16,215 bytes)
+  [92m✓[0m
+  📤 Views/empresas-tomadoras/edit.php (16,718 bytes)
+  [92m✓[0m
+  📤 Views/empresas-tomadoras/index.php (13,179 bytes)
+  [92m✓[0m
+  📤 Views/empresas-tomadoras/show.php (28,809 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/index.php (12,716 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/index_simple.php (1,382 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/minimal.php (1,801 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/boletos/index.php (10,471 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/boletos/show.php (13,941 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/categorias/create.php (13,931 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/categorias/edit.php (16,052 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/categorias/index.php (15,646 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/conciliacoes/importar.php (14,926 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/conciliacoes/index.php (8,492 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/conciliacoes/show.php (19,942 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/contas_pagar/create.php (15,117 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/contas_pagar/edit.php (18,859 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/contas_pagar/index.php (14,736 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/contas_pagar/show.php (22,338 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/contas_receber/create.php (19,509 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/contas_receber/edit.php (25,208 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/contas_receber/index.php (16,685 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/contas_receber/show.php (26,341 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/fluxo_caixa/index.php (15,826 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/lancamentos/create.php (19,922 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/lancamentos/index.php (16,664 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/notas_fiscais/create.php (29,159 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/notas_fiscais/edit.php (27,433 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/notas_fiscais/index.php (11,829 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/notas_fiscais/show.php (27,935 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/relatorios/balancete.php (9,992 bytes)
+  [92m✓[0m
+  📤 Views/financeiro/relatorios/dre.php (13,802 bytes)
+  [92m✓[0m
+  📁 Created: /src/Views/includes
+  📤 Views/layout/footer.php (638 bytes)
+  [92m✓[0m
+  📤 Views/layout/header.php (917 bytes)
+  [92m✓[0m
+  📤 Views/layouts/footer.php (6,794 bytes)
+  [92m✓[0m
+  📤 Views/layouts/header.php (10,888 bytes)
+  [92m✓[0m
+  📁 Created: /src/Views/notas_fiscais
+  📤 Views/notas_fiscais/index_simple.php (1,390 bytes)
+  [92m✓[0m
+  📤 Views/notas_fiscais/minimal.php (1,803 bytes)
+  [92m✓[0m
+  📤 Views/projetos/create.php (15,438 bytes)
+  [92m✓[0m
+  📤 Views/projetos/edit.php (15,447 bytes)
+  [92m✓[0m
+  📤 Views/projetos/financeiro.php (21,792 bytes)
+  [92m✓[0m
+  📤 Views/projetos/index.php (11,920 bytes)
+  [92m✓[0m
+  📤 Views/projetos/index_simple.php (1,624 bytes)
+  [92m✓[0m
+  📤 Views/projetos/minimal.php (1,798 bytes)
+  [92m✓[0m
+  📤 Views/projetos/show.php (12,219 bytes)
+  [92m✓[0m
+  📤 Views/projetos/equipe/index.php (3,997 bytes)
+  [92m✓[0m
+  📤 Views/projetos/etapas/index.php (2,854 bytes)
+  [92m✓[0m
+  📤 Views/projetos/execucao/index.php (3,495 bytes)
+  [92m✓[0m
+  📤 Views/projetos/orcamento/index.php (3,348 bytes)
+  [92m✓[0m
+  📤 Views/servico-valores/create.php (33 bytes)
+  [92m✓[0m
+  📤 Views/servico-valores/edit.php (31 bytes)
+  [92m✓[0m
+  📤 Views/servico-valores/index.php (6,518 bytes)
+  [92m✓[0m
+  📤 Views/servico-valores/show.php (31 bytes)
+  [92m✓[0m
+  📤 Views/servicos/create.php (26,342 bytes)
+  [92m✓[0m
+  📤 Views/servicos/edit.php (27,369 bytes)
+  [92m✓[0m
+  📤 Views/servicos/index.php (23,281 bytes)
+  [92m✓[0m
+  📤 Views/servicos/show.php (34,702 bytes)
+  [92m✓[0m
+
+[96mSummary:[0m
+  ✓ Uploaded: 134
+  ✗ Failed: 0
+  ⊘ Skipped: 0
+
+================================================================================
+[2/3] Configuration files
+Local:  config
+Remote: /config
+================================================================================
+  📤 database.php (523 bytes)
+  [92m✓[0m
+  📤 app.php (2,205 bytes)
+  [92m✓[0m
+  📤 version.php (1,767 bytes)
+  [92m✓[0m
+  📤 config.php (2,983 bytes)
+  [92m✓[0m
+
+[96mSummary:[0m
+  ✓ Uploaded: 4
+  ✗ Failed: 0
+  ⊘ Skipped: 0
+
+================================================================================
+[3/3] Database migrations and seeds
+Local:  database
+Remote: /database
+================================================================================
+  📤 migrations/002_empresas_contratos.sql (16,568 bytes)
+  [92m✓[0m
+  📤 migrations/001_migration.sql (4,916 bytes)
+  [92m✓[0m
+  📤 migrations/004_criar_empresas_contratos.sql (13,875 bytes)
+  [92m✓[0m
+  📤 migrations/005_criar_projetos.sql (26,096 bytes)
+  [92m✓[0m
+  📤 migrations/006_criar_atividades.sql (16,994 bytes)
+  [92m✓[0m
+  📤 migrations/008_criar_sistema_financeiro.sql (53,381 bytes)
+  [92m✓[0m
+  📤 migrations/009_integrar_financeiro_projetos.sql (16,814 bytes)
+  [92m✓[0m
+  📤 migrations/010_inserir_usuario_master.sql (2,329 bytes)
+  [92m✓[0m
+  📤 migrations/011_criar_fornecedores_clientes.sql (3,255 bytes)
+  [92m✓[0m
+  📤 migrations/012_corrigir_banco_completo_sprint13.sql (5,447 bytes)
+  [92m✓[0m
+  📤 migrations/013_executar_todas_migrations.sql (149,175 bytes)
+  [92m✓[0m
+  📤 migrations/014_criar_tabelas_essenciais_sem_fk.sql (7,079 bytes)
+  [92m✓[0m
+  📤 migrations/015_corrigir_schema_projetos_atividades.sql (2,874 bytes)
+  [92m✓[0m
+  📤 migrations/015_corrigir_schema_projetos_atividades_OLD.sql (12,506 bytes)
+  [92m✓[0m
+  📤 migrations/016_adicionar_colunas_notafiscal_controller.sql (9,440 bytes)
+  [92m✓[0m
+  📤 seeds/001_seed_initial_data.sql (1,587 bytes)
+  [92m✓[0m
+
+[96mSummary:[0m
+  ✓ Uploaded: 16
+  ✗ Failed: 0
+  ⊘ Skipped: 0
+
+================================================================================
+📊 RELATÓRIO FINAL DO DEPLOY
+================================================================================
+✓ Arquivos enviados:  [92m154[0m
+✗ Falhas:             [91m0[0m
+⊘ Ignorados:          [93m0[0m
+📁 Total:              154
+
+[92m🎉 DEPLOY 100% COMPLETO![0m
+[93m⚠️  Próximo: Teste V12 para validação[0m
