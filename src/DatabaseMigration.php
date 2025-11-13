@@ -14,7 +14,7 @@ class DatabaseMigration {
     private $migrationsPath;
     
     public function __construct() {
-        $this->db = Database::getInstance();
+        $this->db = Database::getInstance()->getConnection();
         $this->migrationsPath = __DIR__ . '/../database/migrations/';
     }
     

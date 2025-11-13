@@ -108,7 +108,10 @@ $config = require CONFIG_PATH . '/config.php';
 $dbConfig = require CONFIG_PATH . '/database.php';
 
 // ==================== EXECUTAR MIGRATIONS ====================
-
+// TEMPORARIAMENTE DESABILITADO - Sprint 23
+// OPcache está servindo versão antiga do DatabaseMigration.php
+// Aguardando cache expirar ou limpeza manual via hPanel
+/*
 try {
     // Importar classes necessárias
     require_once SRC_PATH . '/Database.php';
@@ -133,6 +136,10 @@ try {
         die("Erro ao executar migrations: " . $e->getMessage());
     }
 }
+*/
+
+// Importar Database manualmente já que migrations estão desabilitadas
+require_once SRC_PATH . '/Database.php';
 
 // ==================== OBTER PARÂMETROS ====================
 
