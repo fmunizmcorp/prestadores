@@ -18,8 +18,8 @@ require_once __DIR__ . '/../layouts/header.php';
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/contratos">Contratos</a></li>
+            <li class="breadcrumb-item"><a href="?page=dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="?page=contratos">Contratos</a></li>
             <li class="breadcrumb-item active"><?= htmlspecialchars($contrato['numero_contrato']) ?></li>
         </ol>
     </nav>
@@ -43,11 +43,11 @@ require_once __DIR__ . '/../layouts/header.php';
             <p class="text-muted mb-0"><?= htmlspecialchars($contrato['empresa_nome']) ?></p>
         </div>
         <div>
-            <a href="/contratos" class="btn btn-secondary">
+            <a href="?page=contratos" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Voltar
             </a>
             <?php if (App\Controllers\AuthController::checkRole(['Master', 'Admin'])): ?>
-            <a href="/contratos/<?= $contrato['id'] ?>/edit" class="btn btn-warning">
+            <a href="?page=contratos&action=edit&id=<?= $contrato['id'] ?>" class="btn btn-warning">
                 <i class="fas fa-edit me-2"></i>Editar
             </a>
             <?php endif; ?>
@@ -204,7 +204,7 @@ require_once __DIR__ . '/../layouts/header.php';
                                 <strong>E-mail:</strong> <?= htmlspecialchars($contrato['empresa_email']) ?>
                                 <?php endif; ?>
                             </p>
-                            <a href="/empresas-tomadoras/<?= $contrato['empresa_tomadora_id'] ?>" class="btn btn-sm btn-outline-success">
+                            <a href="?page=empresas-tomadoras&action=show&id=<?= $contrato['empresa_tomadora_id'] ?>" class="btn btn-sm btn-outline-success">
                                 <i class="fas fa-external-link-alt me-1"></i>Ver Detalhes
                             </a>
                         </div>
@@ -411,7 +411,7 @@ require_once __DIR__ . '/../layouts/header.php';
                                     <td>R$ <?= number_format($sc['valor_unitario'], 2, ',', '.') ?></td>
                                     <td><strong class="text-success">R$ <?= number_format($valorTotal, 2, ',', '.') ?></strong></td>
                                     <td class="text-center">
-                                        <a href="/servicos/<?= $sc['servico_id'] ?>" class="btn btn-sm btn-info" title="Ver Serviço">
+                                        <a href="?page=servicos&action=show&id=<?= $sc['servico_id'] ?>" class="btn btn-sm btn-info" title="Ver Serviço">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>

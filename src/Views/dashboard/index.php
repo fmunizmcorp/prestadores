@@ -54,7 +54,7 @@ $stats = [
                     </div>
                 </div>
                 <div class="mt-3">
-                    <a href="/empresas-tomadoras" class="btn btn-sm btn-light">
+                    <a href="?page=empresas-tomadoras" class="btn btn-sm btn-light">
                         Ver todas <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -75,7 +75,7 @@ $stats = [
                     </div>
                 </div>
                 <div class="mt-3">
-                    <a href="/empresas-prestadoras" class="btn btn-sm btn-light">
+                    <a href="?page=empresas-prestadoras" class="btn btn-sm btn-light">
                         Ver todas <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -96,7 +96,7 @@ $stats = [
                     </div>
                 </div>
                 <div class="mt-3">
-                    <a href="/contratos?status=Vigente" class="btn btn-sm btn-light">
+                    <a href="?page=contratos&status=Vigente" class="btn btn-sm btn-light">
                         Ver contratos <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -117,7 +117,7 @@ $stats = [
                     </div>
                 </div>
                 <div class="mt-3">
-                    <a href="/servicos" class="btn btn-sm btn-light">
+                    <a href="?page=servicos" class="btn btn-sm btn-light">
                         Ver serviços <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -136,25 +136,25 @@ $stats = [
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3 mb-3">
-                        <a href="/empresas-tomadoras/create" class="btn btn-outline-primary d-block">
+                        <a href="?page=empresas-tomadoras&action=create" class="btn btn-outline-primary d-block">
                             <i class="fas fa-plus-circle fa-2x mb-2"></i><br>
                             Nova Empresa Tomadora
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a href="/empresas-prestadoras/create" class="btn btn-outline-success d-block">
+                        <a href="?page=empresas-prestadoras&action=create" class="btn btn-outline-success d-block">
                             <i class="fas fa-plus-circle fa-2x mb-2"></i><br>
                             Nova Empresa Prestadora
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a href="/contratos/create" class="btn btn-outline-info d-block">
+                        <a href="?page=contratos&action=create" class="btn btn-outline-info d-block">
                             <i class="fas fa-plus-circle fa-2x mb-2"></i><br>
                             Novo Contrato
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a href="/servicos/create" class="btn btn-outline-warning d-block">
+                        <a href="?page=servicos&action=create" class="btn btn-outline-warning d-block">
                             <i class="fas fa-plus-circle fa-2x mb-2"></i><br>
                             Novo Serviço
                         </a>
@@ -317,7 +317,7 @@ $stats = [
                 <?php else: ?>
                     <div class="list-group">
                         <?php foreach (array_slice($contratosVencendo, 0, 5) as $contrato): ?>
-                            <a href="/contratos/<?= $contrato['id'] ?>" class="list-group-item list-group-item-action">
+                            <a href="?page=contratos&action=show&id=<?= $contrato['id'] ?>" class="list-group-item list-group-item-action">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1"><?= htmlspecialchars($contrato['numero_contrato']) ?></h6>
                                     <small class="text-danger">
@@ -331,7 +331,7 @@ $stats = [
                     </div>
                     <?php if (count($contratosVencendo) > 5): ?>
                         <div class="mt-3 text-center">
-                            <a href="/contratos?vencendo=90" class="btn btn-sm btn-outline-primary">
+                            <a href="?page=contratos&vencendo=90" class="btn btn-sm btn-outline-primary">
                                 Ver todos (<?= count($contratosVencendo) ?>)
                             </a>
                         </div>

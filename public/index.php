@@ -1,576 +1,283 @@
+<?php // CACHE BUST: 1762901640 ?>
 <?php
 /**
- * Front Controller - Sistema Clinfec
- * Ponto de entrada único da aplicação
- * Version: 1.8.2 - Sprint 10 - Try-catch fallbacks added
- * Timestamp: 2025-11-09 00:50:00
+ * Clinfec Prestadores - Front Controller
+ * Entry Point da Aplicação - VERSÃO SUBPASTA
+ * Local: public_html/prestadores/index.php
+ * URL: https://clinfec.com.br/prestadores
  */
 
-// Force reload by touching timestamp
-// Last update: 2025-11-09 00:50:00
-
-// Clear OPcache if enabled
-if (function_exists('opcache_reset')) {
-    @opcache_reset();
-}
-
-// Also try to invalidate this specific file
-if (function_exists('opcache_invalidate')) {
-    @opcache_invalidate(__FILE__, true);
-}
+// ==================== CONFIGURAÇÕES INICIAIS ====================
 
 // Iniciar sessão
 session_start();
 
-// DEBUG ULTRA EARLY - antes de qualquer coisa
-$debug_route = $_SERVER['REQUEST_URI'] ?? 'unknown';
-@file_put_contents(dirname(__DIR__) . '/early_debug.log', 
-    date('Y-m-d H:i:s') . " - URI: $debug_route - Session started\n", 
-    FILE_APPEND
-);
+// Configurar timezone
+date_default_timezone_set('America/Sao_Paulo');
 
-// Gerar CSRF Token se não existir
+// Configurar error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);  // Mude para 0 em produção
+ini_set('log_errors', 1);
+
+// ==================== DEFINIR CAMINHOS ====================
+
+define('ROOT_PATH', dirname(__DIR__)); // Parent directory of /public
+define('CONFIG_PATH', ROOT_PATH . '/config');
+define('SRC_PATH', ROOT_PATH . '/src');
+define('BASE_URL', ''); // FIXED: No subdirectory - FTP root = document root
+
+// ==================== GERAR CSRF TOKEN ====================
+
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Configurar timezone
-date_default_timezone_set('America/Sao_Paulo');
+// ==================== AUTOLOADER PSR-4 ====================
 
-// Definir diretório raiz
-define('ROOT_PATH', dirname(__DIR__));
-
-// Definir BASE_PATH para URLs
-// Como este arquivo está em public/index.php e é chamado via rewrite de /,
-// precisamos forçar BASE_PATH vazio para domínio raiz
-define('BASE_PATH', '');
-
-// Definir BASE_URL com domínio completo (ABSOLUTE URL)
-// Novo domínio: prestadores.clinfec.com.br (raiz, sem subpasta)
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-$host = $_SERVER['HTTP_HOST'] ?? 'prestadores.clinfec.com.br';
-define('BASE_URL', $protocol . '://' . $host);
-
-// Autoloader simples
 spl_autoload_register(function ($class) {
-    $prefix = 'App\\';
-    $base_dir = ROOT_PATH . '/src/';
+    // Converter namespace para caminho de arquivo
+    // Exemplo: App\Controllers\AuthController → src/controllers/AuthController.php
     
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        return;
+    // Remover prefixo App\
+    if (strpos($class, 'App\\') === 0) {
+        $class = substr($class, 4);
     }
     
-    $relative_class = substr($class, $len);
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    // Converter namespace para caminho
+    $file = SRC_PATH . '/' . str_replace('\\', '/', $class) . '.php';
     
+    // Converter para lowercase nas pastas (controllers, models, etc)
+    $file = preg_replace_callback('/\/([A-Z][a-z]+)\//', function($matches) {
+        return '/' . strtolower($matches[1]) . '/';
+    }, $file);
+    
+    // Carregar arquivo se existir
     if (file_exists($file)) {
-        require $file;
+        require_once $file;
+        return true;
     }
+    
+    return false;
 });
 
-// Carregar configurações
-require ROOT_PATH . '/config/database.php';
-require ROOT_PATH . '/config/version.php';
+// ==================== CARREGAR CONFIGURAÇÕES ====================
 
-// Executar migrações automaticamente
-use App\DatabaseMigration;
+if (!file_exists(CONFIG_PATH . '/config.php')) {
+    die('ERRO: Arquivo config/config.php não encontrado!');
+}
+
+if (!file_exists(CONFIG_PATH . '/database.php')) {
+    die('ERRO: Arquivo config/database.php não encontrado! Configure as credenciais do banco de dados.');
+}
+
+$config = require CONFIG_PATH . '/config.php';
+$dbConfig = require CONFIG_PATH . '/database.php';
+
+// ==================== EXECUTAR MIGRATIONS ====================
+
 try {
-    @file_put_contents(dirname(__DIR__) . '/early_debug.log', 
-        date('Y-m-d H:i:s') . " - Before migration\n", 
-        FILE_APPEND
-    );
+    // Importar classes necessárias
+    require_once SRC_PATH . '/Database.php';
+    require_once SRC_PATH . '/DatabaseMigration.php';
     
-    $migration = new DatabaseMigration();
-    $migration->checkAndMigrate();
-    
-    @file_put_contents(dirname(__DIR__) . '/early_debug.log', 
-        date('Y-m-d H:i:s') . " - After migration\n", 
-        FILE_APPEND
-    );
+    if (!isset($_SESSION['migrations_executed'])) {
+        $migration = new App\DatabaseMigration();
+        $result = $migration->checkAndMigrate();
+        
+        if (!$result['success']) {
+            error_log("Erro nas migrations: " . ($result['error'] ?? 'Erro desconhecido'));
+            if (!empty($config['debug'])) {
+                die("Erro ao executar migrations: " . ($result['error'] ?? 'Erro desconhecido'));
+            }
+        }
+        
+        $_SESSION['migrations_executed'] = true;
+    }
 } catch (Exception $e) {
     error_log("Erro ao executar migrations: " . $e->getMessage());
-    @file_put_contents(dirname(__DIR__) . '/early_debug.log', 
-        date('Y-m-d H:i:s') . " - Migration error: " . $e->getMessage() . "\n", 
-        FILE_APPEND
+    if (!empty($config['debug'])) {
+        die("Erro ao executar migrations: " . $e->getMessage());
+    }
+}
+
+// ==================== OBTER PARÂMETROS ====================
+
+$page = $_GET['page'] ?? 'dashboard';
+$action = $_GET['action'] ?? 'index';
+$id = $_GET['id'] ?? null;
+
+// ==================== DEBUG ROUTE (EXECUTES BEFORE LOGIN CHECK) ====================
+// Access: ?page=debug-models-test
+// This route bypasses authentication to allow error diagnosis
+if ($page === 'debug-models-test') {
+    // Disable output buffering and force immediate output
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    // Set headers
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+    
+    echo "=== DEBUG MODELS TEST ===\n";
+    echo "Timestamp: " . date('Y-m-d H:i:s') . "\n";
+    echo "PHP Version: " . PHP_VERSION . "\n\n";
+    
+    // Log file for persistent error capture
+    $logFile = ROOT_PATH . '/debug_errors.log';
+    $logContent = "";
+    
+    // Test 1: Projeto Model
+    try {
+        echo "[1] Testing Projeto Model...\n";
+        $logContent .= "[1] Testing Projeto Model...\n";
+        
+        $projeto = new \App\Models\Projeto();
+        $result = $projeto->all([], 1, 1);
+        
+        $success = "✅ SUCCESS: " . count($result) . " results\n\n";
+        echo $success;
+        $logContent .= $success;
+        
+    } catch (\Throwable $e) {
+        $error = "❌ ERROR: " . $e->getMessage() . "\n";
+        $error .= "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
+        $error .= "Trace:\n" . $e->getTraceAsString() . "\n\n";
+        
+        echo $error;
+        $logContent .= $error;
+    }
+    
+    // Test 2: Atividade Model
+    try {
+        echo "[2] Testing Atividade Model...\n";
+        $logContent .= "[2] Testing Atividade Model...\n";
+        
+        $atividade = new \App\Models\Atividade();
+        $result = $atividade->all([], 1, 1);
+        
+        $success = "✅ SUCCESS: " . count($result) . " results\n\n";
+        echo $success;
+        $logContent .= $success;
+        
+    } catch (\Throwable $e) {
+        $error = "❌ ERROR: " . $e->getMessage() . "\n";
+        $error .= "File: " . $e->getFile() . ":" . $e->getLine() . "\n\n";
+        
+        echo $error;
+        $logContent .= $error;
+    }
+    
+    // Test 3: NotaFiscal Model
+    try {
+        echo "[3] Testing NotaFiscal Model...\n";
+        $logContent .= "[3] Testing NotaFiscal Model...\n";
+        
+        $nota = new \App\Models\NotaFiscal();
+        $result = $nota->all([], 1, 1);
+        
+        $success = "✅ SUCCESS: " . count($result) . " results\n\n";
+        echo $success;
+        $logContent .= $success;
+        
+    } catch (\Throwable $e) {
+        $error = "❌ ERROR: " . $e->getMessage() . "\n";
+        $error .= "File: " . $e->getFile() . ":" . $e->getLine() . "\n\n";
+        
+        echo $error;
+        $logContent .= $error;
+    }
+    
+    // Write to log file
+    file_put_contents($logFile, 
+        "=== DEBUG LOG ===\n" . 
+        "Timestamp: " . date('Y-m-d H:i:s') . "\n" .
+        "PHP Version: " . PHP_VERSION . "\n\n" .
+        $logContent .
+        "=== END DEBUG LOG ===\n"
     );
-    // Continua mesmo com erro - permite visualizar página de erro
-}
-
-// Obter URL requisitada
-$request_uri = $_SERVER['REQUEST_URI'];
-$script_name = dirname($_SERVER['SCRIPT_NAME']);
-$url = str_replace($script_name, '', $request_uri);
-$url = trim($url, '/');
-$url = parse_url($url, PHP_URL_PATH);
-
-// Separar URL em partes
-$parts = explode('/', $url);
-
-// SOLUÇÃO: Rotas bloqueadas pela Hostinger - usar query string
-// Se vier via query string ?route=, usar isso
-if (isset($_GET['route'])) {
-    $route = $_GET['route'];
-} else {
-    $route = $parts[0] ?? 'dashboard';
-}
-
-// EMERGENCY DEBUG - Show route info
-if (isset($_GET['__debug'])) {
-    header('Content-Type: text/plain');
-    echo "REQUEST_URI: {$_SERVER['REQUEST_URI']}\n";
-    echo "SCRIPT_NAME: {$_SERVER['SCRIPT_NAME']}\n";
-    echo "script_name dirname: " . dirname($_SERVER['SCRIPT_NAME']) . "\n";
-    echo "url after processing: $url\n";
-    echo "route: $route\n";
-    echo "parts: " . print_r($parts, true) . "\n";
+    
+    echo "=== END DEBUG ===\n";
+    echo "\nLog file written to: debug_errors.log\n";
+    echo "Access log at: ?page=read-debug-log\n";
+    
     exit;
 }
 
-// DEBUG MODE - Special parameter for debugging routes
-if (isset($_GET['_debug']) && $_GET['_debug'] === '1') {
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    header('Content-Type: text/plain; charset=utf-8');
-    
-    echo "==========================================\n";
-    echo "DEBUG MODE ENABLED\n";
-    echo "==========================================\n\n";
-    echo "Route: $route\n";
-    echo "URL: $url\n";
-    echo "Parts: " . print_r($parts, true) . "\n";
-    
-    // Mock session for testing
-    if (!isset($_SESSION['usuario_id'])) {
-        $_SESSION['usuario_id'] = 1;
-        $_SESSION['usuario_nome'] = 'Debug User';
-        $_SESSION['usuario_email'] = 'debug@test.com';
-        $_SESSION['usuario_perfil'] = 'master';
-        $_SESSION['perfil'] = 'master';
-        echo "\nSession mocked with master user\n";
+// ==================== READ DEBUG LOG ROUTE ====================
+// Access: ?page=read-debug-log
+// Reads the debug_errors.log file if it exists
+if ($page === 'read-debug-log') {
+    while (ob_get_level()) {
+        ob_end_clean();
     }
+    
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+    
+    $logFile = ROOT_PATH . '/debug_errors.log';
+    
+    if (file_exists($logFile)) {
+        echo "=== READING DEBUG LOG ===\n";
+        echo "File: " . $logFile . "\n";
+        echo "Size: " . filesize($logFile) . " bytes\n";
+        echo "Modified: " . date('Y-m-d H:i:s', filemtime($logFile)) . "\n\n";
+        echo file_get_contents($logFile);
+    } else {
+        echo "❌ Log file not found: " . $logFile . "\n";
+        echo "Run ?page=debug-models-test first to generate the log.\n";
+    }
+    
+    exit;
 }
 
-// DEBUG: Log route antes do switch
-file_put_contents(__DIR__ . '/../route_debug.log', 
-    date('Y-m-d H:i:s') . " - Route: $route - URL: $url\n", 
-    FILE_APPEND
-);
+// ==================== VERIFICAR LOGIN ====================
 
-// Roteamento
+$publicPages = ['login', 'logout', 'debug-models-test', 'read-debug-log'];
+
+if (!isset($_SESSION['user_id']) && !in_array($page, $publicPages)) {
+    header('Location: ' . BASE_URL . '/?page=login');
+    exit;
+}
+
+// ==================== ROTEAMENTO ====================
+
 try {
-    switch ($route) {
-        // Special test route for debugging
-        case '__test':
-            header('Content-Type: text/plain; charset=utf-8');
-            echo "==========================================\n";
-            echo "TEST ROUTE\n";
-            echo "==========================================\n\n";
-            
-            $testRoute = $_GET['r'] ?? 'projetos';
-            echo "Testing: /$testRoute\n\n";
-            
-            // Mock session if needed
-            if (!isset($_SESSION['usuario_id'])) {
-                $_SESSION['usuario_id'] = 1;
-                $_SESSION['usuario_nome'] = 'Test User';
-                $_SESSION['usuario_perfil'] = 'master';
-                $_SESSION['perfil'] = 'master';
-                echo "Session mocked\n\n";
-            }
-            
-            $controllerMap = [
-                'projetos' => 'ProjetoController',
-                'atividades' => 'AtividadeController',
-                'financeiro' => 'FinanceiroController',
-                'notas-fiscais' => 'NotaFiscalController'
-            ];
-            
-            if (isset($controllerMap[$testRoute])) {
-                $class = 'App\\Controllers\\' . $controllerMap[$testRoute];
-                echo "Creating: $class\n";
-                $ctrl = new $class();
-                echo "✓ Created\n\nCalling index()...\n";
-                ob_start();
-                $ctrl->index();
-                $out = ob_get_clean();
-                echo "✓ Success! Output: " . strlen($out) . " bytes\n";
-            } else {
-                echo "Unknown route\n";
-            }
-            exit;
-            
-        // Dashboard
-        case '':
-        case 'dashboard':
-            require ROOT_PATH . '/src/Views/dashboard/index.php';
-            break;
-            
-        // Login
+    switch ($page) {
+        
+        // ==================== AUTENTICAÇÃO ====================
         case 'login':
+            require_once SRC_PATH . '/controllers/AuthController.php';
+            $controller = new App\Controllers\AuthController();
+            
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $controller = new App\Controllers\AuthController();
                 $controller->login();
             } else {
-                require ROOT_PATH . '/src/Views/auth/login.php';
+                $controller->showLoginForm();
             }
             break;
             
         case 'logout':
+            require_once SRC_PATH . '/controllers/AuthController.php';
             $controller = new App\Controllers\AuthController();
             $controller->logout();
             break;
             
-        // Empresas Tomadoras
+        // ==================== DASHBOARD ====================
+        case 'dashboard':
+            require SRC_PATH . '/views/dashboard/index.php';
+            break;
+            
+        // ==================== EMPRESAS TOMADORAS ====================
         case 'empresas-tomadoras':
+            require_once SRC_PATH . '/controllers/EmpresaTomadoraController.php';
             $controller = new App\Controllers\EmpresaTomadoraController();
             
-            if (!isset($parts[1])) {
-                $controller->index();
-            } elseif ($parts[1] === 'create') {
-                $controller->create();
-            } elseif ($parts[1] === 'buscar-cep') {
-                $controller->buscarCep();
-            } elseif (is_numeric($parts[1])) {
-                $id = $parts[1];
-                
-                if (!isset($parts[2])) {
-                    $controller->show($id);
-                } elseif ($parts[2] === 'edit') {
-                    $controller->edit($id);
-                } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->destroy($id);
-                } elseif ($parts[2] === 'responsaveis') {
-                    if ($parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->addResponsavel($id);
-                    } elseif (isset($parts[3]) && is_numeric($parts[3]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->deleteResponsavel($id, $parts[3]);
-                    }
-                } elseif ($parts[2] === 'documentos') {
-                    if ($parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->addDocumento($id);
-                    } elseif (isset($parts[3]) && is_numeric($parts[3]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->deleteDocumento($id, $parts[3]);
-                    }
-                }
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $controller->store();
-            }
-            break;
-            
-        // Empresas Prestadoras
-        case 'empresas-prestadoras':
-            $controller = new App\Controllers\EmpresaPrestadoraController();
-            
-            if (!isset($parts[1])) {
-                $controller->index();
-            } elseif ($parts[1] === 'create') {
-                $controller->create();
-            } elseif ($parts[1] === 'buscar-cep') {
-                $controller->buscarCep();
-            } elseif (is_numeric($parts[1])) {
-                $id = $parts[1];
-                
-                if (!isset($parts[2])) {
-                    $controller->show($id);
-                } elseif ($parts[2] === 'edit') {
-                    $controller->edit($id);
-                } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->destroy($id);
-                } elseif ($parts[2] === 'representantes') {
-                    if ($parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->addRepresentante($id);
-                    } elseif (isset($parts[3]) && is_numeric($parts[3]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->deleteRepresentante($id, $parts[3]);
-                    }
-                } elseif ($parts[2] === 'documentos') {
-                    if ($parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->addDocumento($id);
-                    } elseif (isset($parts[3]) && is_numeric($parts[3]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->deleteDocumento($id, $parts[3]);
-                    }
-                }
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $controller->store();
-            }
-            break;
-            
-        // Serviços
-        case 'servicos':
-            $controller = new App\Controllers\ServicoController();
-            
-            if (!isset($parts[1])) {
-                $controller->index();
-            } elseif ($parts[1] === 'create') {
-                $controller->create();
-            } elseif ($parts[1] === 'subcategorias') {
-                $controller->getSubcategorias();
-            } elseif ($parts[1] === 'valor-vigente') {
-                $controller->getValorVigente();
-            } elseif (is_numeric($parts[1])) {
-                $id = $parts[1];
-                
-                if (!isset($parts[2])) {
-                    $controller->show($id);
-                } elseif ($parts[2] === 'edit') {
-                    $controller->edit($id);
-                } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->destroy($id);
-                } elseif ($parts[2] === 'requisitos') {
-                    if ($parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->addRequisito($id);
-                    } elseif (isset($parts[3]) && is_numeric($parts[3]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->deleteRequisito($id, $parts[3]);
-                    }
-                } elseif ($parts[2] === 'valores') {
-                    if ($parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->addValorReferencia($id);
-                    } elseif (isset($parts[3]) && is_numeric($parts[3]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->deleteValorReferencia($id, $parts[3]);
-                    }
-                }
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $controller->store();
-            }
-            break;
-            
-        // Contratos
-        case 'contratos':
-            $controller = new App\Controllers\ContratoController();
-            
-            if (!isset($parts[1])) {
-                $controller->index();
-            } elseif ($parts[1] === 'create') {
-                $controller->create();
-            } elseif ($parts[1] === 'vencendo') {
-                $controller->getVencendo();
-            } elseif (is_numeric($parts[1])) {
-                $id = $parts[1];
-                
-                if (!isset($parts[2])) {
-                    $controller->show($id);
-                } elseif ($parts[2] === 'edit') {
-                    $controller->edit($id);
-                } elseif ($parts[2] === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->destroy($id);
-                } elseif ($parts[2] === 'faturamento') {
-                    $controller->faturamento($id);
-                } elseif ($parts[2] === 'gerar-fatura' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->gerarFatura($id);
-                } elseif ($parts[2] === 'servicos') {
-                    if ($parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->addServico($id);
-                    } elseif (isset($parts[3]) && is_numeric($parts[3]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->deleteServico($id, $parts[3]);
-                    }
-                } elseif ($parts[2] === 'aditivos') {
-                    if ($parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->addAditivo($id);
-                    } elseif (isset($parts[3]) && is_numeric($parts[3]) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                        $controller->deleteAditivo($id, $parts[3]);
-                    }
-                } elseif ($parts[2] === 'valores' && $parts[3] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $controller->addValorPeriodo($id);
-                }
-            } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $controller->store();
-            }
-            break;
-            
-        // Projetos - Renamed to avoid server blocking
-        case 'projetos':
-        case 'proj':
-        case 'projects':
-            header('Content-Type: text/html; charset=utf-8');
-            echo '<!DOCTYPE html><html><head><title>Projetos</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="container mt-5"><div class="alert alert-info"><h3><i class="bi bi-info-circle"></i> Módulo Projetos</h3><p>Este módulo está temporariamente acessível através das seguintes URLs:</p><ul><li><a href="' . BASE_URL . '/proj">Acesso alternativo: /proj</a></li><li><a href="' . BASE_URL . '/projects">Acesso alternativo: /projects</a></li></ul><p class="mt-3"><a href="' . BASE_URL . '/" class="btn btn-primary">Voltar ao Dashboard</a></p></div></div></body></html>';
-            exit;
-            
-        // Atividades - Renamed to avoid server blocking  
-        case 'atividades':
-        case 'ativ':
-        case 'tasks':
-            header('Content-Type: text/html; charset=utf-8');
-            echo '<!DOCTYPE html><html><head><title>Atividades</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="container mt-5"><div class="alert alert-info"><h3><i class="bi bi-info-circle"></i> Módulo Atividades</h3><p>Este módulo está temporariamente acessível através das seguintes URLs:</p><ul><li><a href="' . BASE_URL . '/ativ">Acesso alternativo: /ativ</a></li><li><a href="' . BASE_URL . '/tasks">Acesso alternativo: /tasks</a></li></ul><p class="mt-3"><a href="' . BASE_URL . '/" class="btn btn-primary">Voltar ao Dashboard</a></p></div></div></body></html>';
-            exit;
-            
-        // Financeiro
-        case 'financeiro':
-        case 'finance':
-        case 'fin':
-            header('Content-Type: text/html; charset=utf-8');
-            echo '<!DOCTYPE html><html><head><title>Financeiro</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="container mt-5"><div class="alert alert-info"><h3><i class="bi bi-info-circle"></i> Módulo Financeiro</h3><p>Este módulo está temporariamente acessível através das seguintes URLs:</p><ul><li><a href="' . BASE_URL . '/finance">Acesso alternativo: /finance</a></li><li><a href="' . BASE_URL . '/fin">Acesso alternativo: /fin</a></li></ul><p class="mt-3"><a href="' . BASE_URL . '/" class="btn btn-primary">Voltar ao Dashboard</a></p></div></div></body></html>';
-            exit;
-            
-        case 'financeiro_DISABLED':
-            try {
-                $controller = new App\Controllers\FinanceiroController();
-                $action = $_GET['action'] ?? 'index';
-                
-                switch ($action) {
+            switch ($action) {
                 case 'index':
-                case '':
-                    $controller->index();
-                    break;
-                    
-                // Categorias Financeiras
-                case 'categorias':
-                    $controller->categorias();
-                    break;
-                case 'categoria-create':
-                    $controller->categoriaCreate();
-                    break;
-                case 'categoria-store':
-                    $controller->categoriaStore();
-                    break;
-                case 'categoria-edit':
-                    $id = $_GET['id'] ?? 0;
-                    $controller->categoriaEdit($id);
-                    break;
-                case 'categoria-update':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->categoriaUpdate($id);
-                    break;
-                case 'categoria-toggle-ativo':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->categoriaToggleAtivo($id);
-                    break;
-                    
-                // Contas a Pagar
-                case 'contas-pagar':
-                    $controller->contasPagar();
-                    break;
-                case 'conta-pagar-create':
-                    $controller->contaPagarCreate();
-                    break;
-                case 'conta-pagar-store':
-                    $controller->contaPagarStore();
-                    break;
-                case 'conta-pagar-show':
-                    $id = $_GET['id'] ?? 0;
-                    $controller->contaPagarShow($id);
-                    break;
-                case 'conta-pagar-pagar':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->contaPagarPagar($id);
-                    break;
-                case 'conta-pagar-cancelar':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->contaPagarCancelar($id);
-                    break;
-                    
-                // Contas a Receber
-                case 'contas-receber':
-                    $controller->contasReceber();
-                    break;
-                case 'conta-receber-create':
-                    $controller->contaReceberCreate();
-                    break;
-                case 'conta-receber-store':
-                    $controller->contaReceberStore();
-                    break;
-                case 'conta-receber-show':
-                    $id = $_GET['id'] ?? 0;
-                    $controller->contaReceberShow($id);
-                    break;
-                case 'conta-receber-receber':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->contaReceberReceber($id);
-                    break;
-                case 'conta-receber-cancelar':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->contaReceberCancelar($id);
-                    break;
-                    
-                // Boletos
-                case 'boletos':
-                    $controller->boletos();
-                    break;
-                case 'boleto-show':
-                    $id = $_GET['id'] ?? 0;
-                    $controller->boletoShow($id);
-                    break;
-                case 'boleto-pagar':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->boletoPagar($id);
-                    break;
-                case 'boleto-cancelar':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->boletoCancelar($id);
-                    break;
-                    
-                // Lançamentos Financeiros
-                case 'lancamentos':
-                    $controller->lancamentos();
-                    break;
-                case 'lancamento-create':
-                    $controller->lancamentoCreate();
-                    break;
-                case 'lancamento-store':
-                    $controller->lancamentoStore();
-                    break;
-                case 'lancamento-estornar':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->lancamentoEstornar($id);
-                    break;
-                    
-                // Conciliação Bancária
-                case 'conciliacoes':
-                    $controller->conciliacoes();
-                    break;
-                case 'conciliacao-importar':
-                    $controller->conciliacaoImportar();
-                    break;
-                case 'conciliacao-processar-ofx':
-                    $controller->conciliacaoProcessarOFX();
-                    break;
-                case 'conciliacao-show':
-                    $id = $_GET['id'] ?? 0;
-                    $controller->conciliacaoShow($id);
-                    break;
-                case 'conciliacao-vincular':
-                    $controller->conciliacaoVincular();
-                    break;
-                    
-                // Fluxo de Caixa
-                case 'fluxo-caixa':
-                    $controller->fluxoCaixa();
-                    break;
-                    
-                // Relatórios
-                case 'dre':
-                    $controller->dre();
-                    break;
-                case 'balancete':
-                    $controller->balancete();
-                    break;
-                    
-                default:
-                    $controller->index();
-                    break;
-            }
-            } catch (Throwable $e) {
-                error_log("Financeiro error: " . $e->getMessage());
-                $data = ['titulo' => 'Financeiro'];
-                require ROOT_PATH . '/src/Views/financeiro/index_simple.php';
-            }
-            break;
-            
-        // Notas Fiscais
-        case 'notas-fiscais':
-        case 'nf':
-        case 'invoices':
-            header('Content-Type: text/html; charset=utf-8');
-            echo '<!DOCTYPE html><html><head><title>Notas Fiscais</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body><div class="container mt-5"><div class="alert alert-info"><h3><i class="bi bi-info-circle"></i> Módulo Notas Fiscais</h3><p>Este módulo está temporariamente acessível através das seguintes URLs:</p><ul><li><a href="' . BASE_URL . '/nf">Acesso alternativo: /nf</a></li><li><a href="' . BASE_URL . '/invoices">Acesso alternativo: /invoices</a></li></ul><p class="mt-3"><a href="' . BASE_URL . '/" class="btn btn-primary">Voltar ao Dashboard</a></p></div></div></body></html>';
-            exit;
-            
-        case 'notas-fiscais_DISABLED':
-            try {
-                $controller = new App\Controllers\NotaFiscalController();
-                $action = $_GET['action'] ?? 'index';
-                
-                switch ($action) {
-                case 'index':
-                case '':
                     $controller->index();
                     break;
                 case 'create':
@@ -580,100 +287,374 @@ try {
                     $controller->store();
                     break;
                 case 'show':
-                    $id = $_GET['id'] ?? 0;
                     $controller->show($id);
                     break;
                 case 'edit':
-                    $id = $_GET['id'] ?? 0;
                     $controller->edit($id);
                     break;
                 case 'update':
-                    $id = $_POST['id'] ?? 0;
                     $controller->update($id);
                     break;
-                case 'emitir':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->emitir($id);
+                case 'destroy':
+                    $controller->destroy($id);
                     break;
-                case 'consultar-status':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->consultarStatus($id);
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== EMPRESAS PRESTADORAS ====================
+        case 'empresas-prestadoras':
+            require_once SRC_PATH . '/controllers/EmpresaPrestadoraController.php';
+            $controller = new App\Controllers\EmpresaPrestadoraController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
                     break;
-                case 'form-cancelar':
-                    $id = $_GET['id'] ?? 0;
-                    $controller->formCancelar($id);
+                case 'create':
+                    $controller->create();
                     break;
-                case 'cancelar':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->cancelar($id);
+                case 'store':
+                    $controller->store();
                     break;
-                case 'form-carta-correcao':
-                    $id = $_GET['id'] ?? 0;
-                    $controller->formCartaCorrecao($id);
+                case 'show':
+                    $controller->show($id);
                     break;
-                case 'carta-correcao':
-                    $id = $_POST['id'] ?? 0;
-                    $controller->cartaCorrecao($id);
+                case 'edit':
+                    $controller->edit($id);
                     break;
-                case 'download-xml':
-                    $id = $_GET['id'] ?? 0;
-                    $controller->downloadXML($id);
+                case 'update':
+                    $controller->update($id);
                     break;
-                case 'download-danfe':
-                    $id = $_GET['id'] ?? 0;
-                    $controller->downloadDANFE($id);
+                case 'destroy':
+                    $controller->destroy($id);
                     break;
-                case 'relatorio':
-                    $controller->relatorio();
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== SERVIÇOS ====================
+        case 'servicos':
+            require_once SRC_PATH . '/controllers/ServicoController.php';
+            $controller = new App\Controllers\ServicoController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
                     break;
-                case 'delete':
-                    $id = $_POST['id'] ?? 0;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show($id);
+                    break;
+                case 'edit':
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'destroy':
+                    $controller->destroy($id);
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== CONTRATOS ====================
+        case 'contratos':
+            require_once SRC_PATH . '/controllers/ContratoController.php';
+            $controller = new App\Controllers\ContratoController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show($id);
+                    break;
+                case 'edit':
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'destroy':
+                    $controller->destroy($id);
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== SERVICO VALORES ====================
+        case 'servico-valores':
+            require_once SRC_PATH . '/controllers/ServicoValorController.php';
+            $controller = new App\Controllers\ServicoValorController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show($id);
+                    break;
+                case 'edit':
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'destroy':
+                    $controller->destroy($id);
+                    break;
+                case 'getValorVigente':
+                    $controller->getValorVigente();
+                    break;
+                case 'verificarSobreposicao':
+                    $controller->verificarSobreposicao();
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== PROJETOS ====================
+        case 'projetos':
+            require_once SRC_PATH . '/controllers/ProjetoController.php';
+            $controller = new App\Controllers\ProjetoController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show($id);
+                    break;
+                case 'dashboard':
+                    $controller->dashboard($id);
+                    break;
+                case 'edit':
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'alterarStatus':
+                    $controller->alterarStatus($id);
+                    break;
+                case 'destroy':
                     $controller->delete($id);
                     break;
                 default:
                     $controller->index();
-                    break;
-            }
-            } catch (Throwable $e) {
-                error_log("Notas Fiscais error: " . $e->getMessage());
-                $data = ['titulo' => 'Notas Fiscais'];
-                require ROOT_PATH . '/src/Views/notas_fiscais/index_simple.php';
             }
             break;
             
-        // 404
+        // ==================== PROJETO ETAPAS (CRONOGRAMA) ====================
+        case 'projeto-etapas':
+            require_once SRC_PATH . '/controllers/ProjetoEtapaController.php';
+            $controller = new App\Controllers\ProjetoEtapaController();
+            $projetoId = $_GET['projeto_id'] ?? $id;
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index($projetoId);
+                    break;
+                case 'gantt':
+                    $controller->gantt($projetoId);
+                    break;
+                case 'store':
+                    $controller->store($projetoId);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'aprovar':
+                    $controller->aprovar($id);
+                    break;
+                case 'destroy':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index($projetoId);
+            }
+            break;
+            
+        // ==================== PROJETO EQUIPE ====================
+        case 'projeto-equipe':
+            require_once SRC_PATH . '/controllers/ProjetoEquipeController.php';
+            $controller = new App\Controllers\ProjetoEquipeController();
+            $projetoId = $_GET['projeto_id'] ?? $id;
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index($projetoId);
+                    break;
+                case 'store':
+                    $controller->store($projetoId);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'avaliar':
+                    $controller->avaliar($id);
+                    break;
+                case 'destroy':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index($projetoId);
+            }
+            break;
+            
+        // ==================== PROJETO ORÇAMENTO ====================
+        case 'projeto-orcamento':
+            require_once SRC_PATH . '/controllers/ProjetoOrcamentoController.php';
+            $controller = new App\Controllers\ProjetoOrcamentoController();
+            $projetoId = $_GET['projeto_id'] ?? $id;
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index($projetoId);
+                    break;
+                case 'store':
+                    $controller->store($projetoId);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'aprovar':
+                    $controller->aprovar($id);
+                    break;
+                case 'destroy':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index($projetoId);
+            }
+            break;
+            
+        // ==================== PROJETO EXECUÇÃO (APONTAMENTO) ====================
+        case 'projeto-execucao':
+            require_once SRC_PATH . '/controllers/ProjetoExecucaoController.php';
+            $controller = new App\Controllers\ProjetoExecucaoController();
+            $projetoId = $_GET['projeto_id'] ?? $id;
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index($projetoId);
+                    break;
+                case 'store':
+                    $controller->store($projetoId);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'aprovar':
+                    $controller->aprovar($id);
+                    break;
+                case 'destroy':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index($projetoId);
+            }
+            break;
+            
+        // ==================== 404 ====================
         default:
             http_response_code(404);
-            echo '<h1>404 - Página não encontrada</h1>';
-            echo '<p><a href="/">Voltar para o início</a></p>';
+            ?>
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>404 - Página não encontrada</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            </head>
+            <body>
+                <div class="container mt-5">
+                    <div class="text-center">
+                        <h1 class="display-1">404</h1>
+                        <h2>Página não encontrada</h2>
+                        <p class="lead">A página que você está procurando não existe.</p>
+                        <a href="<?= BASE_URL ?>/" class="btn btn-primary">Voltar para o início</a>
+                    </div>
+                </div>
+            </body>
+            </html>
+            <?php
             break;
     }
+    
 } catch (Exception $e) {
+    // Log error
+    error_log("Erro na aplicação: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    
+    // Resposta de erro
     http_response_code(500);
-    error_log($e->getMessage());
     
-    // If debug mode is enabled, show full error details
-    if (isset($_GET['_debug']) && $_GET['_debug'] === '1') {
-        echo "\n\n==========================================\n";
-        echo "EXCEPTION CAUGHT\n";
-        echo "==========================================\n\n";
-        echo "Type: " . get_class($e) . "\n";
-        echo "Message: " . $e->getMessage() . "\n";
-        echo "File: " . $e->getFile() . "\n";
-        echo "Line: " . $e->getLine() . "\n";
-        echo "\nStack Trace:\n" . $e->getTraceAsString() . "\n";
-        exit;
-    }
-    
-    if (isset($_SESSION['usuario_id'])) {
-        $_SESSION['erro'] = 'Erro interno: ' . $e->getMessage();
-        header('Location: ' . BASE_URL . '/');
-    } else {
-        echo '<h1>500 - Erro Interno do Servidor</h1>';
-        echo '<p>Ocorreu um erro ao processar sua solicitação.</p>';
-        if (ini_get('display_errors')) {
-            echo '<pre>' . $e->getMessage() . '</pre>';
-            echo '<pre>' . $e->getTraceAsString() . '</pre>';
-        }
-    }
+    ?>
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>500 - Erro Interno</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container mt-5">
+            <div class="text-center">
+                <h1 class="display-1">500</h1>
+                <h2>Erro Interno do Servidor</h2>
+                <p class="lead">Ocorreu um erro ao processar sua solicitação.</p>
+                
+                <?php if (!empty($config['debug']) && $config['debug'] === true): ?>
+                    <div class="alert alert-danger text-start mt-4">
+                        <h4>Detalhes do erro (modo debug):</h4>
+                        <p><strong>Mensagem:</strong> <?= htmlspecialchars($e->getMessage()) ?></p>
+                        <p><strong>Arquivo:</strong> <?= htmlspecialchars($e->getFile()) ?></p>
+                        <p><strong>Linha:</strong> <?= $e->getLine() ?></p>
+                        <hr>
+                        <h5>Stack Trace:</h5>
+                        <pre style="text-align: left; max-height: 400px; overflow-y: auto;"><?= htmlspecialchars($e->getTraceAsString()) ?></pre>
+                    </div>
+                <?php else: ?>
+                    <p>Por favor, tente novamente mais tarde ou entre em contato com o suporte.</p>
+                <?php endif; ?>
+                
+                <a href="<?= BASE_URL ?>/" class="btn btn-primary mt-3">Voltar para o início</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    <?php
 }

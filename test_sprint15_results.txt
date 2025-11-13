@@ -1,0 +1,31 @@
+==========================================
+SPRINT 15 - SISTEMA DE TESTES COMPLETO
+==========================================
+Base URL: https://prestadores.clinfec.com.br
+Data: 2025-11-11 23:58:28
+
+=== TESTE 1: Páginas Públicas ===
+[1] Login page loads... ✓ PASS (HTTP 200)
+
+=== TESTE 2: Autenticação ===
+[2] Login: Master user (master@clinfec.com.br)... ✗ FAIL
+
+⚠️  Login falhou - pulando testes autenticados
+
+=== TESTE 8: Outros Usuários ===
+[16] Login: Admin user (admin@clinfec.com.br)... ✗ FAIL
+[17] Login: Gestor user (gestor@clinfec.com.br)... ✗ FAIL
+
+==========================================
+RESULTADO DOS TESTES
+==========================================
+Total de testes: 17
+test_sprint15_complete.sh: line 131: bc: command not found
+Testes passados: 1 (%)
+Testes falhados: 16
+
+⚠️  Alguns testes falharam
+test_sprint15_complete.sh: line 140: bc: command not found
+Sistema: % FUNCIONAL
+
+Relatório completo salvo em: /home/user/webapp/test_sprint15_results.txt

@@ -17,8 +17,8 @@ require_once __DIR__ . '/../layouts/header.php';
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="/servicos">Serviços</a></li>
+            <li class="breadcrumb-item"><a href="?page=dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="?page=servicos">Serviços</a></li>
             <li class="breadcrumb-item active">Editar Serviço</li>
         </ol>
     </nav>
@@ -29,7 +29,7 @@ require_once __DIR__ . '/../layouts/header.php';
             <h1 class="h2 mb-1">Editar Serviço</h1>
             <p class="text-muted mb-0">Atualize as informações do serviço</p>
         </div>
-        <a href="/servicos" class="btn btn-secondary">
+        <a href="?page=servicos" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i>Voltar
         </a>
     </div>
@@ -37,7 +37,7 @@ require_once __DIR__ . '/../layouts/header.php';
     <!-- Form Card -->
     <div class="card shadow-sm">
         <div class="card-body">
-            <form method="POST" action="/servicos/<?= $servico['id'] ?>/update" id="formServico" novalidate>
+            <form method="POST" action="?page=servicos&action=update&id=<?= $servico['id'] ?>" id="formServico" novalidate>
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
                 <!-- Section 1: Dados Principais -->
@@ -431,7 +431,7 @@ require_once __DIR__ . '/../layouts/header.php';
 
                 <!-- Form Actions -->
                 <div class="d-flex justify-content-between align-items-center pt-4 border-top">
-                    <a href="/servicos" class="btn btn-secondary">
+                    <a href="?page=servicos" class="btn btn-secondary">
                         <i class="fas fa-times me-2"></i>Cancelar
                     </a>
                     <button type="submit" class="btn btn-primary btn-lg">

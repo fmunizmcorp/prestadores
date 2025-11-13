@@ -144,7 +144,7 @@
                 <div class="text-center mt-4">
                     <p class="text-white">
                         <strong>Usuário de teste:</strong><br>
-                        <span class="font-monospace">admin@clinfec.com / admin123</span>
+                        <span class="font-monospace">master@clinfec.com.br / password</span>
                     </p>
                 </div>
             </div>
