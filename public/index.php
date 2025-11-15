@@ -7,6 +7,11 @@
  * URL: https://clinfec.com.br/prestadores
  */
 
+// ==================== CACHE CONTROL (SPRINT 33) ====================
+// Limpar cache durante desenvolvimento
+// Para produção: comentar as linhas em config/cache_control.php
+require_once __DIR__ . '/../config/cache_control.php';
+
 // ==================== DEBUG MODE ====================
 // Sprint 20 - Temporary debug to diagnose blank pages
 if (isset($_GET['debug']) && $_GET['debug'] === 'sprint20') {
@@ -108,38 +113,14 @@ $config = require CONFIG_PATH . '/config.php';
 $dbConfig = require CONFIG_PATH . '/database.php';
 
 // ==================== EXECUTAR MIGRATIONS ====================
-// TEMPORARIAMENTE DESABILITADO - Sprint 23
-// OPcache está servindo versão antiga do DatabaseMigration.php
-// Aguardando cache expirar ou limpeza manual via hPanel
-/*
-try {
-    // Importar classes necessárias
-    require_once SRC_PATH . '/Database.php';
-    require_once SRC_PATH . '/DatabaseMigration.php';
-    
-    if (!isset($_SESSION['migrations_executed'])) {
-        $migration = new App\DatabaseMigration();
-        $result = $migration->checkAndMigrate();
-        
-        if (!$result['success']) {
-            error_log("Erro nas migrations: " . ($result['error'] ?? 'Erro desconhecido'));
-            if (!empty($config['debug'])) {
-                die("Erro ao executar migrations: " . ($result['error'] ?? 'Erro desconhecido'));
-            }
-        }
-        
-        $_SESSION['migrations_executed'] = true;
-    }
-} catch (Exception $e) {
-    error_log("Erro ao executar migrations: " . $e->getMessage());
-    if (!empty($config['debug'])) {
-        die("Erro ao executar migrations: " . $e->getMessage());
-    }
-}
-*/
+// DESABILITADO - Sprint 29
+// Migrations serão executadas manualmente via SQL
+// Motivo: Cache PHP 8.1 impedindo carregamento correto de Database.php
 
-// Importar Database manualmente já que migrations estão desabilitadas
+// Carregar Database manualmente
 require_once SRC_PATH . '/Database.php';
+
+// NOTA: Tabelas já devem existir ou serão criadas manualmente
 
 // ==================== OBTER PARÂMETROS ====================
 

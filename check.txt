@@ -1,0 +1,7 @@
+<?php
+// Simple check
+echo "PHP WORKING!";
+require_once __DIR__ . '/src/Database.php';
+$db = App\Database::getInstance();
+echo "\nDatabase loaded!";
+echo "\nHas exec(): " . (method_exists($db, 'exec') ? 'YES' : 'NO');

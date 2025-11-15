@@ -1,12 +1,21 @@
-<?php
-
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 namespace App\Controllers;
 
 use App\Models\EmpresaPrestadora;
 use App\Models\Servico;
 
 class EmpresaPrestadoraController {
-    private $model;
+    private $model = null;
+    
+    /**
+     * Get model (lazy instantiation)
+     */
+    private function getModel() {
+        if ($this->model === null) {
+            $this->model = new EmpresaPrestadora();
+        }
+        return $this->model;
+    }
     private $servicoModel;
     
     public function __construct() {
@@ -15,8 +24,6 @@ class EmpresaPrestadoraController {
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
-        
-        $this->model = new EmpresaPrestadora();
         $this->servicoModel = new Servico();
     }
     
@@ -39,14 +46,14 @@ class EmpresaPrestadoraController {
         if ($categoria_principal) $filtros['categoria_principal'] = $categoria_principal;
         if ($area_atuacao) $filtros['area_atuacao'] = $area_atuacao;
         
-        $empresas = $this->model->all($filtros, $page, $limit);
-        $total = $this->model->count($filtros);
+        $empresas = $this->getModel()->all($filtros, $page, $limit);
+        $total = $this->getModel()->count($filtros);
         $totalPaginas = ceil($total / $limit);
         
         // Estatísticas
         $stats = [
-            'total' => $this->model->countTotal(),
-            'ativas' => $this->model->countAtivas()
+            'total' => $this->getModel()->countTotal(),
+            'ativas' => $this->getModel()->countAtivas()
         ];
         
         require __DIR__ . '/../Views/empresas-prestadoras/index.php';
@@ -96,12 +103,12 @@ class EmpresaPrestadoraController {
         $data['criado_por'] = $_SESSION['usuario_id'];
         
         try {
-            $id = $this->model->create($data);
+            $id = $this->getModel()->create($data);
             
             // Associar serviços
             if (!empty($_POST['servicos'])) {
                 foreach ($_POST['servicos'] as $servicoId) {
-                    $this->model->addServico($id, $servicoId);
+                    $this->getModel()->addServico($id, $servicoId);
                 }
             }
             
@@ -118,7 +125,7 @@ class EmpresaPrestadoraController {
     
     // EXIBIR DETALHES
     public function show($id) {
-        $empresa = $this->model->findById($id);
+        $empresa = $this->getModel()->findById($id);
         
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
@@ -126,17 +133,17 @@ class EmpresaPrestadoraController {
             exit;
         }
         
-        $representantes = $this->model->getRepresentantes($id);
-        $documentos = $this->model->getDocumentos($id);
-        $servicos = $this->model->getServicos($id);
-        $totalContratos = $this->model->getContratosPorEmpresa($id);
+        $representantes = $this->getModel()->getRepresentantes($id);
+        $documentos = $this->getModel()->getDocumentos($id);
+        $servicos = $this->getModel()->getServicos($id);
+        $totalContratos = $this->getModel()->getContratosPorEmpresa($id);
         
         require __DIR__ . '/../Views/empresas-prestadoras/show.php';
     }
     
     // EXIBIR FORMULÁRIO DE EDIÇÃO
     public function edit($id) {
-        $empresa = $this->model->findById($id);
+        $empresa = $this->getModel()->findById($id);
         
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
@@ -145,7 +152,7 @@ class EmpresaPrestadoraController {
         }
         
         $todosServicos = $this->servicoModel->getAtivos();
-        $servicosEmpresa = $this->model->getServicos($id);
+        $servicosEmpresa = $this->getModel()->getServicos($id);
         $servicosIds = array_column($servicosEmpresa, 'id');
         
         require __DIR__ . '/../Views/empresas-prestadoras/edit.php';
@@ -165,7 +172,7 @@ class EmpresaPrestadoraController {
             exit;
         }
         
-        $empresa = $this->model->findById($id);
+        $empresa = $this->getModel()->findById($id);
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
@@ -199,17 +206,17 @@ class EmpresaPrestadoraController {
         $data['atualizado_por'] = $_SESSION['usuario_id'];
         
         try {
-            $this->model->update($id, $data);
+            $this->getModel()->update($id, $data);
             
             // Atualizar serviços - remover todos e adicionar novamente
-            $servicosAtuais = $this->model->getServicos($id);
+            $servicosAtuais = $this->getModel()->getServicos($id);
             foreach ($servicosAtuais as $servico) {
-                $this->model->removeServico($id, $servico['id']);
+                $this->getModel()->removeServico($id, $servico['id']);
             }
             
             if (!empty($_POST['servicos'])) {
                 foreach ($_POST['servicos'] as $servicoId) {
-                    $this->model->addServico($id, $servicoId);
+                    $this->getModel()->addServico($id, $servicoId);
                 }
             }
             
@@ -237,7 +244,7 @@ class EmpresaPrestadoraController {
             exit;
         }
         
-        $empresa = $this->model->findById($id);
+        $empresa = $this->getModel()->findById($id);
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
@@ -245,7 +252,7 @@ class EmpresaPrestadoraController {
         }
         
         try {
-            $this->model->delete($id);
+            $this->getModel()->delete($id);
             $_SESSION['sucesso'] = 'Empresa excluída com sucesso!';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-prestadoras');
             exit;
@@ -290,7 +297,7 @@ class EmpresaPrestadoraController {
         ];
         
         try {
-            $this->model->addRepresentante($empresaId, $data);
+            $this->getModel()->addRepresentante($empresaId, $data);
             $_SESSION['sucesso'] = 'Representante adicionado com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
@@ -307,7 +314,7 @@ class EmpresaPrestadoraController {
         }
         
         try {
-            $this->model->deleteRepresentante($representanteId);
+            $this->getModel()->deleteRepresentante($representanteId);
             $_SESSION['sucesso'] = 'Representante removido com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
@@ -352,7 +359,7 @@ class EmpresaPrestadoraController {
         ];
         
         try {
-            $this->model->addDocumento($empresaId, $data);
+            $this->getModel()->addDocumento($empresaId, $data);
             $_SESSION['sucesso'] = 'Documento adicionado com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
@@ -369,7 +376,7 @@ class EmpresaPrestadoraController {
         }
         
         try {
-            $this->model->deleteDocumento($documentoId);
+            $this->getModel()->deleteDocumento($documentoId);
             $_SESSION['sucesso'] = 'Documento removido com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
@@ -436,11 +443,11 @@ class EmpresaPrestadoraController {
             $erros[] = 'CNPJ é obrigatório.';
         } else {
             $cnpj = preg_replace('/[^0-9]/', '', $data['cnpj']);
-            if (!$this->model->validateCnpj($cnpj)) {
+            if (!$this->getModel()->validateCnpj($cnpj)) {
                 $erros[] = 'CNPJ inválido.';
             }
             
-            if (!$this->model->validateUniqueCnpj($cnpj, $id)) {
+            if (!$this->getModel()->validateUniqueCnpj($cnpj, $id)) {
                 $erros[] = 'CNPJ já cadastrado.';
             }
         }
