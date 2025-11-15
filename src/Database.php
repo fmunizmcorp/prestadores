@@ -1,4 +1,4 @@
-<?php
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 /**
  * Classe de Conexão com Banco de Dados
  * Singleton Pattern para gerenciar conexões PDO
@@ -57,6 +57,47 @@ class Database {
     
     public function getConnection(): PDO {
         return $this->connection;
+    }
+    
+    /**
+     * Métodos Proxy para compatibilidade com código em cache OPcache
+     * Sprint 26 - Adiciona métodos que o cache antigo espera
+     */
+    
+    public function exec($statement) {
+        return $this->connection->exec($statement);
+    }
+    
+    public function query($statement, $mode = PDO::ATTR_DEFAULT_FETCH_MODE, ...$fetch_mode_args) {
+        return $this->connection->query($statement, $mode, ...$fetch_mode_args);
+    }
+    
+    public function prepare($statement, $driver_options = []) {
+        return $this->connection->prepare($statement, $driver_options);
+    }
+    
+    public function beginTransaction() {
+        return $this->connection->beginTransaction();
+    }
+    
+    public function commit() {
+        return $this->connection->commit();
+    }
+    
+    public function rollBack() {
+        return $this->connection->rollBack();
+    }
+    
+    public function inTransaction() {
+        return $this->connection->inTransaction();
+    }
+    
+    public function lastInsertId($name = null) {
+        return $this->connection->lastInsertId($name);
+    }
+    
+    public function quote($string, $parameter_type = PDO::PARAM_STR) {
+        return $this->connection->quote($string, $parameter_type);
     }
     
     // Previne clonagem

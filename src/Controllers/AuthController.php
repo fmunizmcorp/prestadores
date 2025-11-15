@@ -1,14 +1,19 @@
-<?php
-
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 namespace App\Controllers;
 
 use App\Models\Usuario;
 
 class AuthController {
-    private $model;
+    private $model = null;
     
-    public function __construct() {
-        $this->model = new Usuario();
+    /**
+     * Get model (lazy instantiation)
+     */
+    private function getModel() {
+        if ($this->model === null) {
+            $this->model = new Usuario();
+        }
+        return $this->model;
     }
     
     /**
@@ -37,7 +42,7 @@ class AuthController {
         }
         
         try {
-            $usuario = $this->model->findByEmail($email);
+            $usuario = $this->getModel()->findByEmail($email);
             
             if (!$usuario) {
                 $_SESSION['erro'] = 'E-mail ou senha inválidos.';
@@ -66,7 +71,7 @@ class AuthController {
             $_SESSION['empresa_id'] = $usuario['empresa_id'] ?? null;
             
             // Atualizar último acesso
-            $this->model->updateLastLogin($usuario['id']);
+            $this->getModel()->updateLastLogin($usuario['id']);
             
             // DEBUG LOG
             $redirectUrl = (defined('BASE_URL') ? BASE_URL : '') . '/dashboard';

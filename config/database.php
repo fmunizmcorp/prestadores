@@ -1,4 +1,4 @@
-<?php
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 /**
  * Configuração de Banco de Dados
  * Sistema de Gestão de Prestadores - Clinfec

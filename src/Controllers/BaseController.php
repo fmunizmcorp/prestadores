@@ -1,5 +1,4 @@
-<?php
-
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 namespace App\Controllers;
 
 /**
@@ -39,6 +38,9 @@ abstract class BaseController
     {
         // Extrair variáveis para o escopo da view
         extract($data);
+        
+        // Garantir que $view está disponível no escopo
+        $view = $view; // Passa para o layout
         
         // Incluir o layout principal
         require ROOT_PATH . '/src/Views/layouts/main.php';

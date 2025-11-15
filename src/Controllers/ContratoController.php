@@ -1,5 +1,4 @@
-<?php
-
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 namespace App\Controllers;
 
 use App\Models\Contrato;
@@ -9,7 +8,17 @@ use App\Models\Servico;
 use App\Models\ContratoFinanceiro;
 
 class ContratoController {
-    private $model;
+    private $model = null;
+    
+    /**
+     * Get model (lazy instantiation)
+     */
+    private function getModel() {
+        if ($this->model === null) {
+            $this->model = new Contrato();
+        }
+        return $this->model;
+    }
     private $empresaTomadoraModel;
     private $empresaPrestadoraModel;
     private $servicoModel;
@@ -20,8 +29,6 @@ class ContratoController {
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
-        
-        $this->model = new Contrato();
         $this->empresaTomadoraModel = new EmpresaTomadora();
         $this->empresaPrestadoraModel = new EmpresaPrestadora();
         $this->servicoModel = new Servico();
@@ -46,8 +53,8 @@ class ContratoController {
         if ($empresa_tomadora_id) $filtros['empresa_tomadora_id'] = $empresa_tomadora_id;
         if ($empresa_prestadora_id) $filtros['empresa_prestadora_id'] = $empresa_prestadora_id;
         
-        $contratos = $this->model->all($filtros, $page, $limit);
-        $total = $this->model->count($filtros);
+        $contratos = $this->getModel()->all($filtros, $page, $limit);
+        $total = $this->getModel()->count($filtros);
         $totalPaginas = ceil($total / $limit);
         
         // Para filtros
@@ -56,10 +63,10 @@ class ContratoController {
         
         // Estatísticas
         $stats = [
-            'total' => $this->model->countTotal(),
-            'vigentes' => $this->model->countPorStatus('Vigente'),
-            'vencendo' => count($this->model->getVencendo(90)),
-            'valor_total' => $this->model->getValorTotalAtivos()
+            'total' => $this->getModel()->countTotal(),
+            'vigentes' => $this->getModel()->countPorStatus('Vigente'),
+            'vencendo' => count($this->getModel()->getVencendo(90)),
+            'valor_total' => $this->getModel()->getValorTotalAtivos()
         ];
         
         require __DIR__ . '/../Views/contratos/index.php';
@@ -125,10 +132,10 @@ class ContratoController {
         $data['criado_por'] = $_SESSION['usuario_id'];
         
         try {
-            $id = $this->model->create($data);
+            $id = $this->getModel()->create($data);
             
             // Adicionar histórico
-            $this->model->addHistorico($id, [
+            $this->getModel()->addHistorico($id, [
                 'tipo_evento' => 'Criação',
                 'descricao' => 'Contrato criado',
                 'usuario_id' => $_SESSION['usuario_id'],
@@ -149,7 +156,7 @@ class ContratoController {
     
     // EXIBIR DETALHES
     public function show($id) {
-        $contrato = $this->model->findById($id);
+        $contrato = $this->getModel()->findById($id);
         
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
@@ -157,17 +164,17 @@ class ContratoController {
             exit;
         }
         
-        $servicos = $this->model->getServicos($id);
-        $aditivos = $this->model->getAditivos($id);
-        $historico = $this->model->getHistorico($id, 20);
-        $valoresPeriodo = $this->model->getValoresPeriodo($id);
+        $servicos = $this->getModel()->getServicos($id);
+        $aditivos = $this->getModel()->getAditivos($id);
+        $historico = $this->getModel()->getHistorico($id, 20);
+        $valoresPeriodo = $this->getModel()->getValoresPeriodo($id);
         
         require __DIR__ . '/../Views/contratos/show.php';
     }
     
     // FORMULÁRIO DE EDIÇÃO
     public function edit($id) {
-        $contrato = $this->model->findById($id);
+        $contrato = $this->getModel()->findById($id);
         
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
@@ -195,7 +202,7 @@ class ContratoController {
             exit;
         }
         
-        $contrato = $this->model->findById($id);
+        $contrato = $this->getModel()->findById($id);
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
@@ -227,10 +234,10 @@ class ContratoController {
         $data['atualizado_por'] = $_SESSION['usuario_id'];
         
         try {
-            $this->model->update($id, $data);
+            $this->getModel()->update($id, $data);
             
             // Adicionar histórico
-            $this->model->addHistorico($id, [
+            $this->getModel()->addHistorico($id, [
                 'tipo_evento' => 'Atualização',
                 'descricao' => 'Contrato atualizado',
                 'usuario_id' => $_SESSION['usuario_id'],
@@ -262,7 +269,7 @@ class ContratoController {
             exit;
         }
         
-        $contrato = $this->model->findById($id);
+        $contrato = $this->getModel()->findById($id);
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
@@ -270,7 +277,7 @@ class ContratoController {
         }
         
         try {
-            $this->model->delete($id);
+            $this->getModel()->delete($id);
             $_SESSION['sucesso'] = 'Contrato excluído com sucesso!';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/contratos');
             exit;
@@ -318,10 +325,10 @@ class ContratoController {
         ];
         
         try {
-            $this->model->addServico($contratoId, $data);
+            $this->getModel()->addServico($contratoId, $data);
             
             // Histórico
-            $this->model->addHistorico($contratoId, [
+            $this->getModel()->addHistorico($contratoId, [
                 'tipo_evento' => 'Serviço Adicionado',
                 'descricao' => 'Serviço adicionado ao contrato',
                 'usuario_id' => $_SESSION['usuario_id'],
@@ -345,9 +352,9 @@ class ContratoController {
         }
         
         try {
-            $this->model->deleteServico($servicoId);
+            $this->getModel()->deleteServico($servicoId);
             
-            $this->model->addHistorico($contratoId, [
+            $this->getModel()->addHistorico($contratoId, [
                 'tipo_evento' => 'Serviço Removido',
                 'descricao' => 'Serviço removido do contrato',
                 'usuario_id' => $_SESSION['usuario_id'],
@@ -421,9 +428,9 @@ class ContratoController {
         ];
         
         try {
-            $this->model->addAditivo($contratoId, $data);
+            $this->getModel()->addAditivo($contratoId, $data);
             
-            $this->model->addHistorico($contratoId, [
+            $this->getModel()->addHistorico($contratoId, [
                 'tipo_evento' => 'Aditivo Criado',
                 'descricao' => "Aditivo {$data['numero_aditivo']} criado",
                 'usuario_id' => $_SESSION['usuario_id'],
@@ -447,9 +454,9 @@ class ContratoController {
         }
         
         try {
-            $this->model->deleteAditivo($aditivoId);
+            $this->getModel()->deleteAditivo($aditivoId);
             
-            $this->model->addHistorico($contratoId, [
+            $this->getModel()->addHistorico($contratoId, [
                 'tipo_evento' => 'Aditivo Removido',
                 'descricao' => 'Aditivo removido',
                 'usuario_id' => $_SESSION['usuario_id'],
@@ -486,7 +493,7 @@ class ContratoController {
         ];
         
         try {
-            $this->model->addValorPeriodo($contratoId, $data);
+            $this->getModel()->addValorPeriodo($contratoId, $data);
             $_SESSION['sucesso'] = 'Valor do período adicionado com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
@@ -503,7 +510,7 @@ class ContratoController {
         $dias = $_GET['dias'] ?? 90;
         
         try {
-            $contratos = $this->model->getVencendo($dias);
+            $contratos = $this->getModel()->getVencendo($dias);
             echo json_encode(['success' => true, 'contratos' => $contratos]);
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'erro' => $e->getMessage()]);
@@ -513,7 +520,7 @@ class ContratoController {
     
     // FATURAMENTO DO CONTRATO
     public function faturamento($id) {
-        $contrato = $this->model->findById($id);
+        $contrato = $this->getModel()->findById($id);
         
         if (!$contrato) {
             $_SESSION['erro'] = 'Contrato não encontrado.';
@@ -562,7 +569,7 @@ class ContratoController {
                 $_SESSION['sucesso'] = 'Fatura gerada com sucesso!';
                 
                 // Adicionar histórico ao contrato
-                $this->model->addHistorico($id, [
+                $this->getModel()->addHistorico($id, [
                     'tipo_evento' => 'Faturamento',
                     'descricao' => 'Fatura recorrente gerada manualmente',
                     'usuario_id' => $_SESSION['usuario_id'],
@@ -590,7 +597,7 @@ class ContratoController {
         if (empty($data['numero_contrato'])) {
             $erros[] = 'Número do contrato é obrigatório.';
         } else {
-            if (!$this->model->validateUniqueNumero($data['numero_contrato'], $id)) {
+            if (!$this->getModel()->validateUniqueNumero($data['numero_contrato'], $id)) {
                 $erros[] = 'Número de contrato já cadastrado.';
             }
         }

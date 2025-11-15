@@ -1,0 +1,11 @@
+# Sprint 30 DEBUG - Rewrite OFF
+
+<IfModule mod_rewrite.c>
+    RewriteEngine Off
+</IfModule>
+
+# Configurações de segurança
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

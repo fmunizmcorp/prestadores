@@ -52,3 +52,4 @@ package-lock.json
 
 # Session files
 sessions/
+.ftp_credentials

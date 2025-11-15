@@ -1,19 +1,26 @@
-<?php
-
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 namespace App\Controllers;
 
 use App\Models\Servico;
 
 class ServicoController {
-    private $model;
+    private $model = null;
+    
+    /**
+     * Get model (lazy instantiation)
+     */
+    private function getModel() {
+        if ($this->model === null) {
+            $this->model = new Servico();
+        }
+        return $this->model;
+    }
     
     public function __construct() {
         if (!isset($_SESSION['usuario_id'])) {
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
-        
-        $this->model = new Servico();
     }
     
     // LISTAGEM
@@ -33,18 +40,18 @@ class ServicoController {
         if ($subcategoria) $filtros['subcategoria'] = $subcategoria;
         if ($complexidade) $filtros['complexidade'] = $complexidade;
         
-        $servicos = $this->model->all($filtros, $page, $limit);
-        $total = $this->model->count($filtros);
+        $servicos = $this->getModel()->all($filtros, $page, $limit);
+        $total = $this->getModel()->count($filtros);
         $totalPaginas = ceil($total / $limit);
         
         // Para filtros
-        $categorias = $this->model->getCategorias();
-        $subcategorias = $this->model->getSubcategorias();
+        $categorias = $this->getModel()->getCategorias();
+        $subcategorias = $this->getModel()->getSubcategorias();
         
         // Estatísticas
         $stats = [
-            'total' => $this->model->countTotal(),
-            'ativos' => $this->model->countAtivos()
+            'total' => $this->getModel()->countTotal(),
+            'ativos' => $this->getModel()->countAtivos()
         ];
         
         require __DIR__ . '/../Views/servicos/index.php';
@@ -52,7 +59,7 @@ class ServicoController {
     
     // EXIBIR FORMULÁRIO DE CRIAÇÃO
     public function create() {
-        $categorias = $this->model->getCategorias();
+        $categorias = $this->getModel()->getCategorias();
         require __DIR__ . '/../Views/servicos/create.php';
     }
     
@@ -97,7 +104,7 @@ class ServicoController {
         ];
         
         try {
-            $id = $this->model->create($data);
+            $id = $this->getModel()->create($data);
             $_SESSION['sucesso'] = 'Serviço cadastrado com sucesso!';
             header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$id");
             exit;
@@ -111,7 +118,7 @@ class ServicoController {
     
     // EXIBIR DETALHES
     public function show($id) {
-        $servico = $this->model->findById($id);
+        $servico = $this->getModel()->findById($id);
         
         if (!$servico) {
             $_SESSION['erro'] = 'Serviço não encontrado.';
@@ -119,16 +126,16 @@ class ServicoController {
             exit;
         }
         
-        $requisitos = $this->model->getRequisitos($id);
-        $valoresReferencia = $this->model->getValoresReferencia($id);
-        $servicosRelacionados = $this->model->getServicosRelacionados($id);
+        $requisitos = $this->getModel()->getRequisitos($id);
+        $valoresReferencia = $this->getModel()->getValoresReferencia($id);
+        $servicosRelacionados = $this->getModel()->getServicosRelacionados($id);
         
         require __DIR__ . '/../Views/servicos/show.php';
     }
     
     // EXIBIR FORMULÁRIO DE EDIÇÃO
     public function edit($id) {
-        $servico = $this->model->findById($id);
+        $servico = $this->getModel()->findById($id);
         
         if (!$servico) {
             $_SESSION['erro'] = 'Serviço não encontrado.';
@@ -136,8 +143,8 @@ class ServicoController {
             exit;
         }
         
-        $categorias = $this->model->getCategorias();
-        $subcategorias = $this->model->getSubcategorias($servico['categoria']);
+        $categorias = $this->getModel()->getCategorias();
+        $subcategorias = $this->getModel()->getSubcategorias($servico['categoria']);
         
         require __DIR__ . '/../Views/servicos/edit.php';
     }
@@ -155,7 +162,7 @@ class ServicoController {
             exit;
         }
         
-        $servico = $this->model->findById($id);
+        $servico = $this->getModel()->findById($id);
         if (!$servico) {
             $_SESSION['erro'] = 'Serviço não encontrado.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
@@ -190,7 +197,7 @@ class ServicoController {
         ];
         
         try {
-            $this->model->update($id, $data);
+            $this->getModel()->update($id, $data);
             $_SESSION['sucesso'] = 'Serviço atualizado com sucesso!';
             header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/servicos/$id");
             exit;
@@ -215,7 +222,7 @@ class ServicoController {
             exit;
         }
         
-        $servico = $this->model->findById($id);
+        $servico = $this->getModel()->findById($id);
         if (!$servico) {
             $_SESSION['erro'] = 'Serviço não encontrado.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
@@ -223,7 +230,7 @@ class ServicoController {
         }
         
         try {
-            $this->model->delete($id);
+            $this->getModel()->delete($id);
             $_SESSION['sucesso'] = 'Serviço excluído com sucesso!';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/servicos');
             exit;
@@ -262,7 +269,7 @@ class ServicoController {
         ];
         
         try {
-            $this->model->addRequisito($servicoId, $data);
+            $this->getModel()->addRequisito($servicoId, $data);
             $_SESSION['sucesso'] = 'Requisito adicionado com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
@@ -279,7 +286,7 @@ class ServicoController {
         }
         
         try {
-            $this->model->deleteRequisito($requisitoId);
+            $this->getModel()->deleteRequisito($requisitoId);
             $_SESSION['sucesso'] = 'Requisito removido com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
@@ -324,7 +331,7 @@ class ServicoController {
         ];
         
         try {
-            $this->model->addValorReferencia($servicoId, $data);
+            $this->getModel()->addValorReferencia($servicoId, $data);
             $_SESSION['sucesso'] = 'Valor de referência adicionado com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
@@ -341,7 +348,7 @@ class ServicoController {
         }
         
         try {
-            $this->model->deleteValorReferencia($valorId);
+            $this->getModel()->deleteValorReferencia($valorId);
             $_SESSION['sucesso'] = 'Valor de referência removido com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
@@ -361,7 +368,7 @@ class ServicoController {
         }
         
         try {
-            $subcategorias = $this->model->getSubcategorias($_GET['categoria']);
+            $subcategorias = $this->getModel()->getSubcategorias($_GET['categoria']);
             echo json_encode(['success' => true, 'subcategorias' => $subcategorias]);
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'erro' => $e->getMessage()]);
@@ -382,7 +389,7 @@ class ServicoController {
         $empresaTomadoraId = $_GET['empresa_tomadora_id'] ?? null;
         
         try {
-            $valor = $this->model->getValorReferenciaVigente($servicoId, $empresaTomadoraId);
+            $valor = $this->getModel()->getValorReferenciaVigente($servicoId, $empresaTomadoraId);
             echo json_encode(['success' => true, 'valor' => $valor]);
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'erro' => $e->getMessage()]);
@@ -398,7 +405,7 @@ class ServicoController {
             $erros[] = 'Código é obrigatório.';
         } else {
             $codigo = strtoupper($data['codigo']);
-            if (!$this->model->validateUniqueCodigo($codigo, $id)) {
+            if (!$this->getModel()->validateUniqueCodigo($codigo, $id)) {
                 $erros[] = 'Código já cadastrado.';
             }
         }

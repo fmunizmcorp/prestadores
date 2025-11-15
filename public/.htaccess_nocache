@@ -1,0 +1,40 @@
+# ===========================================
+# SPRINT 31 - DESABILITAR CACHE PHP
+# ===========================================
+
+# Desabilitar TODOS os tipos de cache PHP
+<IfModule mod_php8.c>
+    # OPcache
+    php_flag opcache.enable Off
+    php_value opcache.revalidate_freq 0
+    php_flag opcache.validate_timestamps On
+    php_flag opcache.save_comments Off
+    php_flag opcache.fast_shutdown Off
+    
+    # Realpath Cache
+    php_value realpath_cache_size 0
+    php_value realpath_cache_ttl 0
+    
+    # Stat Cache
+    php_flag opcache.enable_file_override Off
+</IfModule>
+
+# Forçar revalidação de arquivos
+<FilesMatch "\.php$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</FilesMatch>
+
+# ===========================================
+# REWRITE RULES - Roteamento
+# ===========================================
+
+RewriteEngine On
+
+# Permitir acesso direto a arquivos específicos
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirecionar tudo para index.php
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]

@@ -1,0 +1,342 @@
+================================================================================
+🚀 DEPLOYMENT SIMPLIFICADO - HOSTINGER COMPARTILHADA
+================================================================================
+📅 2025-11-15 03:40:33
+📂 Destino: ftp.clinfec.com.br/public_html/prestadores
+================================================================================
+
+🔌 Conectando: ftp.clinfec.com.br
+✅ Conectado!
+
+📤 RAIZ:
+--------------------------------------------------------------------------------
+📤 index.php (11253 bytes)
+   ✅ OK
+📤 .htaccess (1126 bytes)
+   ✅ OK
+📤 test.php (1020 bytes)
+   ✅ OK
+
+📤 config/:
+--------------------------------------------------------------------------------
+📤 config/database.php (523 bytes)
+   ✅ OK
+📤 config/app.php (2205 bytes)
+   ✅ OK
+📤 config/version.php (1767 bytes)
+   ✅ OK
+📤 config/config.php (2983 bytes)
+   ✅ OK
+📤 config/cache_control.php (1956 bytes)
+   ✅ OK
+
+📤 src/:
+--------------------------------------------------------------------------------
+📤 src/Database.php (3826 bytes)
+   ✅ OK
+📤 src/DatabaseMigration.php (10815 bytes)
+   ✅ OK
+📤 src/helpers.php (4646 bytes)
+   ✅ OK
+📤 src/Database_unique_1763123747.php (3826 bytes)
+   ✅ OK
+📤 src/DatabaseMigration_unique_1763123747.php (10833 bytes)
+   ✅ OK
+📤 src/Database_sprint31.php (3865 bytes)
+   ✅ OK
+📤 src/Controllers/AtividadeController.php (11478 bytes)
+   ✅ OK
+📤 src/Controllers/AuthController.php (4177 bytes)
+   ✅ OK
+📤 src/Controllers/BaseController.php (3662 bytes)
+   ✅ OK
+📤 src/Controllers/ContratoController.php (29048 bytes)
+   ✅ OK
+📤 src/Controllers/EmpresaPrestadoraController.php (21742 bytes)
+   ✅ OK
+📤 src/Controllers/EmpresaTomadoraController.php (24511 bytes)
+   ✅ OK
+📤 src/Controllers/FinanceiroController.php (52449 bytes)
+   ✅ OK
+📤 src/Controllers/NotaFiscalController.php (32894 bytes)
+   ✅ OK
+📤 src/Controllers/ProjetoController.php (15240 bytes)
+   ✅ OK
+📤 src/Controllers/ProjetoEquipeController.php (4692 bytes)
+   ✅ OK
+📤 src/Controllers/ProjetoEtapaController.php (5410 bytes)
+   ✅ OK
+📤 src/Controllers/ProjetoExecucaoController.php (5127 bytes)
+   ✅ OK
+📤 src/Controllers/ProjetoOrcamentoController.php (5005 bytes)
+   ✅ OK
+📤 src/Controllers/ServicoController.php (16245 bytes)
+   ✅ OK
+📤 src/Controllers/ServicoValorController.php (16389 bytes)
+   ✅ OK
+📤 src/Controllers/DashboardController.php (13332 bytes)
+   ✅ OK
+📤 src/Controllers/UsuarioController.php (13279 bytes)
+   ✅ OK
+📤 src/Helpers/FluxoCaixaHelper.php (16486 bytes)
+   ✅ OK
+📤 src/Models/Atividade.php (26200 bytes)
+   ✅ OK
+📤 src/Models/AtividadeFinanceiro.php (8500 bytes)
+   ✅ OK
+📤 src/Models/Boleto.php (36869 bytes)
+   ✅ OK
+📤 src/Models/CategoriaFinanceira.php (17587 bytes)
+   ✅ OK
+📤 src/Models/CentroCusto.php (19558 bytes)
+   ✅ OK
+📤 src/Models/Cliente.php (6884 bytes)
+   ✅ OK
+📤 src/Models/ConciliacaoBancaria.php (28287 bytes)
+   ✅ OK
+📤 src/Models/ContaPagar.php (30654 bytes)
+   ✅ OK
+📤 src/Models/ContaReceber.php (34906 bytes)
+   ✅ OK
+📤 src/Models/Contrato.php (31738 bytes)
+   ✅ OK
+📤 src/Models/ContratoFinanceiro.php (14677 bytes)
+   ✅ OK
+📤 src/Models/Documento.php (11842 bytes)
+   ✅ OK
+📤 src/Models/Empresa.php (7807 bytes)
+   ✅ OK
+📤 src/Models/EmpresaPrestadora.php (17049 bytes)
+   ✅ OK
+📤 src/Models/EmpresaTomadora.php (27985 bytes)
+   ✅ OK
+📤 src/Models/Fornecedor.php (6465 bytes)
+   ✅ OK
+📤 src/Models/LancamentoFinanceiro.php (35845 bytes)
+   ✅ OK
+📤 src/Models/NotaFiscal.php (30805 bytes)
+   ✅ OK
+📤 src/Models/Pagamento.php (31158 bytes)
+   ✅ OK
+📤 src/Models/Projeto.php (30457 bytes)
+   ✅ OK
+📤 src/Models/ProjetoAnexo.php (5381 bytes)
+   ✅ OK
+📤 src/Models/ProjetoAvaliacao.php (6035 bytes)
+   ✅ OK
+📤 src/Models/ProjetoCategoria.php (2936 bytes)
+   ✅ OK
+📤 src/Models/ProjetoEquipe.php (12851 bytes)
+   ✅ OK
+📤 src/Models/ProjetoEtapa.php (18659 bytes)
+   ✅ OK
+📤 src/Models/ProjetoExecucao.php (9483 bytes)
+   ✅ OK
+📤 src/Models/ProjetoFinanceiro.php (13718 bytes)
+   ✅ OK
+📤 src/Models/ProjetoOrcamento.php (14080 bytes)
+   ✅ OK
+📤 src/Models/ProjetoRisco.php (3968 bytes)
+   ✅ OK
+📤 src/Models/ProjetoTemplate.php (8960 bytes)
+   ✅ OK
+📤 src/Models/Responsavel.php (7869 bytes)
+   ✅ OK
+📤 src/Models/Servico.php (15721 bytes)
+   ✅ OK
+📤 src/Models/ServicoValor.php (16651 bytes)
+   ✅ OK
+📤 src/Models/Usuario.php (8888 bytes)
+   ✅ OK
+📤 src/Models/BaseModel.php (1318 bytes)
+   ✅ OK
+📤 src/Models/NotaFiscal_SIMPLE_FALLBACK.php (9218 bytes)
+   ✅ OK
+📤 src/Models/Atividade_BACKUP.php (26200 bytes)
+   ✅ OK
+📤 src/Models/NotaFiscal_BACKUP.php (30805 bytes)
+   ✅ OK
+📤 src/Models/Projeto_BACKUP.php (30457 bytes)
+   ✅ OK
+📤 src/Views/atividades/custos.php (21234 bytes)
+   ✅ OK
+📤 src/Views/atividades/index.php (12474 bytes)
+   ✅ OK
+📤 src/Views/atividades/index_simple.php (1344 bytes)
+   ✅ OK
+📤 src/Views/atividades/minimal.php (1794 bytes)
+   ✅ OK
+📤 src/Views/auth/forgot_password.php (2457 bytes)
+   ✅ OK
+📤 src/Views/auth/login.php (8613 bytes)
+   ✅ OK
+📤 src/Views/auth/register.php (4993 bytes)
+   ✅ OK
+📤 src/Views/auth/reset_password.php (3136 bytes)
+   ✅ OK
+📤 src/Views/usuarios/index.php (7952 bytes)
+   ✅ OK
+📤 src/Views/usuarios/create.php (5122 bytes)
+   ✅ OK
+📤 src/Views/contratos/create.php (24254 bytes)
+   ✅ OK
+📤 src/Views/contratos/edit.php (24819 bytes)
+   ✅ OK
+📤 src/Views/contratos/faturamento.php (17631 bytes)
+   ✅ OK
+📤 src/Views/contratos/index.php (26144 bytes)
+   ✅ OK
+📤 src/Views/contratos/show.php (32461 bytes)
+   ✅ OK
+📤 src/Views/dashboard/index.php (23892 bytes)
+   ✅ OK
+📤 src/Views/empresas-prestadoras/create.php (16231 bytes)
+   ✅ OK
+📤 src/Views/empresas-prestadoras/edit.php (16734 bytes)
+   ✅ OK
+📤 src/Views/empresas-prestadoras/index.php (16143 bytes)
+   ✅ OK
+📤 src/Views/empresas-prestadoras/show.php (28832 bytes)
+   ✅ OK
+📤 src/Views/empresas-tomadoras/create.php (16215 bytes)
+   ✅ OK
+📤 src/Views/empresas-tomadoras/edit.php (16718 bytes)
+   ✅ OK
+📤 src/Views/empresas-tomadoras/index.php (13179 bytes)
+   ✅ OK
+📤 src/Views/empresas-tomadoras/show.php (28809 bytes)
+   ✅ OK
+📤 src/Views/financeiro/index.php (12716 bytes)
+   ✅ OK
+📤 src/Views/financeiro/index_simple.php (1382 bytes)
+   ✅ OK
+📤 src/Views/financeiro/minimal.php (1801 bytes)
+   ✅ OK
+📤 src/Views/financeiro/boletos/index.php (10471 bytes)
+   ✅ OK
+📤 src/Views/financeiro/boletos/show.php (13941 bytes)
+   ✅ OK
+📤 src/Views/financeiro/categorias/create.php (13931 bytes)
+   ✅ OK
+📤 src/Views/financeiro/categorias/edit.php (16052 bytes)
+   ✅ OK
+📤 src/Views/financeiro/categorias/index.php (15646 bytes)
+   ✅ OK
+📤 src/Views/financeiro/conciliacoes/importar.php (14926 bytes)
+   ✅ OK
+📤 src/Views/financeiro/conciliacoes/index.php (8492 bytes)
+   ✅ OK
+📤 src/Views/financeiro/conciliacoes/show.php (19942 bytes)
+   ✅ OK
+📤 src/Views/financeiro/contas_pagar/create.php (15117 bytes)
+   ✅ OK
+📤 src/Views/financeiro/contas_pagar/edit.php (18859 bytes)
+   ✅ OK
+📤 src/Views/financeiro/contas_pagar/index.php (14736 bytes)
+   ✅ OK
+📤 src/Views/financeiro/contas_pagar/show.php (22338 bytes)
+   ✅ OK
+📤 src/Views/financeiro/contas_receber/create.php (19509 bytes)
+   ✅ OK
+📤 src/Views/financeiro/contas_receber/edit.php (25208 bytes)
+   ✅ OK
+📤 src/Views/financeiro/contas_receber/index.php (16685 bytes)
+   ✅ OK
+📤 src/Views/financeiro/contas_receber/show.php (26341 bytes)
+   ✅ OK
+📤 src/Views/financeiro/fluxo_caixa/index.php (15826 bytes)
+   ✅ OK
+📤 src/Views/financeiro/lancamentos/create.php (19922 bytes)
+   ✅ OK
+📤 src/Views/financeiro/lancamentos/index.php (16664 bytes)
+   ✅ OK
+📤 src/Views/financeiro/notas_fiscais/create.php (29159 bytes)
+   ✅ OK
+📤 src/Views/financeiro/notas_fiscais/edit.php (27433 bytes)
+   ✅ OK
+📤 src/Views/financeiro/notas_fiscais/index.php (11829 bytes)
+   ✅ OK
+📤 src/Views/financeiro/notas_fiscais/show.php (27935 bytes)
+   ✅ OK
+📤 src/Views/financeiro/relatorios/balancete.php (9992 bytes)
+   ✅ OK
+📤 src/Views/financeiro/relatorios/dre.php (13802 bytes)
+   ✅ OK
+📤 src/Views/layout/footer.php (638 bytes)
+   ✅ OK
+📤 src/Views/layout/header.php (917 bytes)
+   ✅ OK
+📤 src/Views/layouts/footer.php (6794 bytes)
+   ✅ OK
+📤 src/Views/layouts/header.php (10888 bytes)
+   ✅ OK
+📤 src/Views/notas_fiscais/index_simple.php (1390 bytes)
+   ✅ OK
+📤 src/Views/notas_fiscais/minimal.php (1803 bytes)
+   ✅ OK
+📤 src/Views/projetos/create.php (15438 bytes)
+   ✅ OK
+📤 src/Views/projetos/edit.php (15447 bytes)
+   ✅ OK
+📤 src/Views/projetos/financeiro.php (21792 bytes)
+   ✅ OK
+📤 src/Views/projetos/index.php (11920 bytes)
+   ✅ OK
+📤 src/Views/projetos/index_simple.php (1624 bytes)
+   ✅ OK
+📤 src/Views/projetos/minimal.php (1798 bytes)
+   ✅ OK
+📤 src/Views/projetos/show.php (12219 bytes)
+   ✅ OK
+📤 src/Views/projetos/equipe/index.php (3997 bytes)
+   ✅ OK
+📤 src/Views/projetos/etapas/index.php (2854 bytes)
+   ✅ OK
+📤 src/Views/projetos/execucao/index.php (3495 bytes)
+   ✅ OK
+📤 src/Views/projetos/orcamento/index.php (3348 bytes)
+   ✅ OK
+📤 src/Views/servico-valores/create.php (33 bytes)
+   ✅ OK
+📤 src/Views/servico-valores/edit.php (31 bytes)
+   ✅ OK
+📤 src/Views/servico-valores/index.php (6518 bytes)
+   ✅ OK
+📤 src/Views/servico-valores/show.php (31 bytes)
+   ✅ OK
+📤 src/Views/servicos/create.php (26342 bytes)
+   ✅ OK
+📤 src/Views/servicos/edit.php (27369 bytes)
+   ✅ OK
+📤 src/Views/servicos/index.php (23281 bytes)
+   ✅ OK
+📤 src/Views/servicos/show.php (34702 bytes)
+   ✅ OK
+
+📤 assets/:
+--------------------------------------------------------------------------------
+📁 Criado: /public_html/prestadores/assets
+📁 Criado: /public_html/prestadores/assets/css
+📤 assets/css/dashboard.css (5937 bytes)
+   ✅ OK
+📤 assets/css/style.css (9459 bytes)
+   ✅ OK
+📁 Criado: /public_html/prestadores/assets/js
+📤 assets/js/app.js (11859 bytes)
+   ✅ OK
+📤 assets/js/main.js (6848 bytes)
+   ✅ OK
+📤 assets/js/masks.js (8130 bytes)
+   ✅ OK
+📤 assets/js/validations.js (9830 bytes)
+   ✅ OK
+📁 Criado: /public_html/prestadores/assets/images
+
+================================================================================
+📊 ESTATÍSTICAS:
+================================================================================
+✅ Uploaded: 154
+❌ Failed: 0
+⏭️  Skipped: 0
+
+🎉 DEPLOYMENT COMPLETO COM SUCESSO!
