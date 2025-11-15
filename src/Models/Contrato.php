@@ -1,4 +1,4 @@
-<?php
+<?php /* Cache-Buster: 2025-11-15 13:58:50 */
 
 namespace App\Models;
 
@@ -16,7 +16,7 @@ class Contrato {
     private $table = 'contratos';
     
     public function __construct() {
-        $this->db = Database::getInstance();
+        $this->db = Database::getInstance()->getConnection();
     }
     
     /**
@@ -28,6 +28,10 @@ class Contrato {
      * @return array
      */
     public function all($filtros = [], $page = 1, $limit = 25) {
+        // Garantir que são integers para operações matemáticas
+        $page = (int) $page;
+        $limit = (int) $limit;
+        
         $sql = "SELECT 
                     c.*,
                     et.nome_fantasia as tomadora_nome,

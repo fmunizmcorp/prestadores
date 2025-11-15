@@ -1,4 +1,4 @@
-<?php
+<?php /* Cache-Buster: 2025-11-15 13:58:50 */
 
 namespace App\Models;
 
@@ -49,6 +49,9 @@ class Servico {
     }
     
     public function all($filtros = [], $page = 1, $limit = 20) {
+        // Garantir que são integers para operações matemáticas
+        $page = (int) $page;
+        $limit = (int) $limit;
         $offset = ($page - 1) * $limit;
         $where = ["deleted_at IS NULL"];
         $params = [];

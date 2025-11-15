@@ -59,6 +59,82 @@ class Database {
         return $this->connection;
     }
     
+    /**
+     * Wrapper para prepare() - delega para PDO
+     * 
+     * @param string $sql Query SQL com placeholders
+     * @return \PDOStatement
+     */
+    public function prepare(string $sql): \PDOStatement {
+        return $this->connection->prepare($sql);
+    }
+    
+    /**
+     * Wrapper para query() - delega para PDO
+     * 
+     * @param string $sql Query SQL
+     * @return \PDOStatement
+     */
+    public function query(string $sql): \PDOStatement {
+        return $this->connection->query($sql);
+    }
+    
+    /**
+     * Wrapper para exec() - delega para PDO
+     * 
+     * @param string $sql Query SQL
+     * @return int Número de linhas afetadas
+     */
+    public function exec(string $sql): int {
+        return $this->connection->exec($sql);
+    }
+    
+    /**
+     * Wrapper para lastInsertId() - delega para PDO
+     * 
+     * @param string|null $name Nome da sequência
+     * @return string ID do último insert
+     */
+    public function lastInsertId(?string $name = null): string {
+        return $this->connection->lastInsertId($name);
+    }
+    
+    /**
+     * Wrapper para beginTransaction() - delega para PDO
+     * 
+     * @return bool
+     */
+    public function beginTransaction(): bool {
+        return $this->connection->beginTransaction();
+    }
+    
+    /**
+     * Wrapper para commit() - delega para PDO
+     * 
+     * @return bool
+     */
+    public function commit(): bool {
+        return $this->connection->commit();
+    }
+    
+    /**
+     * Wrapper para rollBack() - delega para PDO
+     * 
+     * @return bool
+     */
+    public function rollBack(): bool {
+        return $this->connection->rollBack();
+    }
+    
+    /**
+     * Wrapper para inTransaction() - delega para PDO
+     * 
+     * @return bool
+     */
+    public function inTransaction(): bool {
+        return $this->connection->inTransaction();
+    }
+    
     // Previne clonagem
     private function __clone() {}
     
@@ -67,3 +143,4 @@ class Database {
         throw new \Exception("Não é possível deserializar singleton");
     }
 }
+// Cache-busting FORCE RELOAD: 2025-11-15 19:55:00 Sprint58 CRITICAL FIX
