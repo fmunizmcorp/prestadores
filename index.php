@@ -1,4 +1,4 @@
-<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
+<?php /* Cache-Buster: 2025-11-15 13:16:29 */ 
 /**
  * Clinfec Prestadores - Front Controller
  * Entry Point - VERSÃO HOSTINGER COMPARTILHADA
@@ -101,7 +101,8 @@ try {
             
         // ==================== DASHBOARD ====================
         case 'dashboard':
-            require SRC_PATH . '/views/dashboard/index.php';
+            $controller = new App\Controllers\DashboardController();
+            $controller->index();
             break;
             
         // ==================== EMPRESAS TOMADORAS ====================
