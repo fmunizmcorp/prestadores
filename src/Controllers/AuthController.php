@@ -32,7 +32,14 @@ class AuthController {
         
         if (empty($email) || empty($senha)) {
             $_SESSION['erro'] = 'E-mail e senha são obrigatórios.';
-            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
+            header('Location: /?page=auth&action=showLoginForm');
+            exit;
+        }
+        
+        // Validar reCAPTCHA (Sprint 65)
+        if (!$this->validateRecaptcha()) {
+            $_SESSION['erro'] = 'Validação de segurança falhou. Por favor, tente novamente.';
+            header('Location: /?page=auth&action=showLoginForm');
             exit;
         }
         
@@ -41,19 +48,19 @@ class AuthController {
             
             if (!$usuario) {
                 $_SESSION['erro'] = 'E-mail ou senha inválidos.';
-                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
+                header('Location: /?page=auth&action=showLoginForm');
                 exit;
             }
             
             if (!password_verify($senha, $usuario['senha'])) {
                 $_SESSION['erro'] = 'E-mail ou senha inválidos.';
-                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
+                header('Location: /?page=auth&action=showLoginForm');
                 exit;
             }
             
             if (!$usuario['ativo']) {
                 $_SESSION['erro'] = 'Usuário inativo. Entre em contato com o administrador.';
-                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
+                header('Location: /?page=auth&action=showLoginForm');
                 exit;
             }
             
@@ -69,7 +76,7 @@ class AuthController {
             $this->model->updateLastLogin($usuario['id']);
             
             // DEBUG LOG
-            $redirectUrl = (defined('BASE_URL') ? BASE_URL : '') . '/dashboard';
+            $redirectUrl = '/?page=dashboard';
             error_log("LOGIN SUCCESS - User: {$usuario['email']} - Redirecting to: {$redirectUrl}");
             error_log("BASE_URL constant: " . (defined('BASE_URL') ? BASE_URL : 'NOT DEFINED'));
             error_log("Session created - usuario_id: {$_SESSION['usuario_id']}, usuario_perfil: {$_SESSION['usuario_perfil']}");
@@ -81,7 +88,7 @@ class AuthController {
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao fazer login. Tente novamente.';
             error_log($e->getMessage());
-            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
+            header('Location: /?page=auth&action=showLoginForm');
             exit;
         }
     }
@@ -91,7 +98,7 @@ class AuthController {
      */
     public function logout() {
         session_destroy();
-        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
+        header('Location: /?page=auth&action=showLoginForm');
         exit;
     }
     
@@ -100,7 +107,7 @@ class AuthController {
      */
     public static function checkAuth() {
         if (!isset($_SESSION['usuario_id'])) {
-            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
+            header('Location: /?page=auth&action=showLoginForm');
             exit;
         }
     }
@@ -110,14 +117,88 @@ class AuthController {
      */
     public static function checkRole($roles) {
         if (!isset($_SESSION['usuario_perfil'])) {
-            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
+            header('Location: /?page=auth&action=showLoginForm');
             exit;
         }
         
         if (!in_array($_SESSION['usuario_perfil'], (array)$roles)) {
             $_SESSION['erro'] = 'Você não tem permissão para acessar esta página.';
-            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/dashboard');
+            header('Location: /?page=dashboard');
             exit;
+        }
+    }
+    
+    /**
+     * Validar Google reCAPTCHA v2
+     * Sprint 65 - com opção de skip em desenvolvimento
+     * 
+     * @return bool
+     */
+    private function validateRecaptcha(): bool
+    {
+        // Carregar configurações
+        $config = require __DIR__ . '/../../config/app.php';
+        
+        // Verificar se reCAPTCHA está habilitado
+        if (!$config['recaptcha']['enabled']) {
+            return true;
+        }
+        
+        // Skip em desenvolvimento se configurado
+        if ($config['recaptcha']['skip_in_development']) {
+            error_log('[reCAPTCHA] Validation skipped - Development mode');
+            return true;
+        }
+        
+        // Verificar se o token foi enviado
+        $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
+        
+        if (empty($recaptchaResponse)) {
+            error_log('[reCAPTCHA] Token not provided');
+            return false;
+        }
+        
+        // Validar com API do Google
+        $secretKey = $config['recaptcha']['secret_key'];
+        $verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
+        
+        $data = [
+            'secret' => $secretKey,
+            'response' => $recaptchaResponse,
+            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? ''
+        ];
+        
+        $options = [
+            'http' => [
+                'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method' => 'POST',
+                'content' => http_build_query($data)
+            ]
+        ];
+        
+        $context = stream_context_create($options);
+        $result = file_get_contents($verifyUrl, false, $context);
+        
+        if ($result === false) {
+            error_log('[reCAPTCHA] Failed to connect to Google API');
+            // Em caso de erro na API, permitir login (fail-safe)
+            return true;
+        }
+        
+        $responseData = json_decode($result, true);
+        
+        if (!isset($responseData['success'])) {
+            error_log('[reCAPTCHA] Invalid API response');
+            return true; // fail-safe
+        }
+        
+        if ($responseData['success']) {
+            error_log('[reCAPTCHA] Validation successful');
+            return true;
+        } else {
+            $errors = $responseData['error-codes'] ?? [];
+            error_log('[reCAPTCHA] Validation failed: ' . implode(', ', $errors));
+            return false;
         }
     }
 }

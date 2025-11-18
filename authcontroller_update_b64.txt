@@ -1,0 +1,13 @@
+DEPLOY SPRINT 67 - AUTHCONTROLLER FIX
+
+Este arquivo contém o AuthController corrigido em base64 para upload manual se necessário.
+
+Para usar:
+1. SSH no servidor
+2. cd /opt/webserver/sites/prestadores/src/Controllers
+3. base64 -d <<< "CONTEUDO_BASE64_ABAIXO" > AuthController.php
+4. sudo systemctl reload php8.3-fpm-prestadores
+5. sudo php -r "opcache_reset();"
+
+═══════════════════════════════════════════════════════════════════════
+

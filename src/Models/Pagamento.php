@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Database;
 use PDO;
 
 /**
@@ -53,8 +54,8 @@ class Pagamento
      */
     public function __construct()
     {
-        global $db;
-        $this->db = $db;
+        // SPRINT 73 FIX: Usar Database singleton ao invés de global $db (Bug #24)
+        $this->db = Database::getInstance()->getConnection();
     }
     
     /**

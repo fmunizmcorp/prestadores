@@ -1,0 +1,32 @@
+# Sprint 33 - HTACCESS COMPLETO para subdomínio
+# Configuração para prestadores.clinfec.com.br
+# Todas as requisições roteadas para index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Permitir acesso direto a arquivos e diretórios existentes
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Rotear tudo para index.php
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# Configurações de segurança
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Configurações de cache
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType text/javascript "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+</IfModule>

@@ -9,6 +9,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="/public/css/style.css">
     
+    <!-- Google reCAPTCHA v2 - Sprint 65 -->
+    <?php 
+    $recaptchaConfig = require __DIR__ . '/../../../config/app.php';
+    $recaptchaEnabled = $recaptchaConfig['recaptcha']['enabled'] ?? false;
+    $recaptchaSiteKey = $recaptchaConfig['recaptcha']['site_key'] ?? '';
+    $recaptchaSkipDev = $recaptchaConfig['recaptcha']['skip_in_development'] ?? false;
+    ?>
+    <?php if ($recaptchaEnabled && !empty($recaptchaSiteKey)): ?>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <?php endif; ?>
+    
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -118,6 +129,18 @@
                                     Lembrar-me neste dispositivo
                                 </label>
                             </div>
+                            
+                            <!-- Google reCAPTCHA v2 Widget - Sprint 65 -->
+                            <?php if ($recaptchaEnabled && !empty($recaptchaSiteKey)): ?>
+                            <div class="mb-3 d-flex justify-content-center">
+                                <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars($recaptchaSiteKey) ?>"></div>
+                            </div>
+                            <?php if ($recaptchaSkipDev): ?>
+                            <div class="alert alert-warning alert-sm text-center py-1 mb-3">
+                                <small><i class="fas fa-exclamation-triangle"></i> reCAPTCHA em modo desenvolvimento (validação desabilitada)</small>
+                            </div>
+                            <?php endif; ?>
+                            <?php endif; ?>
                             
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary btn-lg">

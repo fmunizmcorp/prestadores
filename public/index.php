@@ -70,20 +70,16 @@ if (!isset($_SESSION['csrf_token'])) {
 
 spl_autoload_register(function ($class) {
     // Converter namespace para caminho de arquivo
-    // Exemplo: App\Controllers\AuthController → src/controllers/AuthController.php
+    // Exemplo: App\Controllers\AuthController → src/Controllers/AuthController.php
+    // CORREÇÃO SPRINT 72: Remover conversão lowercase para respeitar case-sensitive Linux
     
     // Remover prefixo App\
     if (strpos($class, 'App\\') === 0) {
         $class = substr($class, 4);
     }
     
-    // Converter namespace para caminho
+    // Converter namespace para caminho (mantendo case original)
     $file = SRC_PATH . '/' . str_replace('\\', '/', $class) . '.php';
-    
-    // Converter para lowercase nas pastas (controllers, models, etc)
-    $file = preg_replace_callback('/\/([A-Z][a-z]+)\//', function($matches) {
-        return '/' . strtolower($matches[1]) . '/';
-    }, $file);
     
     // Carregar arquivo se existir
     if (file_exists($file)) {
@@ -140,6 +136,10 @@ try {
 
 // Importar Database manualmente já que migrations estão desabilitadas
 require_once SRC_PATH . '/Database.php';
+
+// ==================== CARREGAR HELPERS ====================
+// SPRINT 68.3.2: Carregar funções auxiliares (incluindo asset())
+require_once SRC_PATH . '/helpers.php';
 
 // ==================== OBTER PARÂMETROS ====================
 
@@ -623,6 +623,164 @@ try {
                     break;
                 default:
                     $controller->index($projetoId);
+            }
+            break;
+            
+        // ==================== PAGAMENTOS ====================
+        // SPRINT 70.1: Módulo de Pagamentos completo
+        case 'pagamentos':
+            require_once SRC_PATH . '/Controllers/PagamentoController.php';
+            $controller = new App\Controllers\PagamentoController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show();
+                    break;
+                case 'confirmar':
+                    $controller->confirmar();
+                    break;
+                case 'estornar':
+                    $controller->estornar();
+                    break;
+                case 'cancelar':
+                    $controller->cancelar();
+                    break;
+                case 'delete':
+                    $controller->delete();
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== CUSTOS ====================
+        // SPRINT 70.2: Módulo de Custos operacionais
+        case 'custos':
+            require_once SRC_PATH . '/Controllers/CustoController.php';
+            $controller = new App\Controllers\CustoController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show();
+                    break;
+                case 'aprovar':
+                    $controller->aprovar();
+                    break;
+                case 'marcar_pago':
+                    $controller->marcar_pago();
+                    break;
+                case 'delete':
+                    $controller->delete();
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== RELATÓRIOS FINANCEIROS ====================
+        // SPRINT 70.3: Módulo de Relatórios Financeiros
+        case 'relatorios-financeiros':
+            require_once SRC_PATH . '/Controllers/RelatorioFinanceiroController.php';
+            $controller = new App\Controllers\RelatorioFinanceiroController();
+            $controller->index();
+            break;
+            
+        // ==================== ATIVIDADES ====================
+        // SPRINT 73: Adicionada rota de atividades (Bug #25)
+        case 'atividades':
+            require_once SRC_PATH . '/Controllers/AtividadeController.php';
+            $controller = new App\Controllers\AtividadeController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show($id);
+                    break;
+                case 'edit':
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'delete':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== RELATÓRIOS ====================
+        // SPRINT 73: Adicionada rota de relatórios (Bug #26)
+        case 'relatorios':
+            require_once SRC_PATH . '/Controllers/RelatorioController.php';
+            $controller = new App\Controllers\RelatorioController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                default:
+                    $controller->index();
+            }
+            break;
+            
+        // ==================== USUÁRIOS ====================
+        // SPRINT 73: Adicionada rota de usuários (Bug #27)
+        case 'usuarios':
+            require_once SRC_PATH . '/Controllers/UsuarioController.php';
+            $controller = new App\Controllers\UsuarioController();
+            
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show($id);
+                    break;
+                case 'edit':
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'delete':
+                    $controller->delete($id);
+                    break;
+                default:
+                    $controller->index();
             }
             break;
             

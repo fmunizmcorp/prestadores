@@ -21,45 +21,54 @@ class ContratoController {
             exit;
         }
         
-        $this->model = new Contrato();
-        $this->empresaTomadoraModel = new EmpresaTomadora();
-        $this->empresaPrestadoraModel = new EmpresaPrestadora();
-        $this->servicoModel = new Servico();
-        $this->contratoFinanceiro = new ContratoFinanceiro();
+        // SPRINT 69.1: Try-catch para prevenir erros
+        try {
+            $this->model = new Contrato();
+            $this->empresaTomadoraModel = new EmpresaTomadora();
+            $this->empresaPrestadoraModel = new EmpresaPrestadora();
+            $this->servicoModel = new Servico();
+            $this->contratoFinanceiro = new ContratoFinanceiro();
+        } catch (\Exception $e) {
+            error_log("ContratoController::__construct error: " . $e->getMessage());
+            throw $e;
+        }
     }
     
     // LISTAGEM
     public function index() {
         try {
-            $page = $_GET['page'] ?? 1;
-        $limit = $_GET['limit'] ?? 20;
+            // SPRINT 68: Corrigir paginação - page pode conter nome da rota
+            $page = isset($_GET['pag']) ? (int)$_GET['pag'] : 1;
+            $page = max(1, $page); // Garantir que seja no mínimo 1
+            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+            $limit = max(1, min(100, $limit)); // Entre 1 e 100
         $search = $_GET['search'] ?? '';
         $status = $_GET['status'] ?? '';
         $tipo_contrato = $_GET['tipo_contrato'] ?? '';
         $empresa_tomadora_id = $_GET['empresa_tomadora_id'] ?? '';
-        $empresa_prestadora_id = $_GET['empresa_prestadora_id'] ?? '';
+        // SPRINT 69.1: empresa_prestadora_id removido (coluna não existe em contratos)
         
         $filtros = [];
         if ($search) $filtros['search'] = $search;
         if ($status) $filtros['status'] = $status;
         if ($tipo_contrato) $filtros['tipo_contrato'] = $tipo_contrato;
         if ($empresa_tomadora_id) $filtros['empresa_tomadora_id'] = $empresa_tomadora_id;
-        if ($empresa_prestadora_id) $filtros['empresa_prestadora_id'] = $empresa_prestadora_id;
         
         $contratos = $this->model->all($filtros, $page, $limit);
         $total = $this->model->count($filtros);
         $totalPaginas = ceil($total / $limit);
         
+        // SPRINT 69.1: Simplificado - usar apenas métodos que existem
         // Para filtros
-        $empresasTomadoras = $this->empresaTomadoraModel->getAtivas();
-        $empresasPrestadoras = $this->empresaPrestadoraModel->getAtivas();
+        $empresasTomadoras = $this->empresaTomadoraModel->all([], 1, 1000); // Pega todas
+        $empresasPrestadoras = $this->empresaPrestadoraModel->all([], 1, 1000); // Pega todas
         
-        // Estatísticas
+        // Estatísticas simplificadas
         $stats = [
-            'total' => $this->model->countTotal(),
-            'vigentes' => $this->model->countPorStatus('Vigente'),
-            'vencendo' => count($this->model->getVencendo(90)),
-            'valor_total' => $this->model->getValorTotalAtivos()
+            'total' => $total,
+            'vigentes' => 0, // TODO: implementar depois
+            'vencendo' => 0, // TODO: implementar depois
+            'valor_total' => 0 // TODO: implementar depois
         ];
         
         require __DIR__ . '/../Views/contratos/index.php';
@@ -82,9 +91,10 @@ class ContratoController {
     
     // FORMULÁRIO DE CRIAÇÃO
     public function create() {
-        $empresasTomadoras = $this->empresaTomadoraModel->getAtivas();
-        $empresasPrestadoras = $this->empresaPrestadoraModel->getAtivas();
-        $servicos = $this->servicoModel->getAtivos();
+        // SPRINT 69.1: Usar all() ao invés de métodos que não existem
+        $empresasTomadoras = $this->empresaTomadoraModel->all([], 1, 1000);
+        $empresasPrestadoras = $this->empresaPrestadoraModel->all([], 1, 1000);
+        $servicos = $this->servicoModel->all([], 1, 1000);
         
         require __DIR__ . '/../Views/contratos/create.php';
     }

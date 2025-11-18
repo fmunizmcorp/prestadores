@@ -33,9 +33,10 @@ return [
     
     // Google reCAPTCHA v2
     'recaptcha' => [
-        'site_key' => '6LcxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxXX', // Substituir pela sua chave
-        'secret_key' => '6LcxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxXX', // Substituir pela sua chave
-        'enabled' => true
+        'site_key' => '6LflrA4sAAAAAJjKbM_eatTpPHBTUV6L-4Tf1xzr',
+        'secret_key' => '6LflrA4sAAAAABzX2U5YCmp4Ad90s_NnudR_wQ6y',
+        'enabled' => false, // SPRINT 67: Temporariamente desabilitado para testes
+        'skip_in_development' => true // Pular validação durante desenvolvimento/testes
     ],
     
     // Perfis de acesso

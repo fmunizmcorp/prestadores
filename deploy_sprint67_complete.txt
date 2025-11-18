@@ -1,0 +1,200 @@
+═══════════════════════════════════════════════════════════════════════
+  SPRINT 67 - INSTRUÇÕES DE DEPLOY COMPLETO
+═══════════════════════════════════════════════════════════════════════
+
+ARQUIVOS QUE PRECISAM SER ATUALIZADOS NO SERVIDOR:
+1. /opt/webserver/sites/prestadores/src/Controllers/AuthController.php
+2. /opt/webserver/sites/prestadores/config/app.php
+
+═══════════════════════════════════════════════════════════════════════
+MÉTODO 1: Deploy Automático via Script (PREFERENCIAL)
+═══════════════════════════════════════════════════════════════════════
+
+Execute este comando NO SERVIDOR como root:
+
+bash <(curl -s https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/scripts/deploy_sprint67.sh)
+
+OU copie o script abaixo e execute no servidor:
+
+───────────────────────────────────────────────────────────────────────
+
+#!/bin/bash
+# SPRINT 67 - Deploy completo (AuthController + Config)
+
+echo "════════════════════════════════════════════════════"
+echo "  SPRINT 67 - DEPLOY COMPLETO"
+echo "════════════════════════════════════════════════════"
+
+cd /opt/webserver/sites/prestadores
+
+# Backup dos arquivos atuais
+echo "📦 Criando backup..."
+cp -v src/Controllers/AuthController.php src/Controllers/AuthController.php.bak.sprint67
+cp -v config/app.php config/app.php.bak.sprint67
+
+# Baixar arquivos do GitHub
+echo ""
+echo "📥 Baixando arquivos do GitHub..."
+
+curl -s -o src/Controllers/AuthController.php \
+  "https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/src/Controllers/AuthControllerDebug.php"
+
+curl -s -o config/app.php \
+  "https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/config/app.php"
+
+# Verificar se os arquivos foram baixados
+if [ -f "src/Controllers/AuthController.php" ] && [ -s "src/Controllers/AuthController.php" ]; then
+    echo "✅ AuthController.php atualizado"
+    ls -lh src/Controllers/AuthController.php
+else
+    echo "❌ ERRO: AuthController.php não foi atualizado"
+    cp src/Controllers/AuthController.php.bak.sprint67 src/Controllers/AuthController.php
+fi
+
+if [ -f "config/app.php" ] && [ -s "config/app.php" ]; then
+    echo "✅ app.php atualizado"
+    ls -lh config/app.php
+else
+    echo "❌ ERRO: app.php não foi atualizado"
+    cp config/app.php.bak.sprint67 config/app.php
+fi
+
+# Ajustar permissões
+echo ""
+echo "🔐 Ajustando permissões..."
+chown -R www-data:www-data src/Controllers/ config/
+chmod 644 src/Controllers/AuthController.php
+chmod 644 config/app.php
+
+# Limpar caches
+echo ""
+echo "🗑️  Limpando caches..."
+
+# Limpar OPcache
+php -r "if(function_exists('opcache_reset')) { opcache_reset(); echo 'OPcache limpo\n'; } else { echo 'OPcache não disponível\n'; }"
+
+# Recarregar PHP-FPM
+echo "🔄 Recarregando PHP-FPM..."
+systemctl reload php8.3-fpm-prestadores.service
+if [ $? -eq 0 ]; then
+    echo "✅ PHP-FPM recarregado com sucesso"
+else
+    echo "❌ ERRO ao recarregar PHP-FPM"
+fi
+
+# Verificar sintaxe dos arquivos PHP
+echo ""
+echo "🔍 Verificando sintaxe dos arquivos..."
+php -l src/Controllers/AuthController.php
+php -l config/app.php
+
+echo ""
+echo "════════════════════════════════════════════════════"
+echo "  DEPLOY CONCLUÍDO"
+echo "════════════════════════════════════════════════════"
+echo ""
+echo "📋 PRÓXIMO PASSO: Testar o login"
+echo "   URL: https://prestadores.clinfec.com.br/?page=login"
+echo "   User: master@clinfec.com.br"
+echo "   Pass: Master123!"
+echo ""
+
+───────────────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════════════
+MÉTODO 2: Deploy Manual (caso o método 1 não funcione)
+═══════════════════════════════════════════════════════════════════════
+
+1. ATUALIZAR AUTHCONTROLLER.PHP:
+
+cd /opt/webserver/sites/prestadores/src/Controllers
+cp AuthController.php AuthController.php.bak.sprint67
+
+# Edite o arquivo e localize a linha 241 (aproximadamente):
+# ANTES:
+if ($config['recaptcha']['skip_in_development']) {
+
+# DEPOIS:
+if (isset($config['recaptcha']['skip_in_development']) && $config['recaptcha']['skip_in_development']) {
+
+───────────────────────────────────────────────────────────────────────
+
+2. ATUALIZAR CONFIG/APP.PHP:
+
+cd /opt/webserver/sites/prestadores/config
+cp app.php app.php.bak.sprint67
+
+# Edite o arquivo e localize a linha com 'enabled' => true,
+# ANTES:
+'enabled' => true,
+
+# DEPOIS:
+'enabled' => false, // SPRINT 67: Temporariamente desabilitado para testes
+
+───────────────────────────────────────────────────────────────────────
+
+3. RECARREGAR SERVIÇOS:
+
+sudo systemctl reload php8.3-fpm-prestadores.service
+sudo php -r "opcache_reset();"
+
+───────────────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════════════
+MÉTODO 3: Deploy via PHP (crie um arquivo temporário)
+═══════════════════════════════════════════════════════════════════════
+
+Copie o conteúdo abaixo e salve como:
+/opt/webserver/sites/prestadores/public_html/deploy_sprint67_temp.php
+
+Depois acesse via navegador:
+https://prestadores.clinfec.com.br/deploy_sprint67_temp.php
+(use credenciais: clinfec / Cf2025api#)
+
+O arquivo fará o deploy automaticamente e se auto-deletará.
+
+[VER ARQUIVO deploy_auth_fix.php no repositório para o conteúdo completo]
+
+═══════════════════════════════════════════════════════════════════════
+VERIFICAÇÃO APÓS DEPLOY
+═══════════════════════════════════════════════════════════════════════
+
+1. Verificar que não há warnings:
+   
+   tail -f /opt/webserver/sites/prestadores/logs/php-error.log
+
+2. Testar login:
+   
+   curl -s -L -c /tmp/cookies.txt -b /tmp/cookies.txt \
+     -X POST \
+     -d "email=master@clinfec.com.br&senha=Master123!" \
+     "https://prestadores.clinfec.com.br/?page=login"
+
+3. Se o login funcionar, você será redirecionado para /?page=dashboard
+   Se falhar, será redirecionado de volta para /?page=login
+
+═══════════════════════════════════════════════════════════════════════
+USUÁRIOS DE TESTE
+═══════════════════════════════════════════════════════════════════════
+
+1. MASTER
+   Email: master@clinfec.com.br
+   Senha: Master123!
+   Role: master
+
+2. ADMIN
+   Email: admin@clinfec.com.br
+   Senha: Admin123!
+   Role: admin
+
+3. GESTOR
+   Email: gestor@clinfec.com.br
+   Senha: Gestor123!
+   Role: gestor
+
+4. USUÁRIO
+   Email: usuario@clinfec.com.br
+   Senha: Usuario123!
+   Role: usuario
+
+═══════════════════════════════════════════════════════════════════════

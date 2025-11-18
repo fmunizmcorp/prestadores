@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Database;
 use PDO;
 
 /**
@@ -38,8 +39,8 @@ class CentroCusto
      */
     public function __construct()
     {
-        global $db;
-        $this->db = $db;
+        // SPRINT 73 FIX: Usar Database singleton ao invés de global $db (Bug #23)
+        $this->db = Database::getInstance()->getConnection();
     }
     
     /**

@@ -22,8 +22,11 @@ class EmpresaPrestadoraController {
     
     // LISTAGEM
     public function index() {
-        $page = $_GET['page'] ?? 1;
-        $limit = $_GET['limit'] ?? 20;
+        // SPRINT 68: Corrigir paginação - page pode conter nome da rota
+        $page = isset($_GET['pag']) ? (int)$_GET['pag'] : 1;
+        $page = max(1, $page); // Garantir que seja no mínimo 1
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+        $limit = max(1, min(100, $limit)); // Entre 1 e 100
         $search = $_GET['search'] ?? '';
         $ativo = $_GET['ativo'] ?? '';
         $cidade = $_GET['cidade'] ?? '';

@@ -1,4 +1,4 @@
-<?php
+<?php /* Cache-Buster: 2025-11-15 13:58:50 */
 
 namespace App\Models;
 
@@ -13,7 +13,7 @@ class Projeto
     
     public function __construct()
     {
-        $this->db = Database::getInstance();
+        $this->db = Database::getInstance()->getConnection();
     }
     
     /**
@@ -22,6 +22,9 @@ class Projeto
     public function all($filtros = [], $page = 1, $limit = 20)
     {
         try {
+            // Garantir que são integers para operações matemáticas
+            $page = (int) $page;
+            $limit = (int) $limit;
             $offset = ($page - 1) * $limit;
             
             $sql = "SELECT 
