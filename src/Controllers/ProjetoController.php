@@ -1,5 +1,4 @@
-<?php
-
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 namespace App\Controllers;
 
 use App\Models\Projeto;
@@ -11,29 +10,58 @@ use App\Models\ProjetoFinanceiro;
 
 class ProjetoController extends BaseController
 {
-    private $projeto;
-    private $categoria;
-    private $tomadora;
-    private $contrato;
-    private $usuario;
-    private $projetoFinanceiro;
+    private $projeto = null;
+    private $categoria = null;
+    private $tomadora = null;
+    private $contrato = null;
+    private $usuario = null;
+    private $projetoFinanceiro = null;
+
+    /**
+     * Lazy getters para models
+     */
+    private function getProjeto() {
+    }
+    
+    private function getCategoria() {
+        if ($this->categoria === null) {
+            $this->categoria = new ProjetoCategoria();
+        }
+        return $this->categoria;
+    }
+    
+    private function getTomadora() {
+        if ($this->tomadora === null) {
+            $this->tomadora = new EmpresaTomadora();
+        }
+        return $this->tomadora;
+    }
+    
+    private function getContrato() {
+        if ($this->contrato === null) {
+            $this->contrato = new Contrato();
+        }
+        return $this->contrato;
+    }
+    
+    private function getUsuario() {
+        if ($this->usuario === null) {
+            $this->usuario = new Usuario();
+        }
+        return $this->usuario;
+    }
+    
+    private function getProjetoFinanceiro() {
+        if ($this->projetoFinanceiro === null) {
+            $this->projetoFinanceiro = new ProjetoFinanceiro();
+        }
+        return $this->projetoFinanceiro;
+    }
 
     public function __construct()
     {
         parent::__construct();
-        
-        try {
-            $this->projeto = new Projeto();
-            $this->categoria = new ProjetoCategoria();
-            $this->tomadora = new EmpresaTomadora();
-            $this->contrato = new Contrato();
-            $this->usuario = new Usuario();
-            $this->projetoFinanceiro = new ProjetoFinanceiro();
-        } catch (\Throwable $e) {
-            error_log("ProjetoController construct error: " . $e->getMessage());
-            // Fallback - minimal initialization
-            $this->projeto = null;
-        }
+        // Models agora são lazy - instanciados apenas quando necessário
     }
 
     /**
@@ -42,10 +70,6 @@ class ProjetoController extends BaseController
     public function index()
     {
         // Fallback if models failed to initialize
-        if ($this->projeto === null) {
-            require ROOT_PATH . '/src/Views/projetos/index_simple.php';
-            return;
-        }
         
         $this->checkPermission(['master', 'admin', 'gestor']);
 
@@ -75,23 +99,23 @@ class ProjetoController extends BaseController
             $filtros['busca'] = $_GET['busca'];
         }
 
-        $projetos = $this->projeto->all($filtros, $page, $limit);
-        $total = $this->projeto->count($filtros);
+        $projetos = $this->getProjeto()->all($filtros, $page, $limit);
+        $total = $this->getProjeto()->count($filtros);
         
         $totalPages = ceil($total / $limit);
 
         // Dados para filtros
-        $categorias = $this->categoria->all();
-        $tomadoras = $this->tomadora->all();
-        $gerentes = $this->usuario->all(['perfil' => ['master', 'admin', 'gestor']]);
+        $categorias = $this->getCategoria()->all();
+        $tomadoras = $this->getTomadora()->all();
+        $gerentes = $this->getUsuario()->all(['perfil' => ['master', 'admin', 'gestor']]);
 
         // Estatísticas
         $stats = [
-            'total' => $this->projeto->countTotal(),
-            'planejamento' => $this->projeto->countPorStatus('planejamento'),
-            'execucao' => $this->projeto->countPorStatus('execucao'),
-            'concluido' => $this->projeto->countPorStatus('concluido'),
-            'atrasados' => count($this->projeto->getAtrasados()),
+            'total' => $this->getProjeto()->countTotal(),
+            'planejamento' => $this->getProjeto()->countPorStatus('planejamento'),
+            'execucao' => $this->getProjeto()->countPorStatus('execucao'),
+            'concluido' => $this->getProjeto()->countPorStatus('concluido'),
+            'atrasados' => count($this->getProjeto()->getAtrasados()),
         ];
 
         $data = [
@@ -119,10 +143,10 @@ class ProjetoController extends BaseController
 
         $data = [
             'titulo' => 'Novo Projeto',
-            'categorias' => $this->categoria->all(),
-            'tomadoras' => $this->tomadora->all(),
-            'contratos' => $this->contrato->all(['status' => 'ativo']),
-            'gerentes' => $this->usuario->all(['perfil' => ['master', 'admin', 'gestor']])
+            'categorias' => $this->getCategoria()->all(),
+            'tomadoras' => $this->getTomadora()->all(),
+            'contratos' => $this->getContrato()->all(['status' => 'ativo']),
+            'gerentes' => $this->getUsuario()->all(['perfil' => ['master', 'admin', 'gestor']])
         ];
 
         $this->render('projetos/create', $data);
@@ -152,7 +176,7 @@ class ProjetoController extends BaseController
 
         if (empty($_POST['codigo'])) {
             $erros[] = 'Código do projeto é obrigatório.';
-        } elseif (!$this->projeto->validateUniqueCodigo($_POST['codigo'])) {
+        } elseif (!$this->getProjeto()->validateUniqueCodigo($_POST['codigo'])) {
             $erros[] = 'Código do projeto já está em uso.';
         }
 
@@ -199,7 +223,7 @@ class ProjetoController extends BaseController
         ];
 
         try {
-            $id = $this->projeto->create($data);
+            $id = $this->getProjeto()->create($data);
             
             $_SESSION['sucesso'] = 'Projeto criado com sucesso!';
             $this->redirect('projetos/show/' . $id);
@@ -217,7 +241,7 @@ class ProjetoController extends BaseController
     {
         $this->checkPermission(['master', 'admin', 'gestor', 'usuario']);
 
-        $projeto = $this->projeto->findById($id);
+        $projeto = $this->getProjeto()->findById($id);
 
         if (!$projeto) {
             $_SESSION['erro'] = 'Projeto não encontrado.';
@@ -226,7 +250,7 @@ class ProjetoController extends BaseController
         }
 
         // Buscar dashboard do projeto
-        $dashboard = $this->projeto->getDashboard($id);
+        $dashboard = $this->getProjeto()->getDashboard($id);
 
         $data = [
             'titulo' => 'Projeto: ' . $projeto['nome'],
@@ -244,7 +268,7 @@ class ProjetoController extends BaseController
     {
         $this->checkPermission(['master', 'admin', 'gestor']);
 
-        $projeto = $this->projeto->findById($id);
+        $projeto = $this->getProjeto()->findById($id);
 
         if (!$projeto) {
             $_SESSION['erro'] = 'Projeto não encontrado.';
@@ -252,8 +276,8 @@ class ProjetoController extends BaseController
             return;
         }
 
-        $dashboard = $this->projeto->getDashboard($id);
-        $stats = $this->projeto->getEstatisticasGerais();
+        $dashboard = $this->getProjeto()->getDashboard($id);
+        $stats = $this->getProjeto()->getEstatisticasGerais();
 
         $data = [
             'titulo' => 'Dashboard - ' . $projeto['nome'],
@@ -272,7 +296,7 @@ class ProjetoController extends BaseController
     {
         $this->checkPermission(['master', 'admin', 'gestor']);
 
-        $projeto = $this->projeto->findById($id);
+        $projeto = $this->getProjeto()->findById($id);
 
         if (!$projeto) {
             $_SESSION['erro'] = 'Projeto não encontrado.';
@@ -283,10 +307,10 @@ class ProjetoController extends BaseController
         $data = [
             'titulo' => 'Editar Projeto',
             'projeto' => $projeto,
-            'categorias' => $this->categoria->all(),
-            'tomadoras' => $this->tomadora->all(),
-            'contratos' => $this->contrato->all(['status' => 'ativo']),
-            'gerentes' => $this->usuario->all(['perfil' => ['master', 'admin', 'gestor']])
+            'categorias' => $this->getCategoria()->all(),
+            'tomadoras' => $this->getTomadora()->all(),
+            'contratos' => $this->getContrato()->all(['status' => 'ativo']),
+            'gerentes' => $this->getUsuario()->all(['perfil' => ['master', 'admin', 'gestor']])
         ];
 
         $this->render('projetos/edit', $data);
@@ -310,7 +334,7 @@ class ProjetoController extends BaseController
             return;
         }
 
-        $projeto = $this->projeto->findById($id);
+        $projeto = $this->getProjeto()->findById($id);
 
         if (!$projeto) {
             $_SESSION['erro'] = 'Projeto não encontrado.';
@@ -323,7 +347,7 @@ class ProjetoController extends BaseController
 
         if (empty($_POST['codigo'])) {
             $erros[] = 'Código do projeto é obrigatório.';
-        } elseif (!$this->projeto->validateUniqueCodigo($_POST['codigo'], $id)) {
+        } elseif (!$this->getProjeto()->validateUniqueCodigo($_POST['codigo'], $id)) {
             $erros[] = 'Código do projeto já está em uso.';
         }
 
@@ -360,7 +384,7 @@ class ProjetoController extends BaseController
         ];
 
         try {
-            $this->projeto->update($id, $data);
+            $this->getProjeto()->update($id, $data);
             
             $_SESSION['sucesso'] = 'Projeto atualizado com sucesso!';
             $this->redirect('projetos/show/' . $id);
@@ -399,7 +423,7 @@ class ProjetoController extends BaseController
         }
 
         try {
-            $this->projeto->alterarStatus($id, $novoStatus, $motivo);
+            $this->getProjeto()->alterarStatus($id, $novoStatus, $motivo);
             
             $_SESSION['sucesso'] = 'Status alterado com sucesso!';
         } catch (\Exception $e) {
@@ -428,7 +452,7 @@ class ProjetoController extends BaseController
         }
 
         try {
-            $this->projeto->delete($id);
+            $this->getProjeto()->delete($id);
             
             $_SESSION['sucesso'] = 'Projeto arquivado com sucesso!';
         } catch (\Exception $e) {
@@ -445,7 +469,7 @@ class ProjetoController extends BaseController
     {
         $this->checkPermission(['master', 'admin', 'gestor', 'usuario']);
 
-        $projeto = $this->projeto->findById($id);
+        $projeto = $this->getProjeto()->findById($id);
 
         if (!$projeto) {
             $_SESSION['erro'] = 'Projeto não encontrado.';
@@ -455,7 +479,7 @@ class ProjetoController extends BaseController
 
         try {
             // Gerar relatório financeiro completo
-            $relatorio = $this->projetoFinanceiro->gerarRelatorioCompleto($id);
+            $relatorio = $this->getProjetoFinanceiro()->gerarRelatorioCompleto($id);
 
             $data = [
                 'titulo' => 'Financeiro - ' . $projeto['nome'],

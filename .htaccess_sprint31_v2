@@ -1,0 +1,20 @@
+# Clinfec Prestadores - Sprint 31 MANUAL INSTALL
+
+RewriteEngine On
+
+# Forçar HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Proteger pastas sensíveis
+RewriteRule ^(config|database|src|docs|vendor|logs)/ - [F,L]
+
+# EXCEÇÃO: Permitir acesso direto a install.php
+RewriteCond %{REQUEST_URI} !^/prestadores/public/install\.php
+
+# Front Controller - Sprint 31
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+Options -Indexes

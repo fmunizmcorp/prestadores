@@ -1,5 +1,4 @@
-<?php
-
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 namespace App\Controllers;
 
 use App\Models\ServicoValor;
@@ -11,7 +10,17 @@ use App\Models\Servico;
  * Gerencia valores de serviços por período com validação de sobreposição
  */
 class ServicoValorController {
-    private $model;
+    private $model = null;
+    
+    /**
+     * Get model (lazy instantiation)
+     */
+    private function getModel() {
+        if ($this->model === null) {
+            $this->model = new ServicoValor();
+        }
+        return $this->model;
+    }
     private $contratoModel;
     private $servicoModel;
     
@@ -20,8 +29,6 @@ class ServicoValorController {
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=login');
             exit;
         }
-        
-        $this->model = new ServicoValor();
         $this->contratoModel = new Contrato();
         $this->servicoModel = new Servico();
     }
@@ -48,8 +55,8 @@ class ServicoValorController {
         
         // Buscar todos os valores do contrato
         $valores = $servicoId 
-            ? $this->model->getByContratoServico($contratoId, $servicoId)
-            : $this->model->getByContrato($contratoId);
+            ? $this->getModel()->getByContratoServico($contratoId, $servicoId)
+            : $this->getModel()->getByContrato($contratoId);
         
         // Buscar serviços disponíveis
         $servicos = $this->servicoModel->getAtivos();
@@ -110,7 +117,7 @@ class ServicoValorController {
         $data = $this->prepareData($_POST);
         
         try {
-            $id = $this->model->create($data);
+            $id = $this->getModel()->create($data);
             
             // Registrar histórico no contrato
             $this->contratoModel->addHistorico($data['contrato_id'], [
@@ -140,7 +147,7 @@ class ServicoValorController {
      * EXIBIR DETALHES
      */
     public function show($id) {
-        $valor = $this->model->findById($id);
+        $valor = $this->getModel()->findById($id);
         
         if (!$valor) {
             $_SESSION['erro'] = 'Valor não encontrado.';
@@ -152,7 +159,7 @@ class ServicoValorController {
         $servico = $this->servicoModel->findById($valor['servico_id']);
         
         // Buscar histórico de valores do mesmo serviço
-        $historico = $this->model->getHistoricoValores($valor['contrato_id'], $valor['servico_id']);
+        $historico = $this->getModel()->getHistoricoValores($valor['contrato_id'], $valor['servico_id']);
         
         require __DIR__ . '/../Views/servico-valores/show.php';
     }
@@ -161,7 +168,7 @@ class ServicoValorController {
      * FORMULÁRIO DE EDIÇÃO
      */
     public function edit($id) {
-        $valor = $this->model->findById($id);
+        $valor = $this->getModel()->findById($id);
         
         if (!$valor) {
             $_SESSION['erro'] = 'Valor não encontrado.';
@@ -194,7 +201,7 @@ class ServicoValorController {
             exit;
         }
         
-        $valor = $this->model->findById($id);
+        $valor = $this->getModel()->findById($id);
         if (!$valor) {
             $_SESSION['erro'] = 'Valor não encontrado.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=contratos');
@@ -215,7 +222,7 @@ class ServicoValorController {
         
         try {
             // Este método fecha o período anterior e cria um novo
-            $this->model->atualizar($id, $data);
+            $this->getModel()->atualizar($id, $data);
             
             // Registrar histórico
             $this->contratoModel->addHistorico($valor['contrato_id'], [
@@ -255,7 +262,7 @@ class ServicoValorController {
             exit;
         }
         
-        $valor = $this->model->findById($id);
+        $valor = $this->getModel()->findById($id);
         if (!$valor) {
             $_SESSION['erro'] = 'Valor não encontrado.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/?page=contratos');
@@ -263,7 +270,7 @@ class ServicoValorController {
         }
         
         try {
-            $this->model->delete($id);
+            $this->getModel()->delete($id);
             
             // Registrar histórico
             $this->contratoModel->addHistorico($valor['contrato_id'], [
@@ -299,7 +306,7 @@ class ServicoValorController {
         }
         
         try {
-            $valor = $this->model->getValorVigente($contratoId, $servicoId, $data);
+            $valor = $this->getModel()->getValorVigente($contratoId, $servicoId, $data);
             
             if ($valor) {
                 echo json_encode(['success' => true, 'valor' => $valor]);
@@ -330,7 +337,7 @@ class ServicoValorController {
         }
         
         try {
-            $sobreposicao = $this->model->verificarSobreposicao(
+            $sobreposicao = $this->getModel()->verificarSobreposicao(
                 $contratoId,
                 $servicoId,
                 $dataInicio,
@@ -389,7 +396,7 @@ class ServicoValorController {
         
         // Verificar sobreposição de períodos
         if (!empty($data['contrato_id']) && !empty($data['servico_id']) && !empty($data['data_inicio'])) {
-            $sobreposicao = $this->model->verificarSobreposicao(
+            $sobreposicao = $this->getModel()->verificarSobreposicao(
                 $data['contrato_id'],
                 $data['servico_id'],
                 $data['data_inicio'],

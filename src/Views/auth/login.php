@@ -1,3 +1,4 @@
+<?php /* Cache-Buster: 2025-11-15 13:15:22 */ ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -68,7 +69,7 @@
                             <?php unset($_SESSION['info']); ?>
                         <?php endif; ?>
                         
-                        <form method="POST" action="<?= (defined('BASE_URL') ? BASE_URL : '') ?>/login" class="needs-validation" novalidate>
+                        <form method="POST" action="/?page=login" class="needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                             
                             <div class="mb-3">

@@ -1,53 +1,48 @@
-# Clinfec Prestadores - Domínio Dedicado
-# Local: public_html/prestadores/.htaccess
-# URL: https://prestadores.clinfec.com.br (raiz)
-
-# Ativar RewriteEngine
-RewriteEngine On
-# RewriteBase / não é necessário (padrão para raiz)
-
-# Forçar HTTPS
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-# Proteger pastas sensíveis
-RewriteRule ^(config|database|src|docs|vendor|logs)/ - [F,L]
-
-# Proteger arquivos sensíveis
-RewriteRule \.(md|json|lock|yml|yaml|ini|log)$ - [F,L]
-
-# Allow direct access to test and debug files
-RewriteRule ^test_.*\.php$ - [L]
-RewriteRule ^capture_error.*\.php$ - [L]
-RewriteRule ^clear_cache\.php$ - [L]
-RewriteRule ^phpinfo_test\.php$ - [L]
-RewriteRule ^diagnose.*\.php$ - [L]
-RewriteRule ^diagnostic.*\.php$ - [L]
-
-# SOLUÇÃO: Redirecionar rotas bloqueadas pela Hostinger para query string
-RewriteRule ^projetos/?(.*)$ public/index.php?route=projetos&path=$1 [QSA,L]
-RewriteRule ^atividades/?(.*)$ public/index.php?route=atividades&path=$1 [QSA,L]
-RewriteRule ^financeiro/?(.*)$ public/index.php?route=financeiro&path=$1 [QSA,L]
-RewriteRule ^notas-fiscais/?(.*)$ public/index.php?route=notas-fiscais&path=$1 [QSA,L]
-
-# Front Controller - Rotear tudo para public/index.php
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ public/index.php [QSA,L]
-
-# Disable directory listing
-Options -Indexes
-
-# Security headers
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-XSS-Protection "1; mode=block"
+# ==================== DESABILITAR OPCACHE COMPLETAMENTE ====================
+<IfModule mod_php.c>
+    php_flag opcache.enable Off
+    php_flag opcache.enable_cli Off
 </IfModule>
 
-# PHP settings
-<IfModule mod_php.c>
-    php_value upload_max_filesize 10M
-    php_value post_max_size 10M
-    php_value max_execution_time 300
+# ==================== HEADERS NO-CACHE ====================
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</IfModule>
+
+# ==================== REWRITE RULES ====================
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Permitir acesso direto a arquivos existentes
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Rotear tudo para index.php
+    RewriteRule ^(.*)$ index.php?route=$1 [QSA,L]
+</IfModule>
+
+# ==================== SEGURANÇA ====================
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Bloquear acesso ao .git
+RedirectMatch 404 /\.git
+
+# ==================== CACHE DE ASSETS ====================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType text/javascript "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
 </IfModule>

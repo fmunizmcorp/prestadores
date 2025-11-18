@@ -1,138 +1,80 @@
 #!/usr/bin/env python3
 """
-FTP EXPLORER - Discover complete FTP structure and upload files
+FTP Explorer - Navegar estrutura FTP Hostinger
 """
-import ftplib
-import os
-import sys
-from datetime import datetime
 
-FTP_SERVER = "ftp.clinfec.com.br"
-FTP_USER = "u673902663.genspark1"
-FTP_PASS = "Genspark1@"
+import ftplib
+import sys
 
 def explore_ftp():
-    print("=== FTP EXPLORER ===\n")
-    
     try:
-        ftp = ftplib.FTP(FTP_SERVER)
-        print(f"✅ Connected to {FTP_SERVER}")
+        # Conectar
+        ftp = ftplib.FTP('ftp.clinfec.com.br')
+        ftp.login('u673902663.genspark1', 'Genspark1@')
         
-        ftp.login(FTP_USER, FTP_PASS)
-        print(f"✅ Logged in as {FTP_USER}\n")
+        print("=== CONECTADO COM SUCESSO ===")
+        print(f"Diretório inicial: {ftp.pwd()}\n")
         
-        pwd = ftp.pwd()
-        print(f"Current Directory: {pwd}\n")
-        
-        # List current directory
-        print("=== ROOT DIRECTORY CONTENTS ===\n")
-        try:
-            files = []
-            ftp.dir(files.append)
-            for line in files:
-                print(line)
-        except Exception as e:
-            print(f"Error listing: {e}")
-        
-        print("\n=== SEARCHING FOR PRESTADORES ===\n")
-        
-        # Try common paths
-        possible_paths = [
-            'prestadores',
-            'public_html/prestadores',
-            'domains/clinfec.com.br/public_html/prestadores',
-            '/prestadores',
-            '/public_html/prestadores',
+        # Tentar ir para domains/clinfec.com.br
+        paths_to_try = [
+            '/',
+            '/domains',
+            '/domains/clinfec.com.br',
+            '/domains/clinfec.com.br/public_html',
+            '/domains/clinfec.com.br/public_html/prestadores',
+            '../domains/clinfec.com.br/public_html/prestadores',
+            '../../domains/clinfec.com.br/public_html/prestadores',
         ]
         
-        prestadores_path = None
-        
-        for path in possible_paths:
-            print(f"Trying: {path} ... ", end='')
+        for path in paths_to_try:
             try:
+                print(f"\n{'='*60}")
+                print(f"Tentando: {path}")
+                print(f"{'='*60}")
+                
                 ftp.cwd(path)
-                print("✅ FOUND!")
-                prestadores_path = ftp.pwd()
-                print(f"Full path: {prestadores_path}\n")
+                current = ftp.pwd()
+                print(f"✅ SUCESSO! Path atual: {current}")
                 
-                print("Contents:")
-                files = []
-                ftp.dir(files.append)
-                for line in files[:20]:  # First 20 items
-                    print(f"  {line}")
+                # Listar conteúdo
+                print("\nArquivos/pastas:")
+                items = []
+                ftp.retrlines('LIST', items.append)
                 
-                # Check for src/Models directory
-                print("\nChecking for src/Models directory...")
-                try:
-                    ftp.cwd('src')
-                    print("  ✅ src/ exists")
-                    try:
-                        ftp.cwd('Models')
-                        print("  ✅ src/Models/ exists")
-                        
-                        print("\n  Current Models:")
-                        files = []
-                        ftp.dir(files.append)
-                        for line in files:
-                            print(f"    {line}")
-                        
-                        ftp.cwd(prestadores_path)  # Go back
-                    except:
-                        print("  ❌ src/Models/ not found")
-                        ftp.cwd(prestadores_path)
-                except:
-                    print("  ❌ src/ not found")
+                for item in items[:20]:  # Mostrar primeiros 20
+                    print(f"  {item}")
                 
-                break
+                if len(items) > 20:
+                    print(f"\n  ... e mais {len(items) - 20} itens")
+                
+            except ftplib.error_perm as e:
+                print(f"❌ Acesso negado: {e}")
             except Exception as e:
-                print(f"❌ Not found")
+                print(f"❌ Erro: {e}")
         
-        if prestadores_path:
-            print(f"\n✅ Prestadores directory located: {prestadores_path}")
-            return ftp, prestadores_path
-        else:
-            print("\n❌ Prestadores directory NOT found")
-            print("\nListing all directories in root:")
-            ftp.cwd(pwd)
+        # Tentar voltar para raiz e listar tudo
+        print(f"\n{'='*60}")
+        print("LISTAGEM COMPLETA DA RAIZ")
+        print(f"{'='*60}")
+        
+        try:
+            ftp.cwd('/')
+            items = []
+            ftp.retrlines('LIST', items.append)
             
-            def list_dirs(ftp, path='', level=0, max_level=2):
-                if level > max_level:
-                    return
-                try:
-                    items = ftp.nlst(path)
-                    for item in items:
-                        basename = os.path.basename(item)
-                        if basename.startswith('.'):
-                            continue
-                        
-                        try:
-                            # Try to CWD to see if it's a directory
-                            current = ftp.pwd()
-                            ftp.cwd(item)
-                            print("  " * level + f"📁 {basename}/")
-                            
-                            if 'prestadores' in basename.lower():
-                                print("  " * level + f"   ⭐ FOUND!")
-                            
-                            ftp.cwd(current)
-                            list_dirs(ftp, item, level + 1, max_level)
-                        except:
-                            print("  " * level + f"📄 {basename}")
-                except Exception as e:
-                    pass
-            
-            list_dirs(ftp)
-            
-            return ftp, None
+            for item in items:
+                print(f"  {item}")
+                
+        except Exception as e:
+            print(f"Erro ao listar raiz: {e}")
+        
+        ftp.quit()
         
     except Exception as e:
-        print(f"❌ ERROR: {e}")
-        import traceback
-        traceback.print_exc()
-        return None, None
+        print(f"ERRO FATAL: {e}")
+        return 1
+    
+    return 0
 
-if __name__ == "__main__":
-    ftp, path = explore_ftp()
-    if ftp:
-        ftp.quit()
-    print("\n=== EXPLORATION COMPLETE ===")
+if __name__ == '__main__':
+    sys.exit(explore_ftp())

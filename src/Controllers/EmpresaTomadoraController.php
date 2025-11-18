@@ -1,11 +1,20 @@
-<?php
-
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 namespace App\Controllers;
 
 use App\Models\EmpresaTomadora;
 
 class EmpresaTomadoraController {
-    private $model;
+    private $model = null;
+    
+    /**
+     * Get model (lazy instantiation)
+     */
+    private function getModel() {
+        if ($this->model === null) {
+            $this->model = new EmpresaTomadora();
+        }
+        return $this->model;
+    }
     
     public function __construct() {
         // Verificar se usuário está autenticado
@@ -13,8 +22,6 @@ class EmpresaTomadoraController {
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
             exit;
         }
-        
-        $this->model = new EmpresaTomadora();
     }
     
     // LISTAGEM
@@ -33,14 +40,14 @@ class EmpresaTomadoraController {
             if ($cidade) $filtros['cidade'] = $cidade;
             if ($estado) $filtros['estado'] = $estado;
             
-            $empresas = $this->model->all($filtros, $page, $limit);
-            $total = $this->model->count($filtros);
+            $empresas = $this->getModel()->all($filtros, $page, $limit);
+            $total = $this->getModel()->count($filtros);
             $totalPaginas = ceil($total / $limit);
             
             // Estatísticas para o dashboard
             $stats = [
-                'total' => $this->model->countTotal(),
-                'ativas' => $this->model->countAtivas()
+                'total' => $this->getModel()->countTotal(),
+                'ativas' => $this->getModel()->countAtivas()
             ];
             
             require __DIR__ . '/../Views/empresas-tomadoras/index.php';
@@ -94,12 +101,12 @@ class EmpresaTomadoraController {
         } else {
             // Validar formato do CNPJ
             $cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
-            if (!$this->model->validateCnpj($cnpj)) {
+            if (!$this->getModel()->validateCnpj($cnpj)) {
                 $erros[] = 'CNPJ inválido.';
             }
             
             // Validar unicidade do CNPJ
-            if (!$this->model->validateUniqueCnpj($cnpj)) {
+            if (!$this->getModel()->validateUniqueCnpj($cnpj)) {
                 $erros[] = 'CNPJ já cadastrado.';
             }
         }
@@ -167,7 +174,7 @@ class EmpresaTomadoraController {
         ];
         
         try {
-            $id = $this->model->create($data);
+            $id = $this->getModel()->create($data);
             $_SESSION['sucesso'] = 'Empresa Tomadora cadastrada com sucesso!';
             header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$id");
             exit;
@@ -181,7 +188,7 @@ class EmpresaTomadoraController {
     
     // EXIBIR DETALHES DA EMPRESA
     public function show($id) {
-        $empresa = $this->model->findById($id);
+        $empresa = $this->getModel()->findById($id);
         
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
@@ -190,19 +197,19 @@ class EmpresaTomadoraController {
         }
         
         // Buscar responsáveis
-        $responsaveis = $this->model->getResponsaveis($id);
+        $responsaveis = $this->getModel()->getResponsaveis($id);
         
         // Buscar documentos
-        $documentos = $this->model->getDocumentos($id);
+        $documentos = $this->getModel()->getDocumentos($id);
         
         // Buscar contratos (se existir)
         $totalContratos = method_exists($this->model, 'getContratosPorEmpresa') 
-            ? $this->model->getContratosPorEmpresa($id) 
+            ? $this->getModel()->getContratosPorEmpresa($id) 
             : 0;
         
         // Buscar projetos (se existir)
         $totalProjetos = method_exists($this->model, 'getProjetosPorEmpresa') 
-            ? $this->model->getProjetosPorEmpresa($id) 
+            ? $this->getModel()->getProjetosPorEmpresa($id) 
             : 0;
         
         require __DIR__ . '/../Views/empresas-tomadoras/show.php';
@@ -210,7 +217,7 @@ class EmpresaTomadoraController {
     
     // EXIBIR FORMULÁRIO DE EDIÇÃO
     public function edit($id) {
-        $empresa = $this->model->findById($id);
+        $empresa = $this->getModel()->findById($id);
         
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
@@ -235,7 +242,7 @@ class EmpresaTomadoraController {
             exit;
         }
         
-        $empresa = $this->model->findById($id);
+        $empresa = $this->getModel()->findById($id);
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
@@ -257,11 +264,11 @@ class EmpresaTomadoraController {
             $erros[] = 'CNPJ é obrigatório.';
         } else {
             $cnpj = preg_replace('/[^0-9]/', '', $_POST['cnpj']);
-            if (!$this->model->validateCnpj($cnpj)) {
+            if (!$this->getModel()->validateCnpj($cnpj)) {
                 $erros[] = 'CNPJ inválido.';
             }
             
-            if (!$this->model->validateUniqueCnpj($cnpj, $id)) {
+            if (!$this->getModel()->validateUniqueCnpj($cnpj, $id)) {
                 $erros[] = 'CNPJ já cadastrado para outra empresa.';
             }
         }
@@ -328,7 +335,7 @@ class EmpresaTomadoraController {
         ];
         
         try {
-            $this->model->update($id, $data);
+            $this->getModel()->update($id, $data);
             $_SESSION['sucesso'] = 'Empresa atualizada com sucesso!';
             header("Location: " . (defined('BASE_URL') ? BASE_URL : '') . "/empresas-tomadoras/$id");
             exit;
@@ -354,7 +361,7 @@ class EmpresaTomadoraController {
             exit;
         }
         
-        $empresa = $this->model->findById($id);
+        $empresa = $this->getModel()->findById($id);
         if (!$empresa) {
             $_SESSION['erro'] = 'Empresa não encontrada.';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
@@ -362,7 +369,7 @@ class EmpresaTomadoraController {
         }
         
         try {
-            $this->model->delete($id);
+            $this->getModel()->delete($id);
             $_SESSION['sucesso'] = 'Empresa excluída com sucesso!';
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/empresas-tomadoras');
             exit;
@@ -409,7 +416,7 @@ class EmpresaTomadoraController {
         ];
         
         try {
-            $this->model->addResponsavel($empresaId, $data);
+            $this->getModel()->addResponsavel($empresaId, $data);
             $_SESSION['sucesso'] = 'Responsável adicionado com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao adicionar responsável: ' . $e->getMessage();
@@ -426,7 +433,7 @@ class EmpresaTomadoraController {
         }
         
         try {
-            $this->model->deleteResponsavel($responsavelId);
+            $this->getModel()->deleteResponsavel($responsavelId);
             $_SESSION['sucesso'] = 'Responsável removido com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao remover responsável: ' . $e->getMessage();
@@ -472,7 +479,7 @@ class EmpresaTomadoraController {
         ];
         
         try {
-            $this->model->addDocumento($empresaId, $data);
+            $this->getModel()->addDocumento($empresaId, $data);
             $_SESSION['sucesso'] = 'Documento adicionado com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao adicionar documento: ' . $e->getMessage();
@@ -489,7 +496,7 @@ class EmpresaTomadoraController {
         }
         
         try {
-            $this->model->deleteDocumento($documentoId);
+            $this->getModel()->deleteDocumento($documentoId);
             $_SESSION['sucesso'] = 'Documento removido com sucesso!';
         } catch (\Exception $e) {
             $_SESSION['erro'] = 'Erro ao remover documento: ' . $e->getMessage();

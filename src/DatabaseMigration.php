@@ -2,6 +2,8 @@
 /**
  * Sistema de Migrations Automáticas
  * Verifica e aplica atualizações do banco de dados automaticamente
+ * Version: 1.0.1 - Sprint 23 - Fixed getInstance()->getConnection()
+ * Last update: 2025-11-13 16:30:00
  */
 
 namespace App;

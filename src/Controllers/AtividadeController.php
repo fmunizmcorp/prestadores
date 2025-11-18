@@ -1,5 +1,4 @@
-<?php
-
+<?php /* Cache-Buster: 2025-11-15 12:18:13 */ 
 namespace App\Controllers;
 
 use App\Models\Atividade;
@@ -9,24 +8,46 @@ use App\Models\AtividadeFinanceiro;
 
 class AtividadeController extends BaseController
 {
-    private $atividade;
-    private $projeto;
-    private $usuario;
-    private $atividadeFinanceiro;
+    private $atividade = null;
+    private $projeto = null;
+    private $usuario = null;
+    private $atividadeFinanceiro = null;
+
+    /**
+     * Lazy getters
+     */
+    private function getAtividade() {
+        if ($this->atividade === null) {
+            $this->atividade = new Atividade();
+        }
+        return $this->atividade;
+    }
+    
+    private function getProjeto() {
+        if ($this->projeto === null) {
+            $this->projeto = new Projeto();
+        }
+        return $this->projeto;
+    }
+    
+    private function getUsuario() {
+        if ($this->usuario === null) {
+            $this->usuario = new Usuario();
+        }
+        return $this->usuario;
+    }
+    
+    private function getAtividadeFinanceiro() {
+        if ($this->atividadeFinanceiro === null) {
+            $this->atividadeFinanceiro = new AtividadeFinanceiro();
+        }
+        return $this->atividadeFinanceiro;
+    }
 
     public function __construct()
     {
         parent::__construct();
-        
-        try {
-            $this->atividade = new Atividade();
-            $this->projeto = new Projeto();
-            $this->usuario = new Usuario();
-            $this->atividadeFinanceiro = new AtividadeFinanceiro();
-        } catch (\Throwable $e) {
-            error_log("AtividadeController construct error: " . $e->getMessage());
-            $this->atividade = null;
-        }
+        // Models lazy - instanciados apenas quando necessário
     }
 
     /**
@@ -63,21 +84,21 @@ class AtividadeController extends BaseController
             $filtros['busca'] = $_GET['busca'];
         }
 
-        $atividades = $this->atividade->all($filtros, $page, $limit);
-        $total = $this->atividade->count($filtros);
+        $atividades = $this->getAtividade()->all($filtros, $page, $limit);
+        $total = $this->getAtividade()->count($filtros);
         
         $totalPages = ceil($total / $limit);
 
         // Dados para filtros
-        $projetos = $this->projeto->all();
-        $usuarios = $this->usuario->all();
+        $projetos = $this->getProjeto()->all();
+        $usuarios = $this->getUsuario()->all();
 
         // Estatísticas
         $stats = [
-            'total' => $this->atividade->countTotal(),
-            'pendente' => $this->atividade->countPorStatus('pendente'),
-            'em_andamento' => $this->atividade->countPorStatus('em_andamento'),
-            'concluida' => $this->atividade->countPorStatus('concluida'),
+            'total' => $this->getAtividade()->countTotal(),
+            'pendente' => $this->getAtividade()->countPorStatus('pendente'),
+            'em_andamento' => $this->getAtividade()->countPorStatus('em_andamento'),
+            'concluida' => $this->getAtividade()->countPorStatus('concluida'),
         ];
 
         $data = [
@@ -104,8 +125,8 @@ class AtividadeController extends BaseController
 
         $data = [
             'titulo' => 'Nova Atividade',
-            'projetos' => $this->projeto->all(),
-            'usuarios' => $this->usuario->all()
+            'projetos' => $this->getProjeto()->all(),
+            'usuarios' => $this->getUsuario()->all()
         ];
 
         $this->render('atividades/create', $data);
@@ -164,7 +185,7 @@ class AtividadeController extends BaseController
         ];
 
         try {
-            $id = $this->atividade->create($data);
+            $id = $this->getAtividade()->create($data);
             
             $_SESSION['sucesso'] = 'Atividade criada com sucesso!';
             $this->redirect('atividades/show/' . $id);
@@ -182,7 +203,7 @@ class AtividadeController extends BaseController
     {
         $this->checkPermission(['master', 'admin', 'gestor', 'usuario']);
 
-        $atividade = $this->atividade->findById($id);
+        $atividade = $this->getAtividade()->findById($id);
 
         if (!$atividade) {
             $_SESSION['erro'] = 'Atividade não encontrada.';
@@ -205,7 +226,7 @@ class AtividadeController extends BaseController
     {
         $this->checkPermission(['master', 'admin', 'gestor']);
 
-        $atividade = $this->atividade->findById($id);
+        $atividade = $this->getAtividade()->findById($id);
 
         if (!$atividade) {
             $_SESSION['erro'] = 'Atividade não encontrada.';
@@ -216,8 +237,8 @@ class AtividadeController extends BaseController
         $data = [
             'titulo' => 'Editar Atividade',
             'atividade' => $atividade,
-            'projetos' => $this->projeto->all(),
-            'usuarios' => $this->usuario->all()
+            'projetos' => $this->getProjeto()->all(),
+            'usuarios' => $this->getUsuario()->all()
         ];
 
         $this->render('atividades/edit', $data);
@@ -241,7 +262,7 @@ class AtividadeController extends BaseController
             return;
         }
 
-        $atividade = $this->atividade->findById($id);
+        $atividade = $this->getAtividade()->findById($id);
 
         if (!$atividade) {
             $_SESSION['erro'] = 'Atividade não encontrada.';
@@ -276,7 +297,7 @@ class AtividadeController extends BaseController
         ];
 
         try {
-            $this->atividade->update($id, $data);
+            $this->getAtividade()->update($id, $data);
             
             $_SESSION['sucesso'] = 'Atividade atualizada com sucesso!';
             $this->redirect('atividades/show/' . $id);
@@ -314,7 +335,7 @@ class AtividadeController extends BaseController
         }
 
         try {
-            $this->atividade->alterarStatus($id, $novoStatus);
+            $this->getAtividade()->alterarStatus($id, $novoStatus);
             
             $_SESSION['sucesso'] = 'Status alterado com sucesso!';
         } catch (\Exception $e) {
@@ -343,7 +364,7 @@ class AtividadeController extends BaseController
         }
 
         try {
-            $this->atividade->delete($id);
+            $this->getAtividade()->delete($id);
             
             $_SESSION['sucesso'] = 'Atividade removida com sucesso!';
         } catch (\Exception $e) {
@@ -360,7 +381,7 @@ class AtividadeController extends BaseController
     {
         $this->checkPermission(['master', 'admin', 'gestor', 'usuario']);
 
-        $atividade = $this->atividade->findById($id);
+        $atividade = $this->getAtividade()->findById($id);
 
         if (!$atividade) {
             $_SESSION['erro'] = 'Atividade não encontrada.';
@@ -370,7 +391,7 @@ class AtividadeController extends BaseController
 
         try {
             // Gerar relatório financeiro completo
-            $relatorio = $this->atividadeFinanceiro->gerarRelatorioCompleto($id);
+            $relatorio = $this->getAtividadeFinanceiro()->gerarRelatorioCompleto($id);
 
             $data = [
                 'titulo' => 'Custos - ' . $atividade['titulo'],

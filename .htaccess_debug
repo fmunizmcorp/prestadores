@@ -1,0 +1,20 @@
+# Clinfec Prestadores - Sprint 30 DEBUG
+# REWRITE COMPLETAMENTE DESABILITADO PARA TESTES
+
+# Ativar RewriteEngine mas deixar passar tudo
+RewriteEngine Off
+
+# Proteger pastas sensíveis
+<FilesMatch "^(config|database|src|docs|vendor|logs)/">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Desabilitar listagem de diretórios
+Options -Indexes
+
+# Proteção de arquivos ocultos
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

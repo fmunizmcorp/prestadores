@@ -1,0 +1,417 @@
+================================================================================
+🚀 SPRINT 33 - DEPLOYMENT COMPLETO DO SISTEMA
+================================================================================
+📅 Data: 2025-11-15 03:18:26
+📂 Local: /home/user/webapp
+🌐 Remoto: ftp.clinfec.com.br/public_html/prestadores
+================================================================================
+
+🔌 Conectando ao servidor FTP: ftp.clinfec.com.br
+✅ Conectado com sucesso!
+
+📁 Mudando para: /public_html/prestadores
+
+================================================================================
+📤 INICIANDO DEPLOYMENT
+================================================================================
+
+
+📁 Deployando pasta: config/
+--------------------------------------------------------------------------------
+📤 [1] config/database.php (523 bytes)
+   ✅ Sucesso!
+📤 [2] config/app.php (2205 bytes)
+   ✅ Sucesso!
+📤 [3] config/version.php (1767 bytes)
+   ✅ Sucesso!
+📤 [4] config/config.php (2983 bytes)
+   ✅ Sucesso!
+📤 [5] config/cache_control.php (1956 bytes)
+   ✅ Sucesso!
+
+📁 Deployando pasta: src/
+--------------------------------------------------------------------------------
+📤 [6] src/Database.php (3826 bytes)
+   ✅ Sucesso!
+📤 [7] src/DatabaseMigration.php (10815 bytes)
+   ✅ Sucesso!
+📤 [8] src/helpers.php (4646 bytes)
+   ✅ Sucesso!
+📤 [9] src/Controllers/AtividadeController.php (11478 bytes)
+   ✅ Sucesso!
+📤 [10] src/Controllers/AuthController.php (4177 bytes)
+   ✅ Sucesso!
+📤 [11] src/Controllers/BaseController.php (3662 bytes)
+   ✅ Sucesso!
+📤 [12] src/Controllers/ContratoController.php (29048 bytes)
+   ✅ Sucesso!
+📤 [13] src/Controllers/EmpresaPrestadoraController.php (21742 bytes)
+   ✅ Sucesso!
+📤 [14] src/Controllers/EmpresaTomadoraController.php (24511 bytes)
+   ✅ Sucesso!
+📤 [15] src/Controllers/FinanceiroController.php (52449 bytes)
+   ✅ Sucesso!
+📤 [16] src/Controllers/NotaFiscalController.php (32894 bytes)
+   ✅ Sucesso!
+📤 [17] src/Controllers/ProjetoController.php (15240 bytes)
+   ✅ Sucesso!
+📤 [18] src/Controllers/ProjetoEquipeController.php (4692 bytes)
+   ✅ Sucesso!
+📤 [19] src/Controllers/ProjetoEtapaController.php (5410 bytes)
+   ✅ Sucesso!
+📤 [20] src/Controllers/ProjetoExecucaoController.php (5127 bytes)
+   ✅ Sucesso!
+📤 [21] src/Controllers/ProjetoOrcamentoController.php (5005 bytes)
+   ✅ Sucesso!
+📤 [22] src/Controllers/ServicoController.php (16245 bytes)
+   ✅ Sucesso!
+📤 [23] src/Controllers/ServicoValorController.php (16389 bytes)
+   ✅ Sucesso!
+📤 [24] src/Controllers/DashboardController.php (13332 bytes)
+   ✅ Sucesso!
+📤 [25] src/Controllers/UsuarioController.php (13279 bytes)
+   ✅ Sucesso!
+📤 [26] src/Helpers/FluxoCaixaHelper.php (16486 bytes)
+   ✅ Sucesso!
+📤 [27] src/Models/Atividade.php (26200 bytes)
+   ✅ Sucesso!
+📤 [28] src/Models/AtividadeFinanceiro.php (8500 bytes)
+   ✅ Sucesso!
+📤 [29] src/Models/Boleto.php (36869 bytes)
+   ✅ Sucesso!
+📤 [30] src/Models/CategoriaFinanceira.php (17587 bytes)
+   ✅ Sucesso!
+📤 [31] src/Models/CentroCusto.php (19558 bytes)
+   ✅ Sucesso!
+📤 [32] src/Models/Cliente.php (6884 bytes)
+   ✅ Sucesso!
+📤 [33] src/Models/ConciliacaoBancaria.php (28287 bytes)
+   ✅ Sucesso!
+📤 [34] src/Models/ContaPagar.php (30654 bytes)
+   ✅ Sucesso!
+📤 [35] src/Models/ContaReceber.php (34906 bytes)
+   ✅ Sucesso!
+📤 [36] src/Models/Contrato.php (31738 bytes)
+   ✅ Sucesso!
+📤 [37] src/Models/ContratoFinanceiro.php (14677 bytes)
+   ✅ Sucesso!
+📤 [38] src/Models/Documento.php (11842 bytes)
+   ✅ Sucesso!
+📤 [39] src/Models/Empresa.php (7807 bytes)
+   ✅ Sucesso!
+📤 [40] src/Models/EmpresaPrestadora.php (17049 bytes)
+   ✅ Sucesso!
+📤 [41] src/Models/EmpresaTomadora.php (27985 bytes)
+   ✅ Sucesso!
+📤 [42] src/Models/Fornecedor.php (6465 bytes)
+   ✅ Sucesso!
+📤 [43] src/Models/LancamentoFinanceiro.php (35845 bytes)
+   ✅ Sucesso!
+📤 [44] src/Models/NotaFiscal.php (30805 bytes)
+   ✅ Sucesso!
+📤 [45] src/Models/Pagamento.php (31158 bytes)
+   ✅ Sucesso!
+📤 [46] src/Models/Projeto.php (30457 bytes)
+   ✅ Sucesso!
+📤 [47] src/Models/ProjetoAnexo.php (5381 bytes)
+   ✅ Sucesso!
+📤 [48] src/Models/ProjetoAvaliacao.php (6035 bytes)
+   ✅ Sucesso!
+📤 [49] src/Models/ProjetoCategoria.php (2936 bytes)
+   ✅ Sucesso!
+📤 [50] src/Models/ProjetoEquipe.php (12851 bytes)
+   ✅ Sucesso!
+📤 [51] src/Models/ProjetoEtapa.php (18659 bytes)
+   ✅ Sucesso!
+📤 [52] src/Models/ProjetoExecucao.php (9483 bytes)
+   ✅ Sucesso!
+📤 [53] src/Models/ProjetoFinanceiro.php (13718 bytes)
+   ✅ Sucesso!
+📤 [54] src/Models/ProjetoOrcamento.php (14080 bytes)
+   ✅ Sucesso!
+📤 [55] src/Models/ProjetoRisco.php (3968 bytes)
+   ✅ Sucesso!
+📤 [56] src/Models/ProjetoTemplate.php (8960 bytes)
+   ✅ Sucesso!
+📤 [57] src/Models/Responsavel.php (7869 bytes)
+   ✅ Sucesso!
+📤 [58] src/Models/Servico.php (15721 bytes)
+   ✅ Sucesso!
+📤 [59] src/Models/ServicoValor.php (16651 bytes)
+   ✅ Sucesso!
+📤 [60] src/Models/Usuario.php (8888 bytes)
+   ✅ Sucesso!
+📤 [61] src/Models/BaseModel.php (1318 bytes)
+   ✅ Sucesso!
+📤 [62] src/Models/NotaFiscal.php.bak_fallback_v1 (9218 bytes)
+   ✅ Sucesso!
+📤 [63] src/Models/NotaFiscal_SIMPLE_FALLBACK.php (9218 bytes)
+   ✅ Sucesso!
+📤 [64] src/Models/Atividade_BACKUP.php (26200 bytes)
+   ✅ Sucesso!
+📤 [65] src/Models/NotaFiscal_BACKUP.php (30805 bytes)
+   ✅ Sucesso!
+📤 [66] src/Models/Projeto_BACKUP.php (30457 bytes)
+   ✅ Sucesso!
+📤 [67] src/Views/atividades/custos.php (21234 bytes)
+   ✅ Sucesso!
+📤 [68] src/Views/atividades/index.php (12474 bytes)
+   ✅ Sucesso!
+📤 [69] src/Views/atividades/index_simple.php (1344 bytes)
+   ✅ Sucesso!
+📤 [70] src/Views/atividades/minimal.php (1794 bytes)
+   ✅ Sucesso!
+📤 [71] src/Views/auth/forgot_password.php (2457 bytes)
+   ✅ Sucesso!
+📤 [72] src/Views/auth/login.php (8613 bytes)
+   ✅ Sucesso!
+📤 [73] src/Views/auth/register.php (4993 bytes)
+   ✅ Sucesso!
+📤 [74] src/Views/auth/reset_password.php (3136 bytes)
+   ✅ Sucesso!
+📤 [75] src/Views/usuarios/index.php (7952 bytes)
+   ✅ Sucesso!
+📤 [76] src/Views/usuarios/create.php (5122 bytes)
+   ✅ Sucesso!
+📤 [77] src/Views/contratos/create.php (24254 bytes)
+   ✅ Sucesso!
+📤 [78] src/Views/contratos/edit.php (24819 bytes)
+   ✅ Sucesso!
+📤 [79] src/Views/contratos/faturamento.php (17631 bytes)
+   ✅ Sucesso!
+📤 [80] src/Views/contratos/index.php (26144 bytes)
+   ✅ Sucesso!
+📤 [81] src/Views/contratos/show.php (32461 bytes)
+   ✅ Sucesso!
+📤 [82] src/Views/dashboard/index.php (23892 bytes)
+   ✅ Sucesso!
+📤 [83] src/Views/empresas-prestadoras/create.php (16231 bytes)
+   ✅ Sucesso!
+📤 [84] src/Views/empresas-prestadoras/edit.php (16734 bytes)
+   ✅ Sucesso!
+📤 [85] src/Views/empresas-prestadoras/index.php (16143 bytes)
+   ✅ Sucesso!
+📤 [86] src/Views/empresas-prestadoras/show.php (28832 bytes)
+   ✅ Sucesso!
+📤 [87] src/Views/empresas-tomadoras/create.php (16215 bytes)
+   ✅ Sucesso!
+📤 [88] src/Views/empresas-tomadoras/edit.php (16718 bytes)
+   ✅ Sucesso!
+📤 [89] src/Views/empresas-tomadoras/index.php (13179 bytes)
+   ✅ Sucesso!
+📤 [90] src/Views/empresas-tomadoras/show.php (28809 bytes)
+   ✅ Sucesso!
+📤 [91] src/Views/financeiro/boletos/index.php (10471 bytes)
+   ✅ Sucesso!
+📤 [92] src/Views/financeiro/boletos/show.php (13941 bytes)
+   ✅ Sucesso!
+📤 [93] src/Views/financeiro/categorias/create.php (13931 bytes)
+   ✅ Sucesso!
+📤 [94] src/Views/financeiro/categorias/edit.php (16052 bytes)
+   ✅ Sucesso!
+📤 [95] src/Views/financeiro/categorias/index.php (15646 bytes)
+   ✅ Sucesso!
+📤 [96] src/Views/financeiro/conciliacoes/importar.php (14926 bytes)
+   ✅ Sucesso!
+📤 [97] src/Views/financeiro/conciliacoes/index.php (8492 bytes)
+   ✅ Sucesso!
+📤 [98] src/Views/financeiro/conciliacoes/show.php (19942 bytes)
+   ✅ Sucesso!
+📤 [99] src/Views/financeiro/contas_pagar/create.php (15117 bytes)
+   ✅ Sucesso!
+📤 [100] src/Views/financeiro/contas_pagar/edit.php (18859 bytes)
+   ✅ Sucesso!
+📤 [101] src/Views/financeiro/contas_pagar/index.php (14736 bytes)
+   ✅ Sucesso!
+📤 [102] src/Views/financeiro/contas_pagar/show.php (22338 bytes)
+   ✅ Sucesso!
+📤 [103] src/Views/financeiro/contas_receber/create.php (19509 bytes)
+   ✅ Sucesso!
+📤 [104] src/Views/financeiro/contas_receber/edit.php (25208 bytes)
+   ✅ Sucesso!
+📤 [105] src/Views/financeiro/contas_receber/index.php (16685 bytes)
+   ✅ Sucesso!
+📤 [106] src/Views/financeiro/contas_receber/show.php (26341 bytes)
+   ✅ Sucesso!
+📤 [107] src/Views/financeiro/fluxo_caixa/index.php (15826 bytes)
+   ✅ Sucesso!
+📤 [108] src/Views/financeiro/index.php (12716 bytes)
+   ✅ Sucesso!
+📤 [109] src/Views/financeiro/index_simple.php (1382 bytes)
+   ✅ Sucesso!
+📤 [110] src/Views/financeiro/lancamentos/create.php (19922 bytes)
+   ✅ Sucesso!
+📤 [111] src/Views/financeiro/lancamentos/index.php (16664 bytes)
+   ✅ Sucesso!
+📤 [112] src/Views/financeiro/minimal.php (1801 bytes)
+   ✅ Sucesso!
+📤 [113] src/Views/financeiro/notas_fiscais/create.php (29159 bytes)
+   ✅ Sucesso!
+📤 [114] src/Views/financeiro/notas_fiscais/edit.php (27433 bytes)
+   ✅ Sucesso!
+📤 [115] src/Views/financeiro/notas_fiscais/index.php (11829 bytes)
+   ✅ Sucesso!
+📤 [116] src/Views/financeiro/notas_fiscais/show.php (27935 bytes)
+   ✅ Sucesso!
+📤 [117] src/Views/financeiro/relatorios/balancete.php (9992 bytes)
+   ✅ Sucesso!
+📤 [118] src/Views/financeiro/relatorios/dre.php (13802 bytes)
+   ✅ Sucesso!
+📤 [119] src/Views/layout/footer.php (638 bytes)
+   ✅ Sucesso!
+📤 [120] src/Views/layout/header.php (917 bytes)
+   ✅ Sucesso!
+📤 [121] src/Views/layouts/footer.php (6794 bytes)
+   ✅ Sucesso!
+📤 [122] src/Views/layouts/header.php (10888 bytes)
+   ✅ Sucesso!
+📤 [123] src/Views/notas_fiscais/index_simple.php (1390 bytes)
+   ✅ Sucesso!
+📤 [124] src/Views/notas_fiscais/minimal.php (1803 bytes)
+   ✅ Sucesso!
+📤 [125] src/Views/projetos/create.php (15438 bytes)
+   ✅ Sucesso!
+📤 [126] src/Views/projetos/edit.php (15447 bytes)
+   ✅ Sucesso!
+📤 [127] src/Views/projetos/equipe/index.php (3997 bytes)
+   ✅ Sucesso!
+📤 [128] src/Views/projetos/etapas/index.php (2854 bytes)
+   ✅ Sucesso!
+📤 [129] src/Views/projetos/execucao/index.php (3495 bytes)
+   ✅ Sucesso!
+📤 [130] src/Views/projetos/financeiro.php (21792 bytes)
+   ✅ Sucesso!
+📤 [131] src/Views/projetos/index.php (11920 bytes)
+   ✅ Sucesso!
+📤 [132] src/Views/projetos/index_simple.php (1624 bytes)
+   ✅ Sucesso!
+📤 [133] src/Views/projetos/minimal.php (1798 bytes)
+   ✅ Sucesso!
+📤 [134] src/Views/projetos/orcamento/index.php (3348 bytes)
+   ✅ Sucesso!
+📤 [135] src/Views/projetos/show.php (12219 bytes)
+   ✅ Sucesso!
+📤 [136] src/Views/servico-valores/create.php (33 bytes)
+   ✅ Sucesso!
+📤 [137] src/Views/servico-valores/edit.php (31 bytes)
+   ✅ Sucesso!
+📤 [138] src/Views/servico-valores/index.php (6518 bytes)
+   ✅ Sucesso!
+📤 [139] src/Views/servico-valores/show.php (31 bytes)
+   ✅ Sucesso!
+📤 [140] src/Views/servicos/create.php (26342 bytes)
+   ✅ Sucesso!
+📤 [141] src/Views/servicos/edit.php (27369 bytes)
+   ✅ Sucesso!
+📤 [142] src/Views/servicos/index.php (23281 bytes)
+   ✅ Sucesso!
+📤 [143] src/Views/servicos/show.php (34702 bytes)
+   ✅ Sucesso!
+📤 [144] src/Database_unique_1763123747.php (3826 bytes)
+   ✅ Sucesso!
+📤 [145] src/DatabaseMigration_unique_1763123747.php (10833 bytes)
+   ✅ Sucesso!
+📤 [146] src/Database_sprint31.php (3865 bytes)
+   ✅ Sucesso!
+
+📁 Deployando pasta: public/
+--------------------------------------------------------------------------------
+📁 Criado diretório: /public_html/prestadores/public
+📁 Criado diretório: /public_html/prestadores/public/css
+📤 [147] public/css/style.css (9459 bytes)
+   ✅ Sucesso!
+📤 [148] public/css/dashboard.css (5937 bytes)
+   ✅ Sucesso!
+📁 Criado diretório: /public_html/prestadores/public/js
+📤 [149] public/js/main.js (6848 bytes)
+   ✅ Sucesso!
+📤 [150] public/js/app.js (11859 bytes)
+   ✅ Sucesso!
+📤 [151] public/js/masks.js (8130 bytes)
+   ✅ Sucesso!
+📤 [152] public/js/validations.js (9830 bytes)
+   ✅ Sucesso!
+📁 Criado diretório: /public_html/prestadores/public/images
+📤 [153] public/images/README.md (1079 bytes)
+   ✅ Sucesso!
+📤 [154] public/images/.gitkeep (0 bytes)
+   ✅ Sucesso!
+📤 [155] public/.htaccess (994 bytes)
+   ✅ Sucesso!
+📤 [156] public/index.php (24056 bytes)
+   ✅ Sucesso!
+📤 [157] public/clear_cache.php (1767 bytes)
+   ✅ Sucesso!
+📤 [158] public/check_atividades_table.php (1508 bytes)
+   ✅ Sucesso!
+📤 [159] public/check_projetos_table.php (1496 bytes)
+   ✅ Sucesso!
+📤 [160] public/debug_route.php (4116 bytes)
+   ✅ Sucesso!
+📤 [161] public/test_routes_direct.php (3390 bytes)
+   ✅ Sucesso!
+📤 [162] public/fix_credentials_now.php (2575 bytes)
+   ✅ Sucesso!
+📤 [163] public/index.php.sprint10.backup (28572 bytes)
+   ✅ Sucesso!
+📤 [164] public/index_sprint23.php (24682 bytes)
+   ✅ Sucesso!
+📤 [165] public/.htaccess_disable_opcache (401 bytes)
+   ✅ Sucesso!
+📤 [166] public/.user.ini (224 bytes)
+   ✅ Sucesso!
+📤 [167] public/index_v2_1763076782.php (24358 bytes)
+   ✅ Sucesso!
+📤 [168] public/php.ini (264 bytes)
+   ✅ Sucesso!
+📤 [169] public/index_clean_1763077010.php (24254 bytes)
+   ✅ Sucesso!
+📤 [170] public/index_unique_1763123588.php (23858 bytes)
+   ✅ Sucesso!
+📤 [171] public/index_unique_clean_1763123706.php (23822 bytes)
+   ✅ Sucesso!
+📤 [172] public/index_eval_bypass.php (3182 bytes)
+   ✅ Sucesso!
+📤 [173] public/test_database_load.php (2694 bytes)
+   ✅ Sucesso!
+📤 [174] public/test_database_exec.php (2329 bytes)
+   ✅ Sucesso!
+📤 [175] public/index_cache_killer.php (3521 bytes)
+   ✅ Sucesso!
+📤 [176] public/test_exec_minimal.php (1447 bytes)
+   ✅ Sucesso!
+📤 [177] public/.htaccess_debug (231 bytes)
+   ✅ Sucesso!
+📤 [178] public/phpinfo_sprint30.php (17 bytes)
+   ✅ Sucesso!
+📤 [179] public/sprint30_diagnostic_test_12345.php (263 bytes)
+   ✅ Sucesso!
+📤 [180] public/install.php (10790 bytes)
+   ✅ Sucesso!
+📤 [181] public/index_sprint31.php (3932 bytes)
+   ✅ Sucesso!
+📤 [182] public/teste_sprint31.php (164 bytes)
+   ✅ Sucesso!
+📤 [183] public/.htaccess_nocache (1131 bytes)
+   ✅ Sucesso!
+📤 [184] public/auto_deploy_sprint31.php (16870 bytes)
+   ✅ Sucesso!
+📤 [185] public/.htaccess_fixed (757 bytes)
+   ✅ Sucesso!
+📤 [186] public/test_basic.php (377 bytes)
+   ✅ Sucesso!
+📤 [187] public/test_direct.html (308 bytes)
+   ✅ Sucesso!
+📤 [188] public/test_router.php (427 bytes)
+   ✅ Sucesso!
+
+================================================================================
+📊 ESTATÍSTICAS FINAIS
+================================================================================
+✅ Arquivos enviados: 188
+❌ Falhas: 0
+⏭️  Ignorados: 0
+📦 Total processado: 188
+
+🎉 DEPLOYMENT COMPLETO COM SUCESSO!
+================================================================================
