@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Database;
 use PDO;
 
 /**
@@ -36,10 +35,13 @@ class Custo
     const STATUS_PAGO = 'pago';
     const STATUS_CANCELADO = 'cancelado';
     
+    /**
+     * Construtor
+     * SPRINT 73: Fix Bug #23 - Use Database::getInstance()
+     */
     public function __construct()
     {
-        // SPRINT 73 FIX: Usar Database singleton ao invés de global $db
-        $this->db = Database::getInstance()->getConnection();
+        $this->db = \App\Database::getInstance()->getConnection();
     }
     
     /**

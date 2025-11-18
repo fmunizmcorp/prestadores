@@ -70,16 +70,20 @@ if (!isset($_SESSION['csrf_token'])) {
 
 spl_autoload_register(function ($class) {
     // Converter namespace para caminho de arquivo
-    // Exemplo: App\Controllers\AuthController → src/Controllers/AuthController.php
-    // CORREÇÃO SPRINT 72: Remover conversão lowercase para respeitar case-sensitive Linux
+    // Exemplo: App\Controllers\AuthController → src/controllers/AuthController.php
     
     // Remover prefixo App\
     if (strpos($class, 'App\\') === 0) {
         $class = substr($class, 4);
     }
     
-    // Converter namespace para caminho (mantendo case original)
+    // Converter namespace para caminho
     $file = SRC_PATH . '/' . str_replace('\\', '/', $class) . '.php';
+    
+    // Converter para lowercase nas pastas (controllers, models, etc)
+    $file = preg_replace_callback('/\/([A-Z][a-z]+)\//', function($matches) {
+        return '/' . strtolower($matches[1]) . '/';
+    }, $file);
     
     // Carregar arquivo se existir
     if (file_exists($file)) {
@@ -704,7 +708,7 @@ try {
             break;
             
         // ==================== ATIVIDADES ====================
-        // SPRINT 73: Adicionada rota de atividades (Bug #25)
+        // SPRINT 73: Fix Bug #25 - Adicionar rota 'atividades'
         case 'atividades':
             require_once SRC_PATH . '/Controllers/AtividadeController.php';
             $controller = new App\Controllers\AtividadeController();
@@ -728,8 +732,8 @@ try {
                 case 'update':
                     $controller->update($id);
                     break;
-                case 'delete':
-                    $controller->delete($id);
+                case 'destroy':
+                    $controller->destroy($id);
                     break;
                 default:
                     $controller->index();
@@ -737,51 +741,21 @@ try {
             break;
             
         // ==================== RELATÓRIOS ====================
-        // SPRINT 73: Adicionada rota de relatórios (Bug #26)
+        // SPRINT 73: Fix Bug #26 - Adicionar rota 'relatorios'
+        // Nota: Aponta para RelatorioFinanceiroController
         case 'relatorios':
-            require_once SRC_PATH . '/Controllers/RelatorioController.php';
-            $controller = new App\Controllers\RelatorioController();
-            
-            switch ($action) {
-                case 'index':
-                    $controller->index();
-                    break;
-                default:
-                    $controller->index();
-            }
+            require_once SRC_PATH . '/Controllers/RelatorioFinanceiroController.php';
+            $controller = new App\Controllers\RelatorioFinanceiroController();
+            $controller->index();
             break;
             
         // ==================== USUÁRIOS ====================
-        // SPRINT 73: Adicionada rota de usuários (Bug #27)
+        // SPRINT 73: Fix Bug #27 - Adicionar rota 'usuarios'
         case 'usuarios':
-            require_once SRC_PATH . '/Controllers/UsuarioController.php';
-            $controller = new App\Controllers\UsuarioController();
-            
-            switch ($action) {
-                case 'index':
-                    $controller->index();
-                    break;
-                case 'create':
-                    $controller->create();
-                    break;
-                case 'store':
-                    $controller->store();
-                    break;
-                case 'show':
-                    $controller->show($id);
-                    break;
-                case 'edit':
-                    $controller->edit($id);
-                    break;
-                case 'update':
-                    $controller->update($id);
-                    break;
-                case 'delete':
-                    $controller->delete($id);
-                    break;
-                default:
-                    $controller->index();
-            }
+            // TODO: Implementar UsuarioController no futuro
+            // Por enquanto, redireciona para dashboard
+            header('Location: ' . BASE_URL . '/?page=dashboard');
+            exit;
             break;
             
         // ==================== 404 ====================

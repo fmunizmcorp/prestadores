@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 
-use App\Database;
 use PDO;
 
 /**
@@ -40,8 +39,8 @@ class ContaPagar
      */
     public function __construct()
     {
-        // SPRINT 73 FIX: Usar Database singleton ao invés de global $db
-        $this->db = Database::getInstance()->getConnection();
+        global $db;
+        $this->db = $db;
     }
     
     /**
