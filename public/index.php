@@ -312,7 +312,7 @@ try {
             
         // ==================== DASHBOARD ====================
         case 'dashboard':
-            require SRC_PATH . '/views/dashboard/index.php';
+            require SRC_PATH . '/Views/dashboard/index.php';
             break;
             
         // ==================== EMPRESAS TOMADORAS ====================
