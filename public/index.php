@@ -750,12 +750,36 @@ try {
             break;
             
         // ==================== USUÁRIOS ====================
-        // SPRINT 73: Fix Bug #27 - Adicionar rota 'usuarios'
+        // SPRINT 75: Fix Bug #29 - Implementar UsuarioController completo
         case 'usuarios':
-            // TODO: Implementar UsuarioController no futuro
-            // Por enquanto, redireciona para dashboard
-            header('Location: ' . BASE_URL . '/?page=dashboard');
-            exit;
+            require_once SRC_PATH . '/Controllers/UsuarioController.php';
+            $controller = new App\Controllers\UsuarioController();
+            switch ($action) {
+                case 'index':
+                    $controller->index();
+                    break;
+                case 'create':
+                    $controller->create();
+                    break;
+                case 'store':
+                    $controller->store();
+                    break;
+                case 'show':
+                    $controller->show($id);
+                    break;
+                case 'edit':
+                    $controller->edit($id);
+                    break;
+                case 'update':
+                    $controller->update($id);
+                    break;
+                case 'destroy':
+                    $controller->destroy($id);
+                    break;
+                default:
+                    $controller->index();
+                    break;
+            }
             break;
             
         // ==================== 404 ====================
