@@ -80,10 +80,10 @@ spl_autoload_register(function ($class) {
     // Converter namespace para caminho
     $file = SRC_PATH . '/' . str_replace('\\', '/', $class) . '.php';
     
-    // Converter para lowercase nas pastas (controllers, models, etc)
-    $file = preg_replace_callback('/\/([A-Z][a-z]+)\//', function($matches) {
-        return '/' . strtolower($matches[1]) . '/';
-    }, $file);
+    // SPRINT 74 CRITICAL FIX: NÃO converter para lowercase!
+    // Bug #28: Linhas de lowercase REMOVIDAS (causavam Fatal Error)
+    // Motivo: Pastas são "Models" e "Controllers" (maiúscula), não "models"/"controllers"
+    // NUNCA REINTRODUZIR ESTAS LINHAS!
     
     // Carregar arquivo se existir
     if (file_exists($file)) {
