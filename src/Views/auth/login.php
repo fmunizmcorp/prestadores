@@ -79,7 +79,7 @@
                             <?php unset($_SESSION['info']); ?>
                         <?php endif; ?>
                         
-                        <form method="POST" action="<?= (defined('BASE_URL') ? BASE_URL : '') ?>/login" class="needs-validation" novalidate>
+                        <form method="POST" action="<?= (defined('BASE_URL') ? BASE_URL : '') ?>/?page=login" class="needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                             
                             <div class="mb-3">
@@ -152,7 +152,7 @@
                         <hr class="my-4">
                         
                         <div class="text-center">
-                            <a href="<?= (defined('BASE_URL') ? BASE_URL : '') ?>/recuperar-senha" class="text-decoration-none">
+                            <a href="<?= (defined('BASE_URL') ? BASE_URL : '') ?>/?page=recuperar-senha" class="text-decoration-none">
                                 <i class="fas fa-key"></i> Esqueci minha senha
                             </a>
                         </div>
