@@ -312,7 +312,10 @@ try {
             
         // ==================== DASHBOARD ====================
         case 'dashboard':
-            require SRC_PATH . '/Views/dashboard/index.php';
+            // SPRINT 74 FIX: Usar controller em vez de require direto (Bug #34)
+            require_once SRC_PATH . '/Controllers/DashboardController.php';
+            $controller = new App\Controllers\DashboardController();
+            $controller->index();
             break;
             
         // ==================== EMPRESAS TOMADORAS ====================
