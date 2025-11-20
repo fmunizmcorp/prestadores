@@ -1,0 +1,278 @@
+RELATÓRIO DE DEPLOYMENT E
+CORREÇÕES - SISTEMA PRESTADORES
+
+PARA EQUIPE DE DESENVOLVIMENTO
+Data: 16 de Novembro de 2025, 10:30 BRT
+Servidor: 72.61.53.222 (VPS)
+Diretório: /opt/webserver/sites/prestadores
+Responsável: QA Tester
+
+📊 RESUMO EXECUTIVO
+
+Realizei o deployment do Sprint 66 e identifiquei/corrigi 2 problemas críticos no banco de
+dados. MAS o login ainda não funciona após todas as correções. Requer investigação
+adicional do time de desenvolvimento.
+
+✅ O QUE FOI FEITO
+
+1. Verificação do Arquivo Database.php ✅
+Bash
+
+# Localização: /opt/webserver/sites/prestadores/src/Database.php
+# Linha 74: public function prepare(string $sql): \PDOStatement {
+
+Status: ✅ CORRETO - Método prepare() presente e funcional
+
+2. Verificação dos Usuários no Banco ❌
+SQL
+
+SELECT id, email, role FROM usuarios
+WHERE email IN ('master@clinfec.com.br', 'admin@clinfec.com.br',
+'gestor@clinfec.com.br', 'usuario@clinfec.com.br');
+
+Resultado:
+ID
+
+Email
+
+Role
+
+1
+
+admin@clinfec.com.br
+
+admin
+
+Problema: Apenas 1 de 4 usuários existia!
+
+3. Análise da Estrutura da Tabela ⚠️
+SQL
+
+SHOW CREATE TABLE usuarios;
+
+PROBLEMA CRÍTICO ENCONTRADO:
+O campo role é um ENUM com apenas 4 valores:
+SQL
+
+role enum('admin','gerente','usuario','financeiro') DEFAULT 'usuario'
+
+MAS o SQL do Sprint 66 tentava criar usuários com roles inválidos:
+• ❌ 'master' → NÃO EXISTE NO ENUM!
+• ✅ 'admin' → OK
+• ❌ 'gestor' → NÃO EXISTE NO ENUM!
+• ✅ 'usuario' → OK
+
+4. Correção Aplicada ✅
+
+Criei os 3 usuários faltantes com roles corretos:
+SQL
+
+-- Usuário 1: Master (role 'admin' - máximo disponível)
+INSERT INTO usuarios (nome, email, senha, role, ativo, created_at,
+updated_at)
+VALUES ('Master User', 'master@clinfec.com.br',
+'$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+'admin', 1, NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+senha = VALUES(senha),
+role = VALUES(role),
+ativo = VALUES(ativo),
+updated_at = NOW();
+-- Usuário 2: Gestor (role 'gerente' - equivalente)
+
+INSERT INTO usuarios (nome, email, senha, role, ativo, created_at,
+updated_at)
+VALUES ('Gestor User', 'gestor@clinfec.com.br',
+'$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+'gerente', 1, NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+senha = VALUES(senha),
+role = VALUES(role),
+ativo = VALUES(ativo),
+updated_at = NOW();
+-- Usuário 3: Usuario Básico (role 'usuario')
+INSERT INTO usuarios (nome, email, senha, role, ativo, created_at,
+updated_at)
+VALUES ('Usuario Basico', 'usuario@clinfec.com.br',
+'$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+'usuario', 1, NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+senha = VALUES(senha),
+role = VALUES(role),
+ativo = VALUES(ativo),
+updated_at = NOW();
+
+Resultado: ✅ Usuarios criados com sucesso!
+
+5. Limpeza de Cache ✅
+Bash
+
+# Recarregar PHP-FPM
+systemctl reload php8.3-fpm
+# Limpar OPcache
+php -r "opcache_reset();"
+
+Resultado: ✅ PHP-FPM recarregado e OPcache limpo
+
+❌ PROBLEMA PERSISTENTE
+Login Ainda Não Funciona!
+
+Após todas as correções, o login com master@clinfec.com.br / password AINDA FALHA:
+Erro: "Você precisa estar autenticado para acessar esta página."
+Teste realizado:
+
+Bash
+curl -X POST 'https://prestadores.clinfec.com.br/login' \
+-d "email=master@clinfec.com.br&senha=password&csrf_token=..."
+
+Resultado: Retorna para página de login com erro
+
+🔍 DIAGNÓSTICO TÉCNICO
+Possíveis Causas:
+
+1. Hash de Senha Incorreto
+• O hash $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi pode não
+corresponder à senha "password"
+• Recomendação: Gerar novo hash com password_hash('password', PASSWORD_BCRYPT )
+2. Problema no Método Usuario::authenticate()
+• Pode estar usando password_verify() incorretamente
+• Pode estar comparando com campo errado
+• Recomendação: Adicionar logs de debug em src/Models/Usuario.php
+3. Problema na Criação de Sessão
+• $_SESSION['user_id'] pode não estar sendo setado
+• Recomendação: Verificar src/Controllers/AuthController.php linha ~50
+4. Middleware de Autenticação Muito Restritivo
+• Pode estar bloqueando mesmo após login bem-sucedido
+• Recomendação: Verificar src/Middleware/AuthMiddleware.php
+5. Cookies/Sessão Não Persistindo
+• Problema com configuração de sessão PHP
+• Recomendação: Verificar session.save_path e permissões
+
+📋 AÇÕES NECESSÁRIAS PARA O DEV
+URGENTE - Prioridade 1:
+1. Verificar Hash de Senha
+
+2. Adicionar Logs de Debug no Login
+3. Verificar Configuração de Sessão
+
+Prioridade 2:
+
+1. Corrigir ENUM da Tabela usuarios
+2. Atualizar SQL do Sprint 66
+• Arquivo: database/create_test_users.sql
+• Corrigir roles para usar apenas valores válidos do ENUM
+• Ou atualizar ENUM antes de executar o SQL
+
+📊 STATUS ATUAL DOS USUÁRIOS
+SQL
+
+SELECT id, nome, email, role, ativo, created_at
+FROM usuarios
+ORDER BY id;
+
+Resultado esperado:
+ID
+
+Nome
+
+1
+
+Admin User
+
+2
+
+Master User
+
+3
+
+Gestor User
+
+4
+
+Usuario
+Basico
+
+Email
+Role
+admin@clinf admin
+ec.com.br
+master@clin admin
+fec.com.br
+gestor@clinf gerente
+ec.com.br
+usuario@cli usuario
+nfec.com.br
+
+🎯 PRÓXIMOS PASSOS
+
+1. DEV: Investigar e corrigir problema de autenticação
+2. DEV: Adicionar logs de debug conforme recomendado
+
+Ativo
+
+Created At
+
+1
+
+...
+
+1
+
+2025-11-16
+10:25
+2025-11-16
+10:25
+2025-11-16
+10:25
+
+1
+1
+
+3. DEV: Validar hash de senha
+4. DEV: Corrigir ENUM da tabela usuarios
+5. QA: Retomar testes end-to-end após correção
+
+📦 ARQUIVOS E COMANDOS ÚTEIS
+Conectar ao Servidor:
+Bash
+
+ssh root@72.61.53.222 -p 22
+# Senha: Jm@D@KDPnw7Q
+
+Diretório do Sistema:
+Bash
+
+cd /opt/webserver/sites/prestadores
+
+Acessar Banco de Dados:
+Bash
+
+mysql -u user_prestadores -p'rN8u7u0ogbFPN3lfYqtF6wuAn5uJZFFP' db_prestadores
+
+Ver Logs PHP:
+Bash
+
+tail -f /var/log/php8.3-fpm/error.log
+# ou
+tail -f /var/log/nginx/prestadores-error.log
+
+Recarregar PHP após mudanças:
+Bash
+
+systemctl reload php8.3-fpm
+
+✅ CONCLUSÃO
+
+Deployment executado com sucesso, mas login ainda não funciona.
+Identifiquei e corrigi 2 problemas críticos:
+1. ✅ Usuários faltantes no banco
+2. ✅ Incompatibilidade de roles com ENUM
+MAS há um 3º problema não identificado que impede a autenticação mesmo com
+usuários criados corretamente.
+Requer investigação urgente do time de desenvolvimento usando os logs de debug
+recomendados acima.
+Testador: QA End-to-End Tester
+Data/Hora: 16/11/2025 10:30 BRT
+Status: ⏳ AGUARDANDO CORREÇÃO DO DEV
+
+

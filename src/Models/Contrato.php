@@ -1,4 +1,4 @@
-<?php
+<?php /* Cache-Buster: 2025-11-15 13:58:50 */
 
 namespace App\Models;
 
@@ -16,7 +16,7 @@ class Contrato {
     private $table = 'contratos';
     
     public function __construct() {
-        $this->db = Database::getInstance();
+        $this->db = Database::getInstance()->getConnection();
     }
     
     /**
@@ -28,19 +28,20 @@ class Contrato {
      * @return array
      */
     public function all($filtros = [], $page = 1, $limit = 25) {
+        // Garantir que são integers para operações matemáticas
+        $page = (int) $page;
+        $limit = (int) $limit;
+        
+        // SPRINT 68.6: Simplificada query - tabela contratos não tem empresa_prestadora_id
         $sql = "SELECT 
                     c.*,
                     et.nome_fantasia as tomadora_nome,
                     et.cidade as tomadora_cidade,
                     et.estado as tomadora_estado,
-                    ep.nome_fantasia as prestadora_nome,
-                    ep.cidade as prestadora_cidade,
-                    DATEDIFF(c.data_fim, NOW()) as dias_vencimento,
-                    (SELECT COUNT(*) FROM servico_valores sv WHERE sv.contrato_id = c.id AND sv.ativo = 1) as total_servicos
+                    DATEDIFF(c.data_fim, NOW()) as dias_vencimento
                 FROM {$this->table} c
                 INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
-                WHERE 1=1";
+                WHERE c.deleted_at IS NULL AND 1=1";
         
         $params = [];
         
@@ -57,10 +58,13 @@ class Contrato {
         }
         
         // Filtro: Empresa Prestadora
+        // SPRINT 68.6: Desabilitado - coluna empresa_prestadora_id não existe em contratos
+        /*
         if (!empty($filtros['empresa_prestadora_id'])) {
             $sql .= " AND c.empresa_prestadora_id = :empresa_prestadora_id";
             $params[':empresa_prestadora_id'] = $filtros['empresa_prestadora_id'];
         }
+        */
         
         // Filtro: Busca
         if (!empty($filtros['search'])) {
@@ -108,11 +112,11 @@ class Contrato {
      * @return int
      */
     public function count($filtros = []) {
+        // SPRINT 68.6: Removido JOIN com empresas_prestadoras (FK não existe)
         $sql = "SELECT COUNT(*) as total 
                 FROM {$this->table} c
                 INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
-                WHERE 1=1";
+                WHERE c.deleted_at IS NULL AND 1=1";
         
         $params = [];
         
@@ -126,10 +130,13 @@ class Contrato {
             $params[':empresa_tomadora_id'] = $filtros['empresa_tomadora_id'];
         }
         
+        // SPRINT 68.6: Desabilitado - coluna empresa_prestadora_id não existe
+        /*
         if (!empty($filtros['empresa_prestadora_id'])) {
             $sql .= " AND c.empresa_prestadora_id = :empresa_prestadora_id";
             $params[':empresa_prestadora_id'] = $filtros['empresa_prestadora_id'];
         }
+        */
         
         if (!empty($filtros['search'])) {
             $sql .= " AND (c.numero_contrato LIKE :search 
@@ -154,6 +161,7 @@ class Contrato {
      * @return array|null
      */
     public function findById($id) {
+        // SPRINT 68.6: Removido JOIN com empresas_prestadoras
         $sql = "SELECT 
                     c.*,
                     et.nome_fantasia as tomadora_nome,
@@ -161,20 +169,14 @@ class Contrato {
                     et.cnpj as tomadora_cnpj,
                     et.cidade as tomadora_cidade,
                     et.estado as tomadora_estado,
-                    ep.nome_fantasia as prestadora_nome,
-                    ep.razao_social as prestadora_razao_social,
-                    ep.cnpj as prestadora_cnpj,
-                    ep.cidade as prestadora_cidade,
-                    ep.estado as prestadora_estado,
                     u1.nome as criado_por_nome,
                     u2.nome as atualizado_por_nome,
                     DATEDIFF(c.data_fim, NOW()) as dias_vencimento
                 FROM {$this->table} c
                 INNER JOIN empresas_tomadoras et ON c.empresa_tomadora_id = et.id
-                INNER JOIN empresas_prestadoras ep ON c.empresa_prestadora_id = ep.id
                 LEFT JOIN usuarios u1 ON c.created_by = u1.id
                 LEFT JOIN usuarios u2 ON c.updated_by = u2.id
-                WHERE c.id = :id";
+                WHERE c.id = :id AND c.deleted_at IS NULL";
         
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -215,37 +217,34 @@ class Contrato {
      * @return int
      */
     public function create($data) {
+        // SPRINT 68.6: Removido empresa_prestadora_id (coluna não existe)
         $sql = "INSERT INTO {$this->table} (
-                    empresa_tomadora_id, empresa_prestadora_id,
-                    numero_contrato, descricao, objeto,
+                    empresa_tomadora_id,
+                    numero_contrato, objeto,
                     data_inicio, data_fim,
-                    valor_total, valor_executado,
-                    status, arquivo_contrato, observacoes,
-                    created_by, created_at
+                    valor_total,
+                    status, observacoes,
+                    created_at
                 ) VALUES (
-                    :empresa_tomadora_id, :empresa_prestadora_id,
-                    :numero_contrato, :descricao, :objeto,
+                    :empresa_tomadora_id,
+                    :numero_contrato, :objeto,
                     :data_inicio, :data_fim,
-                    :valor_total, :valor_executado,
-                    :status, :arquivo_contrato, :observacoes,
-                    :created_by, NOW()
+                    :valor_total,
+                    :status, :observacoes,
+                    NOW()
                 )";
         
         $stmt = $this->db->prepare($sql);
         
         $stmt->bindValue(':empresa_tomadora_id', $data['empresa_tomadora_id'], PDO::PARAM_INT);
-        $stmt->bindValue(':empresa_prestadora_id', $data['empresa_prestadora_id'], PDO::PARAM_INT);
+        // SPRINT 68.6: empresa_prestadora_id removido
         $stmt->bindValue(':numero_contrato', $data['numero_contrato']);
-        $stmt->bindValue(':descricao', $data['descricao'] ?? null);
         $stmt->bindValue(':objeto', $data['objeto'] ?? null);
         $stmt->bindValue(':data_inicio', $data['data_inicio']);
         $stmt->bindValue(':data_fim', $data['data_fim'] ?? null);
         $stmt->bindValue(':valor_total', $data['valor_total'] ?? null);
-        $stmt->bindValue(':valor_executado', $data['valor_executado'] ?? 0);
-        $stmt->bindValue(':status', $data['status'] ?? 'rascunho');
-        $stmt->bindValue(':arquivo_contrato', $data['arquivo_contrato'] ?? null);
+        $stmt->bindValue(':status', $data['status'] ?? 'ativo');
         $stmt->bindValue(':observacoes', $data['observacoes'] ?? null);
-        $stmt->bindValue(':created_by', $data['created_by'] ?? $_SESSION['user_id'], PDO::PARAM_INT);
         
         $stmt->execute();
         $contratoId = $this->db->lastInsertId();
@@ -264,19 +263,16 @@ class Contrato {
      * @return bool
      */
     public function update($id, $data) {
+        // SPRINT 68.6: Removido empresa_prestadora_id, descricao, arquivo_contrato, updated_by
         $sql = "UPDATE {$this->table} SET
                     empresa_tomadora_id = :empresa_tomadora_id,
-                    empresa_prestadora_id = :empresa_prestadora_id,
                     numero_contrato = :numero_contrato,
-                    descricao = :descricao,
                     objeto = :objeto,
                     data_inicio = :data_inicio,
                     data_fim = :data_fim,
                     valor_total = :valor_total,
                     status = :status,
-                    arquivo_contrato = :arquivo_contrato,
                     observacoes = :observacoes,
-                    updated_by = :updated_by,
                     updated_at = NOW()
                 WHERE id = :id";
         
@@ -284,17 +280,14 @@ class Contrato {
         
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->bindValue(':empresa_tomadora_id', $data['empresa_tomadora_id'], PDO::PARAM_INT);
-        $stmt->bindValue(':empresa_prestadora_id', $data['empresa_prestadora_id'], PDO::PARAM_INT);
+        // SPRINT 68.6: empresa_prestadora_id, descricao, arquivo_contrato removidos
         $stmt->bindValue(':numero_contrato', $data['numero_contrato']);
-        $stmt->bindValue(':descricao', $data['descricao'] ?? null);
         $stmt->bindValue(':objeto', $data['objeto'] ?? null);
         $stmt->bindValue(':data_inicio', $data['data_inicio']);
         $stmt->bindValue(':data_fim', $data['data_fim'] ?? null);
         $stmt->bindValue(':valor_total', $data['valor_total'] ?? null);
         $stmt->bindValue(':status', $data['status']);
-        $stmt->bindValue(':arquivo_contrato', $data['arquivo_contrato'] ?? null);
         $stmt->bindValue(':observacoes', $data['observacoes'] ?? null);
-        $stmt->bindValue(':updated_by', $data['updated_by'] ?? $_SESSION['user_id'], PDO::PARAM_INT);
         
         return $stmt->execute();
     }

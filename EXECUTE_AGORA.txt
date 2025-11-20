@@ -1,0 +1,54 @@
+════════════════════════════════════════════════════════════════════════
+  🚀 SPRINT 67 - COMANDO FINAL PARA EXECUTAR AGORA
+════════════════════════════════════════════════════════════════════════
+
+COPIE E COLE ESTE COMANDO NO SERVIDOR (como root):
+
+════════════════════════════════════════════════════════════════════════
+
+bash <(curl -sL https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/DEPLOY_AUTOMATICO_FINAL.sh)
+
+════════════════════════════════════════════════════════════════════════
+
+Este comando irá:
+✅ Fazer backup automático
+✅ Baixar os 2 arquivos corrigidos do GitHub
+✅ Validar sintaxe PHP
+✅ Instalar os arquivos
+✅ Limpar cache
+✅ Recarregar PHP-FPM
+✅ TESTAR LOGIN COM OS 4 USUÁRIOS AUTOMATICAMENTE
+✅ Mostrar resultado dos testes
+
+Tempo estimado: 30-60 segundos
+
+════════════════════════════════════════════════════════════════════════
+
+ALTERNATIVA (se o comando acima não funcionar):
+
+1. Download do script:
+   curl -sL -o /tmp/deploy.sh https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/DEPLOY_AUTOMATICO_FINAL.sh
+
+2. Executar:
+   bash /tmp/deploy.sh
+
+════════════════════════════════════════════════════════════════════════
+
+ONELINER PHP (mais simples ainda):
+
+php -r "\$bd='/opt/webserver/sites/prestadores'; \$bu=\"\$bd/backups/sprint67_\".date('Ymd_His'); @mkdir(\$bu,0755,true); @copy(\"\$bd/src/Controllers/AuthController.php\",\"\$bu/AuthController.php\"); @copy(\"\$bd/config/app.php\",\"\$bu/app.php\"); \$a=file_get_contents('https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/src/Controllers/AuthControllerDebug.php'); \$c=file_get_contents('https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/config/app.php'); file_put_contents(\"\$bd/src/Controllers/AuthController.php\",\$a); file_put_contents(\"\$bd/config/app.php\",\$c); chmod(\"\$bd/src/Controllers/AuthController.php\",0644); chmod(\"\$bd/config/app.php\",0644); if(function_exists('opcache_reset'))opcache_reset(); exec('systemctl reload php8.3-fpm-prestadores.service 2>&1 || systemctl reload php8.3-fpm 2>&1'); echo \"DEPLOY CONCLUIDO!\n\";"
+
+════════════════════════════════════════════════════════════════════════
+
+Após executar qualquer um dos comandos acima:
+
+1. Testar login manualmente em: https://prestadores.clinfec.com.br/?page=login
+2. Usar credenciais:
+   - master@clinfec.com.br / Master123!
+   - admin@clinfec.com.br / Admin123!
+   - gestor@clinfec.com.br / Gestor123!
+   - usuario@clinfec.com.br / Usuario123!
+
+3. Se funcionar: QA pode retomar os 47 testes
+
+════════════════════════════════════════════════════════════════════════

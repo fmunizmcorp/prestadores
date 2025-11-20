@@ -1,4 +1,4 @@
-<?php
+<?php /* Cache-Buster: 2025-11-15 13:58:50 */
 
 namespace App\Models;
 
@@ -71,6 +71,9 @@ class EmpresaTomadora {
         $sql .= " ORDER BY {$orderBy} {$orderDir}";
         
         // Paginação
+        // Garantir que são integers para operações matemáticas
+        $page = (int) $page;
+        $limit = (int) $limit;
         $offset = ($page - 1) * $limit;
         $sql .= " LIMIT :limit OFFSET :offset";
         

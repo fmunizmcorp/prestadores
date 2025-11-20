@@ -1,0 +1,77 @@
+═══════════════════════════════════════════════════════════════════════
+  SPRINT 67 - COMANDO DE DEPLOY ÚNICO
+═══════════════════════════════════════════════════════════════════════
+
+EXECUTE ESTE COMANDO NO SERVIDOR como root:
+
+bash <(curl -sL https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/scripts/deploy_sprint67.sh)
+
+───────────────────────────────────────────────────────────────────────
+
+OU, se preferir ver o que será executado antes:
+
+curl -sL https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/scripts/deploy_sprint67.sh > /tmp/deploy_sprint67.sh
+cat /tmp/deploy_sprint67.sh  # Revisar o script
+sudo bash /tmp/deploy_sprint67.sh
+
+───────────────────────────────────────────────────────────────────────
+
+O que este script faz:
+✅ Cria backup automático dos arquivos atuais
+✅ Baixa AuthController.php corrigido do GitHub
+✅ Baixa config/app.php com reCAPTCHA desabilitado
+✅ Valida sintaxe PHP dos arquivos
+✅ Ajusta permissões (www-data:www-data)
+✅ Limpa OPcache
+✅ Recarrega PHP-FPM
+✅ Fornece instruções de teste
+
+═══════════════════════════════════════════════════════════════════════
+
+ALTERNATIVA: Deploy Manual Rápido
+
+Se não puder executar o script, copie e cole este bloco no terminal do servidor:
+
+───────────────────────────────────────────────────────────────────────
+
+cd /opt/webserver/sites/prestadores
+
+# Backup
+mkdir -p backups/sprint67
+cp src/Controllers/AuthController.php backups/sprint67/
+cp config/app.php backups/sprint67/
+
+# Download dos arquivos
+curl -sL -o src/Controllers/AuthController.php \
+  "https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/src/Controllers/AuthControllerDebug.php"
+
+curl -sL -o config/app.php \
+  "https://raw.githubusercontent.com/fmunizmcorp/prestadores/genspark_ai_developer/config/app.php"
+
+# Permissões
+chown www-data:www-data src/Controllers/AuthController.php config/app.php
+chmod 644 src/Controllers/AuthController.php config/app.php
+
+# Validar sintaxe
+php -l src/Controllers/AuthController.php
+php -l config/app.php
+
+# Recarregar
+systemctl reload php8.3-fpm-prestadores.service
+php -r "opcache_reset();"
+
+echo "✅ Deploy concluído!"
+
+───────────────────────────────────────────────────────────────────────
+
+APÓS O DEPLOY, TESTE IMEDIATAMENTE:
+
+curl -s -L -c /tmp/cookies.txt -b /tmp/cookies.txt \
+  -X POST \
+  -d "email=master@clinfec.com.br&senha=Master123!" \
+  "https://prestadores.clinfec.com.br/?page=login" | grep -o "page=[^\"&]*"
+
+Se mostrar "page=dashboard" = ✅ LOGIN FUNCIONANDO!
+Se mostrar "page=login" ou "page=auth" = ❌ Ainda com problema
+
+═══════════════════════════════════════════════════════════════════════

@@ -50,11 +50,11 @@ class Pagamento
     
     /**
      * Construtor
+     * SPRINT 73: Fix Bug #24 - Use Database::getInstance()
      */
     public function __construct()
     {
-        global $db;
-        $this->db = $db;
+        $this->db = \App\Database::getInstance()->getConnection();
     }
     
     /**

@@ -1,0 +1,1037 @@
+🚀 SPRINT 62 - STEP 1: Analyze and Download from Hostinger
+======================================================================
+
+📡 Connecting to ftp.clinfec.com.br...
+✅ Connected as u673902663.genspark1
+✅ Changed to /public_html/prestadores
+
+📋 Analyzing structure...
+======================================================================
+
+1️⃣ Essential Root Files:
+  📄 .htaccess (1,126 bytes)
+  ⏭️  SKIP: composer.json (not found)
+  ⏭️  SKIP: composer.lock (not found)
+  ⏭️  SKIP: autoload.php (not found)
+  ⏭️  SKIP: bootstrap.php (not found)
+
+2️⃣ Directory: src/
+  📁 DIR: src/Controllers/
+  📄 FILE: src/Controllers/AtividadeController.php (11,478 bytes)
+  📄 FILE: src/Controllers/AuthController.php (4,177 bytes)
+  📄 FILE: src/Controllers/BaseController.php (3,662 bytes)
+  📄 FILE: src/Controllers/ContratoController.php (29,048 bytes)
+  📄 FILE: src/Controllers/DashboardController.php (13,332 bytes)
+  📄 FILE: src/Controllers/EmpresaPrestadoraController.php (21,742 bytes)
+  📄 FILE: src/Controllers/EmpresaTomadoraController.php (24,511 bytes)
+  📄 FILE: src/Controllers/FinanceiroController.php (52,449 bytes)
+  📄 FILE: src/Controllers/NotaFiscalController.php (32,894 bytes)
+  📄 FILE: src/Controllers/ProjetoController.php (15,240 bytes)
+  📄 FILE: src/Controllers/ProjetoEquipeController.php (4,692 bytes)
+  📄 FILE: src/Controllers/ProjetoEtapaController.php (5,410 bytes)
+  📄 FILE: src/Controllers/ProjetoExecucaoController.php (5,127 bytes)
+  📄 FILE: src/Controllers/ProjetoOrcamentoController.php (5,005 bytes)
+  📄 FILE: src/Controllers/ServicoController.php (16,245 bytes)
+  📄 FILE: src/Controllers/ServicoValorController.php (16,389 bytes)
+  📄 FILE: src/Controllers/UsuarioController.php (13,279 bytes)
+  📄 FILE: src/DatabaseMigration.php (10,815 bytes)
+  📄 FILE: src/DatabaseMigration_unique_1763123747.php (10,833 bytes)
+  📄 FILE: src/Database.php (4,656 bytes)
+  📄 FILE: src/Database_sprint31.php (3,865 bytes)
+  📄 FILE: src/Database_unique_1763123747.php (3,826 bytes)
+  📁 DIR: src/Helpers/
+  📄 FILE: src/Helpers/FluxoCaixaHelper.php (16,486 bytes)
+  📄 FILE: src/helpers.php (4,646 bytes)
+  📁 DIR: src/libraries/
+  📁 DIR: src/libraries/phpspreadsheet/
+  📁 DIR: src/libraries/tcpdf/
+  📁 DIR: src/middleware/
+  📁 DIR: src/Models/
+  📄 FILE: src/Models/Atividade_BACKUP.php (26,200 bytes)
+  📄 FILE: src/Models/AtividadeFinanceiro.php (8,500 bytes)
+  📄 FILE: src/Models/Atividade.php (26,200 bytes)
+  📄 FILE: src/Models/BaseModel.php (1,318 bytes)
+  📄 FILE: src/Models/Boleto.php (36,869 bytes)
+  📄 FILE: src/Models/CategoriaFinanceira.php (17,587 bytes)
+  📄 FILE: src/Models/CentroCusto.php (19,558 bytes)
+  📄 FILE: src/Models/Cliente.php (6,884 bytes)
+  📄 FILE: src/Models/ConciliacaoBancaria.php (28,287 bytes)
+  📄 FILE: src/Models/ContaPagar.php (30,654 bytes)
+  📄 FILE: src/Models/ContaReceber.php (34,906 bytes)
+  📄 FILE: src/Models/ContratoFinanceiro.php (14,677 bytes)
+  📄 FILE: src/Models/Contrato.php (31,738 bytes)
+  📄 FILE: src/Models/Documento.php (11,842 bytes)
+  📄 FILE: src/Models/Empresa.php (7,807 bytes)
+  📄 FILE: src/Models/EmpresaPrestadora.php (17,049 bytes)
+  📄 FILE: src/Models/EmpresaTomadora.php (27,985 bytes)
+  📄 FILE: src/Models/Fornecedor.php (6,465 bytes)
+  📄 FILE: src/Models/LancamentoFinanceiro.php (35,845 bytes)
+  📄 FILE: src/Models/NotaFiscal_BACKUP.php (30,805 bytes)
+  📄 FILE: src/Models/NotaFiscal.php (30,805 bytes)
+  📄 FILE: src/Models/NotaFiscal.php.bak_fallback_v1 (9,218 bytes)
+  📄 FILE: src/Models/NotaFiscal_SIMPLE_FALLBACK.php (9,218 bytes)
+  📄 FILE: src/Models/Pagamento.php (31,158 bytes)
+  📄 FILE: src/Models/ProjetoAnexo.php (5,381 bytes)
+  📄 FILE: src/Models/ProjetoAvaliacao.php (6,035 bytes)
+  📄 FILE: src/Models/Projeto_BACKUP.php (30,457 bytes)
+  📄 FILE: src/Models/ProjetoCategoria.php (2,936 bytes)
+  📄 FILE: src/Models/ProjetoEquipe.php (12,851 bytes)
+  📄 FILE: src/Models/ProjetoEtapa.php (18,659 bytes)
+  📄 FILE: src/Models/ProjetoExecucao.php (9,483 bytes)
+  📄 FILE: src/Models/ProjetoFinanceiro.php (13,718 bytes)
+  📄 FILE: src/Models/ProjetoOrcamento.php (14,080 bytes)
+  📄 FILE: src/Models/Projeto.php (30,457 bytes)
+  📄 FILE: src/Models/ProjetoRisco.php (3,968 bytes)
+  📄 FILE: src/Models/ProjetoTemplate.php (8,960 bytes)
+  📄 FILE: src/Models/Responsavel.php (7,869 bytes)
+  📄 FILE: src/Models/Servico.php (15,721 bytes)
+  📄 FILE: src/Models/ServicoValor.php (16,651 bytes)
+  📄 FILE: src/Models/Usuario.php (8,888 bytes)
+  📁 DIR: src/Views/
+  📁 DIR: src/Views/atestados/
+  📁 DIR: src/Views/atividades/
+  📄 FILE: src/Views/atividades/custos.php (21,234 bytes)
+  📄 FILE: src/Views/atividades/index.php (12,474 bytes)
+  📄 FILE: src/Views/atividades/index_simple.php (1,344 bytes)
+  📄 FILE: src/Views/atividades/minimal.php (1,794 bytes)
+  📁 DIR: src/Views/auth/
+  📄 FILE: src/Views/auth/forgot_password.php (2,457 bytes)
+  📄 FILE: src/Views/auth/login.php (8,613 bytes)
+  📄 FILE: src/Views/auth/register.php (4,993 bytes)
+  📄 FILE: src/Views/auth/reset_password.php (3,136 bytes)
+  📁 DIR: src/Views/contratos/
+  📄 FILE: src/Views/contratos/create.php (24,254 bytes)
+  📄 FILE: src/Views/contratos/edit.php (24,819 bytes)
+  📄 FILE: src/Views/contratos/faturamento.php (17,631 bytes)
+  📄 FILE: src/Views/contratos/index.php (26,144 bytes)
+  📄 FILE: src/Views/contratos/show.php (32,461 bytes)
+  📁 DIR: src/Views/dashboard/
+  📄 FILE: src/Views/dashboard/index.php (23,892 bytes)
+  📁 DIR: src/Views/documentos/
+  📁 DIR: src/Views/empresas/
+  📁 DIR: src/Views/empresas-prestadoras/
+  📄 FILE: src/Views/empresas-prestadoras/create.php (16,231 bytes)
+  📄 FILE: src/Views/empresas-prestadoras/edit.php (16,734 bytes)
+  📄 FILE: src/Views/empresas-prestadoras/index.php (16,143 bytes)
+  📄 FILE: src/Views/empresas-prestadoras/show.php (28,832 bytes)
+  📁 DIR: src/Views/empresas-tomadoras/
+  📄 FILE: src/Views/empresas-tomadoras/create.php (16,215 bytes)
+  📄 FILE: src/Views/empresas-tomadoras/edit.php (16,718 bytes)
+  📄 FILE: src/Views/empresas-tomadoras/index.php (13,179 bytes)
+  📄 FILE: src/Views/empresas-tomadoras/show.php (28,809 bytes)
+  📁 DIR: src/Views/faturas/
+  📁 DIR: src/Views/financeiro/
+  📁 DIR: src/Views/financeiro/boletos/
+  📄 FILE: src/Views/financeiro/boletos/index.php (10,471 bytes)
+  📄 FILE: src/Views/financeiro/boletos/show.php (13,941 bytes)
+  📁 DIR: src/Views/financeiro/categorias/
+  📄 FILE: src/Views/financeiro/categorias/create.php (13,931 bytes)
+  📄 FILE: src/Views/financeiro/categorias/edit.php (16,052 bytes)
+  📄 FILE: src/Views/financeiro/categorias/index.php (15,646 bytes)
+  📁 DIR: src/Views/financeiro/conciliacoes/
+  📄 FILE: src/Views/financeiro/conciliacoes/importar.php (14,926 bytes)
+  📄 FILE: src/Views/financeiro/conciliacoes/index.php (8,492 bytes)
+  📄 FILE: src/Views/financeiro/conciliacoes/show.php (19,942 bytes)
+  📁 DIR: src/Views/financeiro/contas_pagar/
+  📄 FILE: src/Views/financeiro/contas_pagar/create.php (15,117 bytes)
+  📄 FILE: src/Views/financeiro/contas_pagar/edit.php (18,859 bytes)
+  📄 FILE: src/Views/financeiro/contas_pagar/index.php (14,736 bytes)
+  📄 FILE: src/Views/financeiro/contas_pagar/show.php (22,338 bytes)
+  📁 DIR: src/Views/financeiro/contas_receber/
+  📄 FILE: src/Views/financeiro/contas_receber/create.php (19,509 bytes)
+  📄 FILE: src/Views/financeiro/contas_receber/edit.php (25,208 bytes)
+  📄 FILE: src/Views/financeiro/contas_receber/index.php (16,685 bytes)
+  📄 FILE: src/Views/financeiro/contas_receber/show.php (26,341 bytes)
+  📁 DIR: src/Views/financeiro/fluxo_caixa/
+  📄 FILE: src/Views/financeiro/fluxo_caixa/index.php (15,826 bytes)
+  📄 FILE: src/Views/financeiro/index.php (12,716 bytes)
+  📄 FILE: src/Views/financeiro/index_simple.php (1,382 bytes)
+  📁 DIR: src/Views/financeiro/lancamentos/
+  📄 FILE: src/Views/financeiro/lancamentos/create.php (19,922 bytes)
+  📄 FILE: src/Views/financeiro/lancamentos/index.php (16,664 bytes)
+  📄 FILE: src/Views/financeiro/minimal.php (1,801 bytes)
+  📁 DIR: src/Views/financeiro/notas_fiscais/
+  📄 FILE: src/Views/financeiro/notas_fiscais/create.php (29,159 bytes)
+  📄 FILE: src/Views/financeiro/notas_fiscais/edit.php (27,433 bytes)
+  📄 FILE: src/Views/financeiro/notas_fiscais/index.php (11,829 bytes)
+  📄 FILE: src/Views/financeiro/notas_fiscais/show.php (27,935 bytes)
+  📁 DIR: src/Views/financeiro/relatorios/
+  📄 FILE: src/Views/financeiro/relatorios/balancete.php (9,992 bytes)
+  📄 FILE: src/Views/financeiro/relatorios/dre.php (13,802 bytes)
+  📁 DIR: src/Views/includes/
+  📁 DIR: src/Views/layout/
+  📄 FILE: src/Views/layout/footer.php (638 bytes)
+  📄 FILE: src/Views/layout/header.php (917 bytes)
+  📁 DIR: src/Views/layouts/
+  📄 FILE: src/Views/layouts/footer.php (6,794 bytes)
+  📄 FILE: src/Views/layouts/header.php (10,888 bytes)
+  📁 DIR: src/Views/notas_fiscais/
+  📄 FILE: src/Views/notas_fiscais/index_simple.php (1,390 bytes)
+  📄 FILE: src/Views/notas_fiscais/minimal.php (1,803 bytes)
+  📁 DIR: src/Views/projetos/
+  📄 FILE: src/Views/projetos/create.php (15,438 bytes)
+  📄 FILE: src/Views/projetos/edit.php (15,447 bytes)
+  📁 DIR: src/Views/projetos/equipe/
+  📄 FILE: src/Views/projetos/equipe/index.php (3,997 bytes)
+  📁 DIR: src/Views/projetos/etapas/
+  📄 FILE: src/Views/projetos/etapas/index.php (2,854 bytes)
+  📁 DIR: src/Views/projetos/execucao/
+  📄 FILE: src/Views/projetos/execucao/index.php (3,495 bytes)
+  📄 FILE: src/Views/projetos/financeiro.php (21,792 bytes)
+  📄 FILE: src/Views/projetos/index.php (11,920 bytes)
+  📄 FILE: src/Views/projetos/index_simple.php (1,624 bytes)
+  📄 FILE: src/Views/projetos/minimal.php (1,798 bytes)
+  📁 DIR: src/Views/projetos/orcamento/
+  📄 FILE: src/Views/projetos/orcamento/index.php (3,348 bytes)
+  📄 FILE: src/Views/projetos/show.php (12,219 bytes)
+  📁 DIR: src/Views/relatorios/
+  📁 DIR: src/Views/servicos/
+  📄 FILE: src/Views/servicos/create.php (26,342 bytes)
+  📄 FILE: src/Views/servicos/edit.php (27,369 bytes)
+  📄 FILE: src/Views/servicos/index.php (23,281 bytes)
+  📄 FILE: src/Views/servicos/show.php (34,702 bytes)
+  📁 DIR: src/Views/servico-valores/
+  📄 FILE: src/Views/servico-valores/create.php (33 bytes)
+  📄 FILE: src/Views/servico-valores/edit.php (31 bytes)
+  📄 FILE: src/Views/servico-valores/index.php (6,518 bytes)
+  📄 FILE: src/Views/servico-valores/show.php (31 bytes)
+  📁 DIR: src/Views/usuarios/
+  📄 FILE: src/Views/usuarios/create.php (5,122 bytes)
+  📄 FILE: src/Views/usuarios/index.php (7,952 bytes)
+  ✅ Found 141 files
+
+3️⃣ Directory: public/
+  📄 FILE: public/auto_deploy_sprint31.php (16,870 bytes)
+  📄 FILE: public/check_atividades_table.php (1,508 bytes)
+  📄 FILE: public/check_projetos_table.php (1,496 bytes)
+  📄 FILE: public/clear_cache.php (1,767 bytes)
+  📁 DIR: public/css/
+  📄 FILE: public/css/dashboard.css (5,937 bytes)
+  📄 FILE: public/css/style.css (9,459 bytes)
+  📄 FILE: public/debug_route.php (4,116 bytes)
+  📄 FILE: public/fix_credentials_now.php (2,575 bytes)
+  📄 FILE: public/.htaccess (994 bytes)
+  📄 FILE: public/.htaccess_debug (231 bytes)
+  📄 FILE: public/.htaccess_disable_opcache (401 bytes)
+  📄 FILE: public/.htaccess_fixed (757 bytes)
+  📄 FILE: public/.htaccess_nocache (1,131 bytes)
+  📁 DIR: public/images/
+  ⏭️  SKIP: public/images/.gitkeep
+  📄 FILE: public/images/README.md (1,079 bytes)
+  📄 FILE: public/index_cache_killer.php (3,521 bytes)
+  📄 FILE: public/index_clean_1763077010.php (24,254 bytes)
+  📄 FILE: public/index_eval_bypass.php (3,182 bytes)
+  📄 FILE: public/index.php (548 bytes)
+  📄 FILE: public/index.php.sprint10.backup (28,572 bytes)
+  📄 FILE: public/index_sprint23.php (24,682 bytes)
+  📄 FILE: public/index_sprint31.php (3,932 bytes)
+  📄 FILE: public/index_unique_1763123588.php (23,858 bytes)
+  📄 FILE: public/index_unique_clean_1763123706.php (23,822 bytes)
+  📄 FILE: public/index_v2_1763076782.php (24,358 bytes)
+  📄 FILE: public/install.php (10,790 bytes)
+  📁 DIR: public/js/
+  📄 FILE: public/js/app.js (11,859 bytes)
+  📄 FILE: public/js/main.js (6,848 bytes)
+  📄 FILE: public/js/masks.js (8,130 bytes)
+  📄 FILE: public/js/validations.js (9,830 bytes)
+  📄 FILE: public/phpinfo_sprint30.php (17 bytes)
+  📄 FILE: public/php.ini (264 bytes)
+  📄 FILE: public/sprint30_diagnostic_test_12345.php (263 bytes)
+  📄 FILE: public/test_basic.php (377 bytes)
+  📄 FILE: public/test_database_exec.php (2,329 bytes)
+  📄 FILE: public/test_database_load.php (2,694 bytes)
+  📄 FILE: public/test_direct.html (308 bytes)
+  📄 FILE: public/teste_sprint31.php (164 bytes)
+  📄 FILE: public/test_exec_minimal.php (1,447 bytes)
+  📄 FILE: public/test_router.php (427 bytes)
+  📄 FILE: public/test_routes_direct.php (3,390 bytes)
+  📄 FILE: public/.user.ini (224 bytes)
+  ✅ Found 41 files
+
+4️⃣ Directory: config/
+  📄 FILE: config/app.php (2,205 bytes)
+  📄 FILE: config/cache_control.php (1,956 bytes)
+  📄 FILE: config/config.php (2,983 bytes)
+  📄 FILE: config/database.php (523 bytes)
+  📄 FILE: config/version.php (1,767 bytes)
+  ✅ Found 5 files
+
+5️⃣ Directory: vendor/
+  ⚠️  Error listing /public_html/prestadores/vendor: 450 /public_html/prestadores/vendor: No such file or directory
+  ✅ Found 0 files
+
+6️⃣ Directory: database/
+  ⚠️  Error listing /public_html/prestadores/database: 450 /public_html/prestadores/database: No such file or directory
+  ✅ Found 0 files
+
+======================================================================
+📊 SUMMARY:
+   Total files to download: 188
+   Total size: 2,382,972 bytes (2.27 MB)
+======================================================================
+
+⚠️  This will download 188 files to:
+   /home/user/webapp/migration_backup
+
+Proceed with download? (yes/no): 
+📥 Downloading files...
+======================================================================
+
+[1/188] .htaccess
+  Size: 1,126 bytes
+  ✅ Downloaded
+
+[2/188] src/Controllers/AtividadeController.php
+  Size: 11,478 bytes
+  ✅ Downloaded
+
+[3/188] src/Controllers/AuthController.php
+  Size: 4,177 bytes
+  ✅ Downloaded
+
+[4/188] src/Controllers/BaseController.php
+  Size: 3,662 bytes
+  ✅ Downloaded
+
+[5/188] src/Controllers/ContratoController.php
+  Size: 29,048 bytes
+  ✅ Downloaded
+
+[6/188] src/Controllers/DashboardController.php
+  Size: 13,332 bytes
+  ✅ Downloaded
+
+[7/188] src/Controllers/EmpresaPrestadoraController.php
+  Size: 21,742 bytes
+  ✅ Downloaded
+
+[8/188] src/Controllers/EmpresaTomadoraController.php
+  Size: 24,511 bytes
+  ✅ Downloaded
+
+[9/188] src/Controllers/FinanceiroController.php
+  Size: 52,449 bytes
+  ✅ Downloaded
+
+[10/188] src/Controllers/NotaFiscalController.php
+  Size: 32,894 bytes
+  ✅ Downloaded
+
+[11/188] src/Controllers/ProjetoController.php
+  Size: 15,240 bytes
+  ✅ Downloaded
+
+[12/188] src/Controllers/ProjetoEquipeController.php
+  Size: 4,692 bytes
+  ✅ Downloaded
+
+[13/188] src/Controllers/ProjetoEtapaController.php
+  Size: 5,410 bytes
+  ✅ Downloaded
+
+[14/188] src/Controllers/ProjetoExecucaoController.php
+  Size: 5,127 bytes
+  ✅ Downloaded
+
+[15/188] src/Controllers/ProjetoOrcamentoController.php
+  Size: 5,005 bytes
+  ✅ Downloaded
+
+[16/188] src/Controllers/ServicoController.php
+  Size: 16,245 bytes
+  ✅ Downloaded
+
+[17/188] src/Controllers/ServicoValorController.php
+  Size: 16,389 bytes
+  ✅ Downloaded
+
+[18/188] src/Controllers/UsuarioController.php
+  Size: 13,279 bytes
+  ✅ Downloaded
+
+[19/188] src/DatabaseMigration.php
+  Size: 10,815 bytes
+  ✅ Downloaded
+
+[20/188] src/DatabaseMigration_unique_1763123747.php
+  Size: 10,833 bytes
+  ✅ Downloaded
+
+[21/188] src/Database.php
+  Size: 4,656 bytes
+  ✅ Downloaded
+
+[22/188] src/Database_sprint31.php
+  Size: 3,865 bytes
+  ✅ Downloaded
+
+[23/188] src/Database_unique_1763123747.php
+  Size: 3,826 bytes
+  ✅ Downloaded
+
+[24/188] src/Helpers/FluxoCaixaHelper.php
+  Size: 16,486 bytes
+  ✅ Downloaded
+
+[25/188] src/helpers.php
+  Size: 4,646 bytes
+  ✅ Downloaded
+
+[26/188] src/Models/Atividade_BACKUP.php
+  Size: 26,200 bytes
+  ✅ Downloaded
+
+[27/188] src/Models/AtividadeFinanceiro.php
+  Size: 8,500 bytes
+  ✅ Downloaded
+
+[28/188] src/Models/Atividade.php
+  Size: 26,200 bytes
+  ✅ Downloaded
+
+[29/188] src/Models/BaseModel.php
+  Size: 1,318 bytes
+  ✅ Downloaded
+
+[30/188] src/Models/Boleto.php
+  Size: 36,869 bytes
+  ✅ Downloaded
+
+[31/188] src/Models/CategoriaFinanceira.php
+  Size: 17,587 bytes
+  ✅ Downloaded
+
+[32/188] src/Models/CentroCusto.php
+  Size: 19,558 bytes
+  ✅ Downloaded
+
+[33/188] src/Models/Cliente.php
+  Size: 6,884 bytes
+  ✅ Downloaded
+
+[34/188] src/Models/ConciliacaoBancaria.php
+  Size: 28,287 bytes
+  ✅ Downloaded
+
+[35/188] src/Models/ContaPagar.php
+  Size: 30,654 bytes
+  ✅ Downloaded
+
+[36/188] src/Models/ContaReceber.php
+  Size: 34,906 bytes
+  ✅ Downloaded
+
+[37/188] src/Models/ContratoFinanceiro.php
+  Size: 14,677 bytes
+  ✅ Downloaded
+
+[38/188] src/Models/Contrato.php
+  Size: 31,738 bytes
+  ✅ Downloaded
+
+[39/188] src/Models/Documento.php
+  Size: 11,842 bytes
+  ✅ Downloaded
+
+[40/188] src/Models/Empresa.php
+  Size: 7,807 bytes
+  ✅ Downloaded
+
+[41/188] src/Models/EmpresaPrestadora.php
+  Size: 17,049 bytes
+  ✅ Downloaded
+
+[42/188] src/Models/EmpresaTomadora.php
+  Size: 27,985 bytes
+  ✅ Downloaded
+
+[43/188] src/Models/Fornecedor.php
+  Size: 6,465 bytes
+  ✅ Downloaded
+
+[44/188] src/Models/LancamentoFinanceiro.php
+  Size: 35,845 bytes
+  ✅ Downloaded
+
+[45/188] src/Models/NotaFiscal_BACKUP.php
+  Size: 30,805 bytes
+  ✅ Downloaded
+
+[46/188] src/Models/NotaFiscal.php
+  Size: 30,805 bytes
+  ✅ Downloaded
+
+[47/188] src/Models/NotaFiscal.php.bak_fallback_v1
+  Size: 9,218 bytes
+  ✅ Downloaded
+
+[48/188] src/Models/NotaFiscal_SIMPLE_FALLBACK.php
+  Size: 9,218 bytes
+  ✅ Downloaded
+
+[49/188] src/Models/Pagamento.php
+  Size: 31,158 bytes
+  ✅ Downloaded
+
+[50/188] src/Models/ProjetoAnexo.php
+  Size: 5,381 bytes
+  ✅ Downloaded
+
+[51/188] src/Models/ProjetoAvaliacao.php
+  Size: 6,035 bytes
+  ✅ Downloaded
+
+[52/188] src/Models/Projeto_BACKUP.php
+  Size: 30,457 bytes
+  ✅ Downloaded
+
+[53/188] src/Models/ProjetoCategoria.php
+  Size: 2,936 bytes
+  ✅ Downloaded
+
+[54/188] src/Models/ProjetoEquipe.php
+  Size: 12,851 bytes
+  ✅ Downloaded
+
+[55/188] src/Models/ProjetoEtapa.php
+  Size: 18,659 bytes
+  ✅ Downloaded
+
+[56/188] src/Models/ProjetoExecucao.php
+  Size: 9,483 bytes
+  ✅ Downloaded
+
+[57/188] src/Models/ProjetoFinanceiro.php
+  Size: 13,718 bytes
+  ✅ Downloaded
+
+[58/188] src/Models/ProjetoOrcamento.php
+  Size: 14,080 bytes
+  ✅ Downloaded
+
+[59/188] src/Models/Projeto.php
+  Size: 30,457 bytes
+  ✅ Downloaded
+
+[60/188] src/Models/ProjetoRisco.php
+  Size: 3,968 bytes
+  ✅ Downloaded
+
+[61/188] src/Models/ProjetoTemplate.php
+  Size: 8,960 bytes
+  ✅ Downloaded
+
+[62/188] src/Models/Responsavel.php
+  Size: 7,869 bytes
+  ✅ Downloaded
+
+[63/188] src/Models/Servico.php
+  Size: 15,721 bytes
+  ✅ Downloaded
+
+[64/188] src/Models/ServicoValor.php
+  Size: 16,651 bytes
+  ✅ Downloaded
+
+[65/188] src/Models/Usuario.php
+  Size: 8,888 bytes
+  ✅ Downloaded
+
+[66/188] src/Views/atividades/custos.php
+  Size: 21,234 bytes
+  ✅ Downloaded
+
+[67/188] src/Views/atividades/index.php
+  Size: 12,474 bytes
+  ✅ Downloaded
+
+[68/188] src/Views/atividades/index_simple.php
+  Size: 1,344 bytes
+  ✅ Downloaded
+
+[69/188] src/Views/atividades/minimal.php
+  Size: 1,794 bytes
+  ✅ Downloaded
+
+[70/188] src/Views/auth/forgot_password.php
+  Size: 2,457 bytes
+  ✅ Downloaded
+
+[71/188] src/Views/auth/login.php
+  Size: 8,613 bytes
+  ✅ Downloaded
+
+[72/188] src/Views/auth/register.php
+  Size: 4,993 bytes
+  ✅ Downloaded
+
+[73/188] src/Views/auth/reset_password.php
+  Size: 3,136 bytes
+  ✅ Downloaded
+
+[74/188] src/Views/contratos/create.php
+  Size: 24,254 bytes
+  ✅ Downloaded
+
+[75/188] src/Views/contratos/edit.php
+  Size: 24,819 bytes
+  ✅ Downloaded
+
+[76/188] src/Views/contratos/faturamento.php
+  Size: 17,631 bytes
+  ✅ Downloaded
+
+[77/188] src/Views/contratos/index.php
+  Size: 26,144 bytes
+  ✅ Downloaded
+
+[78/188] src/Views/contratos/show.php
+  Size: 32,461 bytes
+  ✅ Downloaded
+
+[79/188] src/Views/dashboard/index.php
+  Size: 23,892 bytes
+  ✅ Downloaded
+
+[80/188] src/Views/empresas-prestadoras/create.php
+  Size: 16,231 bytes
+  ✅ Downloaded
+
+[81/188] src/Views/empresas-prestadoras/edit.php
+  Size: 16,734 bytes
+  ✅ Downloaded
+
+[82/188] src/Views/empresas-prestadoras/index.php
+  Size: 16,143 bytes
+  ✅ Downloaded
+
+[83/188] src/Views/empresas-prestadoras/show.php
+  Size: 28,832 bytes
+  ✅ Downloaded
+
+[84/188] src/Views/empresas-tomadoras/create.php
+  Size: 16,215 bytes
+  ✅ Downloaded
+
+[85/188] src/Views/empresas-tomadoras/edit.php
+  Size: 16,718 bytes
+  ✅ Downloaded
+
+[86/188] src/Views/empresas-tomadoras/index.php
+  Size: 13,179 bytes
+  ✅ Downloaded
+
+[87/188] src/Views/empresas-tomadoras/show.php
+  Size: 28,809 bytes
+  ✅ Downloaded
+
+[88/188] src/Views/financeiro/boletos/index.php
+  Size: 10,471 bytes
+  ✅ Downloaded
+
+[89/188] src/Views/financeiro/boletos/show.php
+  Size: 13,941 bytes
+  ✅ Downloaded
+
+[90/188] src/Views/financeiro/categorias/create.php
+  Size: 13,931 bytes
+  ✅ Downloaded
+
+[91/188] src/Views/financeiro/categorias/edit.php
+  Size: 16,052 bytes
+  ✅ Downloaded
+
+[92/188] src/Views/financeiro/categorias/index.php
+  Size: 15,646 bytes
+  ✅ Downloaded
+
+[93/188] src/Views/financeiro/conciliacoes/importar.php
+  Size: 14,926 bytes
+  ✅ Downloaded
+
+[94/188] src/Views/financeiro/conciliacoes/index.php
+  Size: 8,492 bytes
+  ✅ Downloaded
+
+[95/188] src/Views/financeiro/conciliacoes/show.php
+  Size: 19,942 bytes
+  ✅ Downloaded
+
+[96/188] src/Views/financeiro/contas_pagar/create.php
+  Size: 15,117 bytes
+  ✅ Downloaded
+
+[97/188] src/Views/financeiro/contas_pagar/edit.php
+  Size: 18,859 bytes
+  ✅ Downloaded
+
+[98/188] src/Views/financeiro/contas_pagar/index.php
+  Size: 14,736 bytes
+  ✅ Downloaded
+
+[99/188] src/Views/financeiro/contas_pagar/show.php
+  Size: 22,338 bytes
+  ✅ Downloaded
+
+[100/188] src/Views/financeiro/contas_receber/create.php
+  Size: 19,509 bytes
+  ✅ Downloaded
+
+[101/188] src/Views/financeiro/contas_receber/edit.php
+  Size: 25,208 bytes
+  ✅ Downloaded
+
+[102/188] src/Views/financeiro/contas_receber/index.php
+  Size: 16,685 bytes
+  ✅ Downloaded
+
+[103/188] src/Views/financeiro/contas_receber/show.php
+  Size: 26,341 bytes
+  ✅ Downloaded
+
+[104/188] src/Views/financeiro/fluxo_caixa/index.php
+  Size: 15,826 bytes
+  ✅ Downloaded
+
+[105/188] src/Views/financeiro/index.php
+  Size: 12,716 bytes
+  ✅ Downloaded
+
+[106/188] src/Views/financeiro/index_simple.php
+  Size: 1,382 bytes
+  ✅ Downloaded
+
+[107/188] src/Views/financeiro/lancamentos/create.php
+  Size: 19,922 bytes
+  ✅ Downloaded
+
+[108/188] src/Views/financeiro/lancamentos/index.php
+  Size: 16,664 bytes
+  ✅ Downloaded
+
+[109/188] src/Views/financeiro/minimal.php
+  Size: 1,801 bytes
+  ✅ Downloaded
+
+[110/188] src/Views/financeiro/notas_fiscais/create.php
+  Size: 29,159 bytes
+  ✅ Downloaded
+
+[111/188] src/Views/financeiro/notas_fiscais/edit.php
+  Size: 27,433 bytes
+  ✅ Downloaded
+
+[112/188] src/Views/financeiro/notas_fiscais/index.php
+  Size: 11,829 bytes
+  ✅ Downloaded
+
+[113/188] src/Views/financeiro/notas_fiscais/show.php
+  Size: 27,935 bytes
+  ✅ Downloaded
+
+[114/188] src/Views/financeiro/relatorios/balancete.php
+  Size: 9,992 bytes
+  ✅ Downloaded
+
+[115/188] src/Views/financeiro/relatorios/dre.php
+  Size: 13,802 bytes
+  ✅ Downloaded
+
+[116/188] src/Views/layout/footer.php
+  Size: 638 bytes
+  ✅ Downloaded
+
+[117/188] src/Views/layout/header.php
+  Size: 917 bytes
+  ✅ Downloaded
+
+[118/188] src/Views/layouts/footer.php
+  Size: 6,794 bytes
+  ✅ Downloaded
+
+[119/188] src/Views/layouts/header.php
+  Size: 10,888 bytes
+  ✅ Downloaded
+
+[120/188] src/Views/notas_fiscais/index_simple.php
+  Size: 1,390 bytes
+  ✅ Downloaded
+
+[121/188] src/Views/notas_fiscais/minimal.php
+  Size: 1,803 bytes
+  ✅ Downloaded
+
+[122/188] src/Views/projetos/create.php
+  Size: 15,438 bytes
+  ✅ Downloaded
+
+[123/188] src/Views/projetos/edit.php
+  Size: 15,447 bytes
+  ✅ Downloaded
+
+[124/188] src/Views/projetos/equipe/index.php
+  Size: 3,997 bytes
+  ✅ Downloaded
+
+[125/188] src/Views/projetos/etapas/index.php
+  Size: 2,854 bytes
+  ✅ Downloaded
+
+[126/188] src/Views/projetos/execucao/index.php
+  Size: 3,495 bytes
+  ✅ Downloaded
+
+[127/188] src/Views/projetos/financeiro.php
+  Size: 21,792 bytes
+  ✅ Downloaded
+
+[128/188] src/Views/projetos/index.php
+  Size: 11,920 bytes
+  ✅ Downloaded
+
+[129/188] src/Views/projetos/index_simple.php
+  Size: 1,624 bytes
+  ✅ Downloaded
+
+[130/188] src/Views/projetos/minimal.php
+  Size: 1,798 bytes
+  ✅ Downloaded
+
+[131/188] src/Views/projetos/orcamento/index.php
+  Size: 3,348 bytes
+  ✅ Downloaded
+
+[132/188] src/Views/projetos/show.php
+  Size: 12,219 bytes
+  ✅ Downloaded
+
+[133/188] src/Views/servicos/create.php
+  Size: 26,342 bytes
+  ✅ Downloaded
+
+[134/188] src/Views/servicos/edit.php
+  Size: 27,369 bytes
+  ✅ Downloaded
+
+[135/188] src/Views/servicos/index.php
+  Size: 23,281 bytes
+  ✅ Downloaded
+
+[136/188] src/Views/servicos/show.php
+  Size: 34,702 bytes
+  ✅ Downloaded
+
+[137/188] src/Views/servico-valores/create.php
+  Size: 33 bytes
+  ✅ Downloaded
+
+[138/188] src/Views/servico-valores/edit.php
+  Size: 31 bytes
+  ✅ Downloaded
+
+[139/188] src/Views/servico-valores/index.php
+  Size: 6,518 bytes
+  ✅ Downloaded
+
+[140/188] src/Views/servico-valores/show.php
+  Size: 31 bytes
+  ✅ Downloaded
+
+[141/188] src/Views/usuarios/create.php
+  Size: 5,122 bytes
+  ✅ Downloaded
+
+[142/188] src/Views/usuarios/index.php
+  Size: 7,952 bytes
+  ✅ Downloaded
+
+[143/188] public/auto_deploy_sprint31.php
+  Size: 16,870 bytes
+  ✅ Downloaded
+
+[144/188] public/check_atividades_table.php
+  Size: 1,508 bytes
+  ✅ Downloaded
+
+[145/188] public/check_projetos_table.php
+  Size: 1,496 bytes
+  ✅ Downloaded
+
+[146/188] public/clear_cache.php
+  Size: 1,767 bytes
+  ✅ Downloaded
+
+[147/188] public/css/dashboard.css
+  Size: 5,937 bytes
+  ✅ Downloaded
+
+[148/188] public/css/style.css
+  Size: 9,459 bytes
+  ✅ Downloaded
+
+[149/188] public/debug_route.php
+  Size: 4,116 bytes
+  ✅ Downloaded
+
+[150/188] public/fix_credentials_now.php
+  Size: 2,575 bytes
+  ✅ Downloaded
+
+[151/188] public/.htaccess
+  Size: 994 bytes
+  ✅ Downloaded
+
+[152/188] public/.htaccess_debug
+  Size: 231 bytes
+  ✅ Downloaded
+
+[153/188] public/.htaccess_disable_opcache
+  Size: 401 bytes
+  ✅ Downloaded
+
+[154/188] public/.htaccess_fixed
+  Size: 757 bytes
+  ✅ Downloaded
+
+[155/188] public/.htaccess_nocache
+  Size: 1,131 bytes
+  ✅ Downloaded
+
+[156/188] public/images/README.md
+  Size: 1,079 bytes
+  ✅ Downloaded
+
+[157/188] public/index_cache_killer.php
+  Size: 3,521 bytes
+  ✅ Downloaded
+
+[158/188] public/index_clean_1763077010.php
+  Size: 24,254 bytes
+  ✅ Downloaded
+
+[159/188] public/index_eval_bypass.php
+  Size: 3,182 bytes
+  ✅ Downloaded
+
+[160/188] public/index.php
+  Size: 548 bytes
+  ✅ Downloaded
+
+[161/188] public/index.php.sprint10.backup
+  Size: 28,572 bytes
+  ✅ Downloaded
+
+[162/188] public/index_sprint23.php
+  Size: 24,682 bytes
+  ✅ Downloaded
+
+[163/188] public/index_sprint31.php
+  Size: 3,932 bytes
+  ✅ Downloaded
+
+[164/188] public/index_unique_1763123588.php
+  Size: 23,858 bytes
+  ✅ Downloaded
+
+[165/188] public/index_unique_clean_1763123706.php
+  Size: 23,822 bytes
+  ✅ Downloaded
+
+[166/188] public/index_v2_1763076782.php
+  Size: 24,358 bytes
+  ✅ Downloaded
+
+[167/188] public/install.php
+  Size: 10,790 bytes
+  ✅ Downloaded
+
+[168/188] public/js/app.js
+  Size: 11,859 bytes
+  ✅ Downloaded
+
+[169/188] public/js/main.js
+  Size: 6,848 bytes
+  ✅ Downloaded
+
+[170/188] public/js/masks.js
+  Size: 8,130 bytes
+  ✅ Downloaded
+
+[171/188] public/js/validations.js
+  Size: 9,830 bytes
+  ✅ Downloaded
+
+[172/188] public/phpinfo_sprint30.php
+  Size: 17 bytes
+  ✅ Downloaded
+
+[173/188] public/php.ini
+  Size: 264 bytes
+  ✅ Downloaded
+
+[174/188] public/sprint30_diagnostic_test_12345.php
+  Size: 263 bytes
+  ✅ Downloaded
+
+[175/188] public/test_basic.php
+  Size: 377 bytes
+  ✅ Downloaded
+
+[176/188] public/test_database_exec.php
+  Size: 2,329 bytes
+  ✅ Downloaded
+
+[177/188] public/test_database_load.php
+  Size: 2,694 bytes
+  ✅ Downloaded
+
+[178/188] public/test_direct.html
+  Size: 308 bytes
+  ✅ Downloaded
+
+[179/188] public/teste_sprint31.php
+  Size: 164 bytes
+  ✅ Downloaded
+
+[180/188] public/test_exec_minimal.php
+  Size: 1,447 bytes
+  ✅ Downloaded
+
+[181/188] public/test_router.php
+  Size: 427 bytes
+  ✅ Downloaded
+
+[182/188] public/test_routes_direct.php
+  Size: 3,390 bytes
+  ✅ Downloaded
+
+[183/188] public/.user.ini
+  Size: 224 bytes
+  ✅ Downloaded
+
+[184/188] config/app.php
+  Size: 2,205 bytes
+  ✅ Downloaded
+
+[185/188] config/cache_control.php
+  Size: 1,956 bytes
+  ✅ Downloaded
+
+[186/188] config/config.php
+  Size: 2,983 bytes
+  ✅ Downloaded
+
+[187/188] config/database.php
+  Size: 523 bytes
+  ✅ Downloaded
+
+[188/188] config/version.php
+  Size: 1,767 bytes
+  ✅ Downloaded
+
+======================================================================
+✅ DOWNLOAD COMPLETE!
+   Success: 188 files
+   Failed: 0 files
+   Location: /home/user/webapp/migration_backup
+======================================================================

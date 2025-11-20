@@ -1,0 +1,16 @@
+# Sprint 23 - Disable OPcache
+# Força PHP a não usar cache e sempre ler arquivos do disco
+
+<IfModule mod_php7.c>
+    php_flag opcache.enable Off
+    php_flag opcache.enable_cli Off
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_flag opcache.enable Off
+    php_flag opcache.enable_cli Off
+</IfModule>
+
+# Alternative: Use SetEnv
+SetEnv PHP_VALUE "opcache.enable=0"
+SetEnv PHP_VALUE "opcache.enable_cli=0"

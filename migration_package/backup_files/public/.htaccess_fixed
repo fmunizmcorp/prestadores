@@ -1,0 +1,30 @@
+# Clinfec Prestadores - .htaccess
+# Sprint 33 - Fixed version to handle all requests
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /prestadores/
+    
+    # Allow direct access to existing files and directories
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Route everything else to index.php
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# Security settings
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|sql)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Disable directory listing
+Options -Indexes
+
+# PHP settings (if allowed)
+<IfModule mod_php.c>
+    php_flag display_errors On
+    php_flag log_errors On
+    php_value error_log /home/user/prestadores_errors.log
+</IfModule>

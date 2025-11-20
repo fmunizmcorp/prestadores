@@ -35,11 +35,11 @@ class CentroCusto
     
     /**
      * Construtor
+     * SPRINT 73: Fix Bug #23 - Use Database::getInstance()
      */
     public function __construct()
     {
-        global $db;
-        $this->db = $db;
+        $this->db = \App\Database::getInstance()->getConnection();
     }
     
     /**

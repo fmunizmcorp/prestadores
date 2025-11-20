@@ -1,0 +1,139 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║         SPRINT 66 - BUG #7 FIX - QUICK DEPLOYMENT GUIDE          ║
+║                 Login Crítico Bloqueador - URGENT                 ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+📋 PROBLEMA:
+   Login quebrado em produção - Sistema 100% inacessível
+   Root Cause: Database.php sem métodos prepare(), query(), exec()
+
+🎯 SOLUÇÃO:
+   1. Upload Database.php corrigido
+   2. Criar 4 usuários de teste
+   3. Reload PHP-FPM
+   4. Clear OPcache
+
+═══════════════════════════════════════════════════════════════════
+
+🚀 MÉTODO RÁPIDO - SCRIPT AUTOMATIZADO:
+═══════════════════════════════════════════════════════════════════
+
+1. Dar acesso SSH ao servidor:
+   ssh root@72.61.53.222
+
+2. Executar script:
+   ./fix_bug7_deploy.sh
+
+3. Testar login:
+   https://prestadores.clinfec.com.br
+   master@clinfec.com.br / password
+
+═══════════════════════════════════════════════════════════════════
+
+📋 MÉTODO MANUAL - PASSO A PASSO:
+═══════════════════════════════════════════════════════════════════
+
+PASSO 1: Upload Database.php
+──────────────────────────────
+Local:  Database.php (neste pacote)
+Remoto: /opt/webserver/sites/prestadores/src/Database.php
+
+Via SCP:
+  scp Database.php root@72.61.53.222:/opt/webserver/sites/prestadores/src/
+
+Ou via FTP/SFTP:
+  Host: 72.61.53.222
+  User: root
+  Destino: /opt/webserver/sites/prestadores/src/
+
+PASSO 2: Criar Usuários
+──────────────────────────────
+SSH no servidor:
+  ssh root@72.61.53.222
+
+Upload SQL:
+  scp create_test_users.sql root@72.61.53.222:/opt/webserver/sites/prestadores/database/
+
+Executar SQL:
+  cd /opt/webserver/sites/prestadores
+  mysql -u user_prestadores -prN8u7u0ogbFPN3lfYqtF6wuAn5uJZFFP db_prestadores < database/create_test_users.sql
+
+PASSO 3: Reload PHP-FPM
+──────────────────────────────
+No servidor VPS:
+  systemctl reload php8.3-fpm-prestadores
+
+PASSO 4: Clear OPcache
+──────────────────────────────
+No servidor VPS:
+  echo "<?php opcache_reset(); echo 'OK'; ?>" | php8.3
+
+═══════════════════════════════════════════════════════════════════
+
+🧪 VALIDAÇÃO:
+═══════════════════════════════════════════════════════════════════
+
+Teste 1: Login Master
+  URL: https://prestadores.clinfec.com.br
+  Email: master@clinfec.com.br
+  Senha: password
+  ✅ Deve redirecionar para dashboard
+
+Teste 2: Login Admin
+  URL: https://prestadores.clinfec.com.br
+  Email: admin@clinfec.com.br
+  Senha: admin123
+  ✅ Deve redirecionar para dashboard
+
+═══════════════════════════════════════════════════════════════════
+
+📊 USUÁRIOS DE TESTE CRIADOS:
+═══════════════════════════════════════════════════════════════════
+
+| Email                      | Senha    | Role    |
+|----------------------------|----------|---------|
+| master@clinfec.com.br      | password | master  |
+| admin@clinfec.com.br       | admin123 | admin   |
+| gestor@clinfec.com.br      | password | gestor  |
+| usuario@clinfec.com.br     | password | usuario |
+
+═══════════════════════════════════════════════════════════════════
+
+⚠️  TROUBLESHOOTING:
+═══════════════════════════════════════════════════════════════════
+
+Se login ainda falha:
+  1. Verificar Database.php foi uploadado
+     grep "public function prepare" /opt/webserver/sites/prestadores/src/Database.php
+  
+  2. Verificar usuários foram criados
+     mysql -u user_prestadores -prN8u7u0ogbFPN3lfYqtF6wuAn5uJZFFP db_prestadores \
+       -e "SELECT id,nome,email,role FROM usuarios WHERE email LIKE '%@clinfec.com.br';"
+  
+  3. Verificar logs de erro
+     tail -50 /var/log/php8.3-fpm-prestadores.log
+     tail -50 /var/log/nginx/prestadores_error.log
+
+═══════════════════════════════════════════════════════════════════
+
+📖 DOCUMENTAÇÃO COMPLETA:
+═══════════════════════════════════════════════════════════════════
+
+Consulte README.md neste pacote para:
+  - Métodos alternativos de deployment
+  - Troubleshooting detalhado
+  - Checklist completo
+  - Logs e validação
+
+═══════════════════════════════════════════════════════════════════
+
+🔗 REFERÊNCIAS:
+═══════════════════════════════════════════════════════════════════
+
+GitHub PR: https://github.com/fmunizmcorp/prestadores/pull/7
+Commit: 76d986e
+Sprint: 66
+Data: 2025-11-16
+Status: 🟡 READY FOR DEPLOYMENT
+
+═══════════════════════════════════════════════════════════════════

@@ -9,6 +9,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="/public/css/style.css">
     
+    <!-- Google reCAPTCHA v2 - Sprint 65 -->
+    <?php 
+    $recaptchaConfig = require __DIR__ . '/../../../config/app.php';
+    $recaptchaEnabled = $recaptchaConfig['recaptcha']['enabled'] ?? false;
+    $recaptchaSiteKey = $recaptchaConfig['recaptcha']['site_key'] ?? '';
+    $recaptchaSkipDev = $recaptchaConfig['recaptcha']['skip_in_development'] ?? false;
+    ?>
+    <?php if ($recaptchaEnabled && !empty($recaptchaSiteKey)): ?>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <?php endif; ?>
+    
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -68,7 +79,7 @@
                             <?php unset($_SESSION['info']); ?>
                         <?php endif; ?>
                         
-                        <form method="POST" action="<?= (defined('BASE_URL') ? BASE_URL : '') ?>/login" class="needs-validation" novalidate>
+                        <form method="POST" action="<?= (defined('BASE_URL') ? BASE_URL : '') ?>/?page=login" class="needs-validation" novalidate>
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                             
                             <div class="mb-3">
@@ -119,6 +130,18 @@
                                 </label>
                             </div>
                             
+                            <!-- Google reCAPTCHA v2 Widget - Sprint 65 -->
+                            <?php if ($recaptchaEnabled && !empty($recaptchaSiteKey)): ?>
+                            <div class="mb-3 d-flex justify-content-center">
+                                <div class="g-recaptcha" data-sitekey="<?= htmlspecialchars($recaptchaSiteKey) ?>"></div>
+                            </div>
+                            <?php if ($recaptchaSkipDev): ?>
+                            <div class="alert alert-warning alert-sm text-center py-1 mb-3">
+                                <small><i class="fas fa-exclamation-triangle"></i> reCAPTCHA em modo desenvolvimento (validação desabilitada)</small>
+                            </div>
+                            <?php endif; ?>
+                            <?php endif; ?>
+                            
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary btn-lg">
                                     <i class="fas fa-sign-in-alt"></i> Entrar
@@ -129,7 +152,7 @@
                         <hr class="my-4">
                         
                         <div class="text-center">
-                            <a href="<?= (defined('BASE_URL') ? BASE_URL : '') ?>/recuperar-senha" class="text-decoration-none">
+                            <a href="<?= (defined('BASE_URL') ? BASE_URL : '') ?>/?page=recuperar-senha" class="text-decoration-none">
                                 <i class="fas fa-key"></i> Esqueci minha senha
                             </a>
                         </div>

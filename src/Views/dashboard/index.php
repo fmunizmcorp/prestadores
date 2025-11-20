@@ -179,6 +179,7 @@ $stats = [
                 try {
                     $projetoModel = new App\Models\Projeto();
                     $projetosAtivos = $projetoModel->all(['status' => 'execucao'], 1, 5);
+                    $projetosAtivos = is_array($projetosAtivos) ? $projetosAtivos : [];
                     if (empty($projetosAtivos)):
                 ?>
                     <div class="alert alert-secondary mb-0">
@@ -221,6 +222,7 @@ $stats = [
                 try {
                     $atividadeModel = new App\Models\Atividade();
                     $atividadesPendentes = $atividadeModel->all(['status' => 'pendente'], 1, 5);
+                    $atividadesPendentes = is_array($atividadesPendentes) ? $atividadesPendentes : [];
                     if (empty($atividadesPendentes)):
                 ?>
                     <div class="alert alert-success mb-0">
@@ -263,6 +265,7 @@ $stats = [
                 try {
                     $nfModel = new App\Models\NotaFiscal();
                     $notasRecentes = $nfModel->all([], 1, 5);
+                    $notasRecentes = is_array($notasRecentes) ? $notasRecentes : [];
                     if (empty($notasRecentes)):
                 ?>
                     <div class="alert alert-secondary mb-0">
@@ -309,6 +312,7 @@ $stats = [
             <div class="card-body">
                 <?php
                 $contratosVencendo = $contratoModel->getVencendo(90);
+                $contratosVencendo = is_array($contratosVencendo) ? $contratosVencendo : [];
                 if (empty($contratosVencendo)):
                 ?>
                     <div class="alert alert-success mb-0">
